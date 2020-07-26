@@ -28,9 +28,9 @@ public class HomeScreenViewModel extends ViewModel {
 //    public LiveData<List<Azan>> getAzanTimesForCurrentDay() {
 //        return mRepository.getTimeTableForCurrentDay();
 //    }
-//
-//    public LiveData<List<Azan>> getAnnualCalendar() {
-//        return mRepository.getAnnualTables();
-//    }
+
+    public LiveData<List<Azan>> getAnnualCalendar() {
+        return mRepository.getAnnualTables();
+    }
 
 }

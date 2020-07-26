@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="currentDate"
+            type="String" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".view.HomeFragment">
+
+        <TextView
+            android:id="@+id/date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@{currentDate}"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="150dp" />
+
+
+        <TextView
+            android:id="@+id/fajr_name"
+            style="@style/prayer_name"
+            android:text="Fajr"
+            app:layout_constraintEnd_toStartOf="@+id/fajr_time"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline_horizontal" />
+
+        <ImageButton
+            android:id="@+id/fajr_btn"
+            style="@style/prayer_btn"
+            android:src="@drawable/ic_volume_off"
+            app:layout_constraintBottom_toBottomOf="@+id/fajr_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/fajr_time"
+            app:layout_constraintTop_toTopOf="@+id/fajr_time" />
+
+        <TextView
+            android:id="@+id/fajr_time"
+            style="@style/prayer_time"
+            android:text="00:00 AM"
+            app:layout_constraintBottom_toBottomOf="@+id/fajr_name"
+            app:layout_constraintEnd_toStartOf="@+id/fajr_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/fajr_name"
+            app:layout_constraintTop_toTopOf="@+id/fajr_name" />
+
+
+        <TextView
+            android:id="@+id/zhuhr_name"
+            style="@style/prayer_name"
+            android:text="Zhuhr"
+            app:layout_constraintEnd_toStartOf="@+id/zhuhr_time"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fajr_name" />
+
+        <ImageButton
+            android:id="@+id/zhuhr_btn"
+            style="@style/prayer_btn"
+            android:src="@drawable/ic_volume_off"
+            app:layout_constraintBottom_toBottomOf="@+id/zhuhr_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/zhuhr_time"
+            app:layout_constraintTop_toTopOf="@+id/zhuhr_time" />
+
+        <TextView
+            android:id="@+id/zhuhr_time"
+            style="@style/prayer_time"
+            android:text="00:00 AM"
+            app:layout_constraintBottom_toBottomOf="@+id/zhuhr_name"
+            app:layout_constraintEnd_toStartOf="@+id/zhuhr_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/zhuhr_name"
+            app:layout_constraintTop_toTopOf="@+id/zhuhr_name" />
+
+
+        <TextView
+            android:id="@+id/asr_name"
+            style="@style/prayer_name"
+            android:text="Asr"
+            app:layout_constraintEnd_toStartOf="@+id/asr_time"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/zhuhr_name" />
+
+        <ImageButton
+            android:id="@+id/asr_btn"
+            style="@style/prayer_btn"
+            android:src="@drawable/ic_volume_off"
+            app:layout_constraintBottom_toBottomOf="@+id/asr_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/asr_time"
+            app:layout_constraintTop_toTopOf="@+id/asr_time" />
+
+        <TextView
+            android:id="@+id/asr_time"
+            style="@style/prayer_time"
+            android:text="00:00 AM"
+            app:layout_constraintBottom_toBottomOf="@+id/asr_name"
+            app:layout_constraintEnd_toStartOf="@+id/asr_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/asr_name"
+            app:layout_constraintTop_toTopOf="@+id/asr_name" />
+
+
+        <TextView
+            android:id="@+id/maghrib_name"
+            style="@style/prayer_name"
+            android:text="Maghrib"
+            app:layout_constraintEnd_toStartOf="@+id/maghrib_time"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/asr_name" />
+
+        <ImageButton
+            android:id="@+id/maghrib_btn"
+            style="@style/prayer_btn"
+            android:src="@drawable/ic_volume_off"
+            app:layout_constraintBottom_toBottomOf="@+id/maghrib_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/maghrib_time"
+            app:layout_constraintTop_toTopOf="@+id/maghrib_time" />
+
+        <TextView
+            android:id="@+id/maghrib_time"
+            style="@style/prayer_time"
+            android:text="00:00 AM"
+            app:layout_constraintBottom_toBottomOf="@+id/maghrib_name"
+            app:layout_constraintEnd_toStartOf="@+id/maghrib_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/maghrib_name"
+            app:layout_constraintTop_toTopOf="@+id/maghrib_name" />
+
+
+        <TextView
+            android:id="@+id/isha_name"
+            style="@style/prayer_name"
+            android:text="Isha"
+            app:layout_constraintEnd_toStartOf="@+id/isha_time"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/maghrib_name" />
+
+        <ImageButton
+            android:id="@+id/isha_btn"
+            style="@style/prayer_btn"
+            android:src="@drawable/ic_volume_off"
+            app:layout_constraintBottom_toBottomOf="@+id/isha_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/isha_time"
+            app:layout_constraintTop_toTopOf="@+id/isha_time" />
+
+        <TextView
+            android:id="@+id/isha_time"
+            style="@style/prayer_time"
+            android:text="00:00 AM"
+            app:layout_constraintBottom_toBottomOf="@+id/isha_name"
+            app:layout_constraintEnd_toStartOf="@+id/isha_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/isha_name"
+            app:layout_constraintTop_toTopOf="@+id/isha_name" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

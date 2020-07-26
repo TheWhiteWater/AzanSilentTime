@@ -1,0 +1,60 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Location">
+
+        <EditTextPreference
+            android:summary="Tap to change"
+            app:key="location"
+            app:title="Your location"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            app:key="auto_detect_location"
+            app:summary="Requires location tracking permission"
+            app:title="Auto detect your location"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Mute Mode Options">
+
+        <SwitchPreference
+            app:key="auto_mute"
+            app:summary="Requires location autodetect"
+            app:title="Auto mute in prayer locations"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            app:key="auto_reply"
+            app:title="Auto reply missed calls"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:defaultValue="Sorry, I'm busy now. I'll call back later"
+            android:summary="Tap to change"
+            app:key="auto_reply_message"
+            app:title="Reply message"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Mute Timings">
+
+        <DropDownPreference
+            android:entries="@array/mute_period_entries"
+            android:entryValues="@array/mute_period_values"
+            android:key="mute_period"
+            android:title="Mute period"
+            app:useSimpleSummaryProvider="true" />
+
+        <DropDownPreference
+            android:entries="@array/notification_entries"
+            android:entryValues="@array/notification_values"
+            android:key="notification_period"
+            android:title="Notification period"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

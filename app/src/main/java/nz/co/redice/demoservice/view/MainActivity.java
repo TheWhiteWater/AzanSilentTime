@@ -1,45 +1,49 @@
 package nz.co.redice.demoservice.view;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-import javax.inject.Inject;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
+
+import java.util.Arrays;
+import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import nz.co.redice.demoservice.repo.Repository;
-import nz.co.redice.demoservice.utils.Converters;
-import nz.co.redice.demoservice.R;
-import nz.co.redice.demoservice.service.Service;
-import nz.co.redice.demoservice.viewmodel.HomeScreenViewModel;
+import nz.co.redice.demoservice.databinding.ActivityMainBinding;
+import nz.co.redice.demoservice.view.presentation.Category;
+import nz.co.redice.demoservice.view.presentation.PagerAdapter;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
-    private HomeScreenViewModel mViewModel;
+    private PagerAdapter mPagerAdapter;
+    private ViewPager2 mViewPager;
+    private ActivityMainBinding mBinding;
 
-    @Inject
-    Repository mRepository;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        Intent intent = new Intent(this, Service.class);
-        startService(intent);
-        mViewModel = new ViewModelProvider(this).get(HomeScreenViewModel.class);
-        mRepository.requestAnnualCalendar(-40.3596, 175.61);
 
-//        mViewModel.getAnnualCalendar().observe(this, new Observer<List<AzanDay>>() {
-//            @Override
-//            public void onChanged(List<AzanDay> azanDays) {
-//                Log.d("App", "onChanged: " + azanDays.size());
-//            }
-//        });
+        List<Category> categories = Arrays.asList(
+                Category.HOME,
+                Category.SETTINGS);
+
+        mPagerAdapter = new PagerAdapter(this, categories);
+        mViewPager = mBinding.viewpager;
+        mViewPager.setAdapter(mPagerAdapter);
+
+//        TabLayout tabLayout = mBinding.tablayout;
+//        new TabLayoutMediator(tabLayout, mViewPager,
+//                ((tab, position) -> tab.setText(categories.get(position).toString()))).attach();
+
+
+
+
 
     }
 }

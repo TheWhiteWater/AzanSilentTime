@@ -1,10 +1,11 @@
 
 package nz.co.redice.demoservice.repo.local.models;
 
+import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Gregorian {
+public class Hijri {
 
     @SerializedName("date")
     @Expose
@@ -17,15 +18,18 @@ public class Gregorian {
     public String day;
     @SerializedName("weekday")
     @Expose
-    public Weekday weekday;
+    public Weekday_ weekday;
     @SerializedName("month")
     @Expose
-    public Month month;
+    public Month_ month;
     @SerializedName("year")
     @Expose
     public String year;
     @SerializedName("designation")
     @Expose
-    public Designation designation;
+    public Designation_ designation;
+    @SerializedName("holidays")
+    @Expose
+    public List<Object> holidays = null;
 
 }

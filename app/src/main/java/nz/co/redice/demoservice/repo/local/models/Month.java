@@ -4,13 +4,13 @@ package nz.co.redice.demoservice.repo.local.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Entry {
+public class Month {
 
-    @SerializedName("timings")
+    @SerializedName("number")
     @Expose
-    public Timings timings;
-    @SerializedName("date")
+    public Integer number;
+    @SerializedName("en")
     @Expose
-    public Date date;
+    public String en;
 
 }

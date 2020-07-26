@@ -32,7 +32,6 @@ public class Service extends android.app.Service {
     @Override
     public void onCreate() {
         super.onCreate();
-//        mPermissionHelper = new PermissionHelper(this);
         mPermissionHelper.getDNDPermission();
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         muteAllStreams();

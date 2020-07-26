@@ -15,4 +15,8 @@ public class Date {
     @SerializedName("gregorian")
     @Expose
     public Gregorian gregorian;
+    @SerializedName("hijri")
+    @Expose
+    public Hijri hijri;
+
 }

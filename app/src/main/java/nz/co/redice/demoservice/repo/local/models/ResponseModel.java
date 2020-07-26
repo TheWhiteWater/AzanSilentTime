@@ -1,6 +1,7 @@
 
 package nz.co.redice.demoservice.repo.local.models;
 
+import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -14,6 +15,6 @@ public class ResponseModel {
     public String status;
     @SerializedName("data")
     @Expose
-    public Data data;
+    public List<Datum> data = null;
 
 }

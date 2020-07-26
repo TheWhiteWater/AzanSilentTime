@@ -1,14 +1,13 @@
 
 package nz.co.redice.demoservice.repo.local.models;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Data {
+public class Weekday {
 
-    @SerializedName("1")
+    @SerializedName("en")
     @Expose
-    public List<Entry> entries = null;
+    public String en;
 
 }
