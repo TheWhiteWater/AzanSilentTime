@@ -39,7 +39,6 @@ public class Azan {
         this.dhuhr = Converters.getLocalDateTimeFromStringIntoLong(date, dhuhr, zoneId);
         this.asr = Converters.getLocalDateTimeFromStringIntoLong(date, asr, zoneId);
         this.maghrib = Converters.getLocalDateTimeFromStringIntoLong(date, maghrib, zoneId);
-
     }
 
 

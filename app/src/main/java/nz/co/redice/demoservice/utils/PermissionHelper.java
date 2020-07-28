@@ -8,12 +8,13 @@ import android.os.Build;
 import android.provider.Settings;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-
+@Singleton
 public class PermissionHelper {
 
     private Context mContext;

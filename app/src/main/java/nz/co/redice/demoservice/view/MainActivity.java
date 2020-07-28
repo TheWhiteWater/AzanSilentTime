@@ -1,5 +1,6 @@
 package nz.co.redice.demoservice.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.databinding.ActivityMainBinding;
+import nz.co.redice.demoservice.services.ForegroundService;
 import nz.co.redice.demoservice.view.presentation.Category;
 import nz.co.redice.demoservice.view.presentation.PagerAdapter;
 
@@ -21,12 +23,12 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mBinding;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+
 
 
         List<Category> categories = Arrays.asList(
@@ -37,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = mBinding.viewpager;
         mViewPager.setAdapter(mPagerAdapter);
 
-
-
+        Intent intent = new Intent(this, ForegroundService.class);
+        startService(intent);
     }
+
+
 }

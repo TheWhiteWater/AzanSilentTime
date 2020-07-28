@@ -1,4 +1,4 @@
-package nz.co.redice.demoservice.service;
+package nz.co.redice.demoservice.services;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import nz.co.redice.demoservice.utils.PermissionHelper;
 import nz.co.redice.demoservice.utils.PrefHelper;
 
 @AndroidEntryPoint
-public class Service extends android.app.Service {
+public class JobService extends android.app.Service {
 
     private AudioManager mAudioManager;
     @Inject PrefHelper mPrefHelper;
@@ -34,7 +34,8 @@ public class Service extends android.app.Service {
         super.onCreate();
         mPermissionHelper.getDNDPermission();
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        muteAllStreams();
+
+
     }
 
     void adjustSoundStreams() {

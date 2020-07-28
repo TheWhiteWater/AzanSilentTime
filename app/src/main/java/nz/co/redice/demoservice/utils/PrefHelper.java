@@ -6,11 +6,13 @@ import android.content.SharedPreferences;
 import java.util.Calendar;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 import static android.content.Context.MODE_PRIVATE;
 
+@Singleton
 public class PrefHelper {
 
     private SharedPreferences mSharedPreferences;

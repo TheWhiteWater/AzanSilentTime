@@ -70,9 +70,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // TODO: 27.07.2020
-//        Intent intent = new Intent(this, Service.class);
-//        startService(intent);
+
 
 
         // TODO: 27.07.2020
