@@ -37,12 +37,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = mBinding.viewpager;
         mViewPager.setAdapter(mPagerAdapter);
 
-//        TabLayout tabLayout = mBinding.tablayout;
-//        new TabLayoutMediator(tabLayout, mViewPager,
-//                ((tab, position) -> tab.setText(categories.get(position).toString()))).attach();
-
-
-
 
 
     }

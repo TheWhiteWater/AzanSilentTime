@@ -51,14 +51,6 @@ public class Service extends android.app.Service {
     }
 
     private void muteAllStreams() {
-        // Check for DND permissions for API 24+
-//        mAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_RING, true);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_VOICE_CALL, true);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_DTMF, true);
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
         //setting mute pref on
@@ -67,14 +59,6 @@ public class Service extends android.app.Service {
     }
 
     private void unMuteAllStreams() {
-        // Check for DND permissions for API 24+
-//        mAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_RING, false);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_VOICE_CALL, false);
-//        mAudioManager.setStreamMute(AudioManager.STREAM_DTMF, false);
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 
         //setting mute pref off

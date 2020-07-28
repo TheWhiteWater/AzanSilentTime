@@ -3,7 +3,6 @@ package nz.co.redice.demoservice.repo.local.models;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverter;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,9 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import javax.inject.Inject;
-
-import nz.co.redice.demoservice.utils.PrefHelper;
+import nz.co.redice.demoservice.utils.Converters;
 
 
 @Entity(tableName = "data_table")
@@ -21,12 +18,12 @@ public class Azan {
 
     @PrimaryKey
     private Long date;
-    private String timeZone;
     private Long fajr;
     private Long dhuhr;
     private Long asr;
     private Long maghrib;
     private Long isha;
+    private String timeZone;
 
 
     public Azan() {
@@ -36,27 +33,15 @@ public class Azan {
     public Azan(String date, String timeZone, String fajr, String dhuhr, String asr, String maghrib, String isha) {
         this.timeZone = timeZone;
         ZoneId zoneId = ZoneId.of(timeZone);
-        this.date = setDate(date, zoneId);
-        this.fajr = setTime(date, fajr, zoneId);
-        this.isha = setTime(date, isha, zoneId);
-        this.dhuhr = setTime(date, dhuhr, zoneId);
-        this.asr = setTime(date, asr, zoneId);
-        this.maghrib = setTime(date, maghrib, zoneId);
+        this.date = Converters.getLocalDateFromStringIntoLong(date, zoneId);
+        this.fajr = Converters.getLocalDateTimeFromStringIntoLong(date, fajr, zoneId);
+        this.isha = Converters.getLocalDateTimeFromStringIntoLong(date, isha, zoneId);
+        this.dhuhr = Converters.getLocalDateTimeFromStringIntoLong(date, dhuhr, zoneId);
+        this.asr = Converters.getLocalDateTimeFromStringIntoLong(date, asr, zoneId);
+        this.maghrib = Converters.getLocalDateTimeFromStringIntoLong(date, maghrib, zoneId);
+
     }
 
-
-    private Long setDate(String date, ZoneId zoneId) {
-        return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-                .atStartOfDay(zoneId)
-                .toEpochSecond();
-    }
-
-    private Long setTime(String date, String time, ZoneId zoneId) {
-        String[] mytime = time.split(" ");
-        return LocalDateTime.parse(date + " " + mytime[0], DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"))
-                .atZone(zoneId)
-                .toEpochSecond();
-    }
 
     public Long getDate() {
         return date;
@@ -114,36 +99,4 @@ public class Azan {
         this.timeZone = timeZone;
     }
 
-    public LocalDate getLocalDate() {
-        return getLocalDateFromLong(date);
-    }
-
-    public LocalDateTime getFajrTime() {
-        return getLocalDateTimeFromLong(fajr);
-    }
-
-    public LocalDateTime getDhuhrTime() {
-        return getLocalDateTimeFromLong(dhuhr);
-    }
-
-    public LocalDateTime getAsrTime() {
-        return getLocalDateTimeFromLong(asr);
-    }
-
-    public LocalDateTime getMaghribTime() {
-        return getLocalDateTimeFromLong(maghrib);
-    }
-
-    public LocalDateTime getIshaTime() {
-        return getLocalDateTimeFromLong(isha);
-    }
-
-
-    private LocalDate getLocalDateFromLong(Long longValue) {
-        return Instant.ofEpochSecond(longValue).atZone(ZoneId.of(this.timeZone)).toLocalDate();
-    }
-
-    private LocalDateTime getLocalDateTimeFromLong(Long longValue) {
-        return LocalDateTime.ofInstant(Instant.ofEpochSecond(longValue), ZoneId.of(this.timeZone));
-    }
 }

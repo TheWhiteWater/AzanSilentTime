@@ -18,16 +18,10 @@ public interface EventDao {
     @Query("SELECT * FROM data_table")
     LiveData<List<Azan>> getAnnualCalendar ();
 
-//    @Query("SELECT * FROM CalendarDay WHERE eventId = :eventId")
-//    CalendarDay getEventById (int eventId);
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertEntry(Azan entry);
 
-    @Query("SELECT * FROM data_table WHERE date BETWEEN :from AND :to")
-    LiveData<List<Azan>> findAzanTimesBetweenDates(Long from, Long to);
-
     @Query("SELECT * FROM data_table WHERE date = :selectedDate ")
-    LiveData<List<Azan>> getAzanTimesForDate(Long selectedDate);
+    LiveData<Azan> getAzanTimesForDate(Long selectedDate);
 
 }

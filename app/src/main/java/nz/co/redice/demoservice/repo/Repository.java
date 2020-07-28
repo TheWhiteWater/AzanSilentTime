@@ -2,9 +2,7 @@ package nz.co.redice.demoservice.repo;
 
 import androidx.lifecycle.LiveData;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,16 +12,14 @@ import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.local.EventDao;
 import nz.co.redice.demoservice.repo.local.models.Azan;
 import nz.co.redice.demoservice.repo.remote.AzanService;
-import nz.co.redice.demoservice.utils.Converters;
 import nz.co.redice.demoservice.utils.PrefHelper;
 
 public class Repository {
 
     private static final String TAG = "Repo";
-
+    private static final int MUSLIM_WORLD_LEAGUE_METHOD = 3;
     private final AzanService mAzanService;
     private final EventDao mDao;
-    private static final int MUSLIM_WORLD_LEAGUE_METHOD = 3;
     @Inject PrefHelper mPrefHelper;
 
     @Inject
@@ -55,13 +51,12 @@ public class Repository {
                         error -> System.err.println("" + error.getStackTrace()));
     }
 
-//    public LiveData<List<Azan>> getTimeTableForCurrentDay() {
-//        return mDao.getAzanTimesForDate(Converters.getStartTimeOfCurrentDay());
-//    }
-
     public LiveData<List<Azan>> getAnnualTables() {
         return mDao.getAnnualCalendar();
     }
 
+    public LiveData<Azan> getTimesForSelectedDate(Long value) {
+        return mDao.getAzanTimesForDate(value);
+    }
 
 }

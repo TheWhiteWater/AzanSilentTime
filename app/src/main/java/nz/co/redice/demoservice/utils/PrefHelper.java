@@ -21,6 +21,9 @@ public class PrefHelper {
     private static final String WAKEUP_TIME = "wakeup time";
     private static final String TIME_ZONE = "time zone";
     private static final String MONTHLY_DB_UPDATE_STATUS = "monthly timetable status";
+    private static final String LOCAL_DATE_FORMAT_PATTERN = "EEE, dd MMMM uuuu";
+    private static final String LOCAL_TIME_FORMAT_PATTERN = "HH:mm a";
+
 
     private Context mContext;
 
@@ -70,5 +73,19 @@ public class PrefHelper {
 
     public String getTimeZone() {
         return mSharedPreferences.getString(TIME_ZONE, "Pacific/Auckland");
+    }
+
+    public String getLocalDateFormatPattern() {
+        return mSharedPreferences.getString(LOCAL_DATE_FORMAT_PATTERN, "EEE, dd MMMM uuuu");
+    }
+    public void setLocalDateToStringFormat() {
+        mEditor.putString(LOCAL_DATE_FORMAT_PATTERN, "EEE, dd MMMM uuuu").apply();
+    }
+
+    public String getLocalTimeFormatPattern() {
+        return mSharedPreferences.getString(LOCAL_TIME_FORMAT_PATTERN, "HH:mm a");
+    }
+    public void setLocalTimeToStringFormat() {
+        mEditor.putString(LOCAL_TIME_FORMAT_PATTERN, "HH:mm a").apply();
     }
 }
