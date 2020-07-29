@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.local.EventDao;
 import nz.co.redice.demoservice.repo.local.models.Azan;
 import nz.co.redice.demoservice.repo.remote.AzanService;
-import nz.co.redice.demoservice.utils.PrefHelper;
+import nz.co.redice.demoservice.utils.PreferencesHelper;
 
 public class Repository {
 
@@ -20,7 +20,7 @@ public class Repository {
     private static final int MUSLIM_WORLD_LEAGUE_METHOD = 3;
     private final AzanService mAzanService;
     private final EventDao mDao;
-    @Inject PrefHelper mPrefHelper;
+    @Inject PreferencesHelper mPreferencesHelper;
 
     @Inject
     public Repository(AzanService newsService, EventDao dao) {
@@ -36,10 +36,10 @@ public class Repository {
                 .toObservable()
                 .flatMap(s -> Observable.fromIterable(s.data))
                 .map(s -> {
-                    mPrefHelper.setLocalTimeZone(s.meta.timezone);
+                    mPreferencesHelper.setLocalTimeZone(s.meta.timezone);
                     return new Azan(
                             s.date.gregorian.date,
-                            mPrefHelper.getTimeZone(),
+                            mPreferencesHelper.getTimeZone(),
                             s.timings.fajr,
                             s.timings.dhuhr,
                             s.timings.asr,

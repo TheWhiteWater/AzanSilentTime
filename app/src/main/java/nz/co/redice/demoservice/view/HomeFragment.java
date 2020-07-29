@@ -2,7 +2,6 @@ package nz.co.redice.demoservice.view;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.databinding.HomeFragmentBinding;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.utils.Converters;
-import nz.co.redice.demoservice.utils.PrefHelper;
+import nz.co.redice.demoservice.utils.PreferencesHelper;
+import nz.co.redice.demoservice.utils.ServiceHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
 import nz.co.redice.demoservice.view.presentation.TimeTable;
 import nz.co.redice.demoservice.viewmodel.HomeScreenViewModel;
@@ -32,20 +32,17 @@ import nz.co.redice.demoservice.viewmodel.HomeScreenViewModel;
 public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     @Inject Repository mRepository;
-    @Inject PrefHelper mPrefHelper;
+    @Inject PreferencesHelper mPreferencesHelper;
     private HomeScreenViewModel mViewModel;
-    private HomeFragmentBinding mBinding;
-    private TimeTable mTimeTable;
-
+    private HomeFragmentBinding mViewBinding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mBinding = HomeFragmentBinding.inflate(inflater, container, false);
-        View view = mBinding.getRoot();
-        mBinding.setLifecycleOwner(getViewLifecycleOwner());
+        mViewBinding = HomeFragmentBinding.inflate(inflater, container, false);
+        View view = mViewBinding.getRoot();
         mViewModel = new ViewModelProvider(this).get(HomeScreenViewModel.class);
-        mTimeTable = new TimeTable();
+
         return view;
     }
 
@@ -54,12 +51,13 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         super.onViewCreated(view, savedInstanceState);
 
         //setting date picker
-        mBinding.dateTv.setOnClickListener(this::showDatePickerDialog);
+        mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
 
         // setting timings for current day
-        Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.of(mPrefHelper.getTimeZone())).toEpochSecond();
-        setDataBindingByStringValue(currentDayEpoch);
+        Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.of(mPreferencesHelper.getTimeZone())).toEpochSecond();
+        getTimingsForSelectedDate(currentDayEpoch);
     }
+
 
     private void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment(getContext(), this);
@@ -67,48 +65,30 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-
-
-
-        // TODO: 27.07.2020
-//        mPrefHelper.setDatabaseUpdateStatus(false);
-        Log.d("App", "onCreate: " + mPrefHelper.getDatabaseUpdateStatus());
-        if (!mPrefHelper.getDatabaseUpdateStatus()) {
-            mRepository.requestAnnualCalendar(-40.3596, 175.61);
-            mPrefHelper.setDatabaseUpdateStatus(true);
-        }
-
-    }
-
-
-    @Override
     public void onDestroyView() {
+        mViewBinding = null;
         super.onDestroyView();
-        mBinding = null;
     }
 
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        LocalDate newDate = LocalDate.of(year, ++month, dayOfMonth);
-        Long longDate = newDate.atStartOfDay(ZoneId.of(mPrefHelper.getTimeZone())).toEpochSecond();
-        Log.d("App", "onDateSet: " + longDate);
-        setDataBindingByStringValue(longDate);
+        LocalDate selectedDate = LocalDate.of(year, ++month, dayOfMonth);
+        Long selectedEpoch = selectedDate.atStartOfDay(ZoneId.of(mPreferencesHelper.getTimeZone())).toEpochSecond();
+        getTimingsForSelectedDate(selectedEpoch);
     }
 
 
-    private void setDataBindingByStringValue(Long date) {
+    private void getTimingsForSelectedDate(Long date) {
         mViewModel.getTimesForSelectedDate(date).observe(getViewLifecycleOwner(), selected -> {
-            mTimeTable.setDate(Converters.convertLongValueOfLocalDateIntoString(selected.getDate(), selected.getTimeZone(), mPrefHelper.getLocalDateFormatPattern()));
-            mTimeTable.setFajr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getFajr(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setAsr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getAsr(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setDhuhr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getDhuhr(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setIsha(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getIsha(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setMaghrib(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getMaghrib(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mBinding.setTimeTable(mTimeTable);
+            TimeTable timeTable = new TimeTable();
+            timeTable.setDate(Converters.convertLongValueOfLocalDateIntoString(selected.getDate(), selected.getTimeZone(), mPreferencesHelper.getLocalDateFormatPattern()));
+            timeTable.setFajr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getFajr(), selected.getTimeZone(), mPreferencesHelper.getLocalTimeFormatPattern()));
+            timeTable.setAsr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getAsr(), selected.getTimeZone(), mPreferencesHelper.getLocalTimeFormatPattern()));
+            timeTable.setDhuhr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getDhuhr(), selected.getTimeZone(), mPreferencesHelper.getLocalTimeFormatPattern()));
+            timeTable.setIsha(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getIsha(), selected.getTimeZone(), mPreferencesHelper.getLocalTimeFormatPattern()));
+            timeTable.setMaghrib(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getMaghrib(), selected.getTimeZone(), mPreferencesHelper.getLocalTimeFormatPattern()));
+            mViewBinding.setTimeTable(timeTable);
         });
 
 

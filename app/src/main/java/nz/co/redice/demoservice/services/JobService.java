@@ -14,13 +14,13 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.utils.PermissionHelper;
-import nz.co.redice.demoservice.utils.PrefHelper;
+import nz.co.redice.demoservice.utils.PreferencesHelper;
 
 @AndroidEntryPoint
 public class JobService extends android.app.Service {
 
     private AudioManager mAudioManager;
-    @Inject PrefHelper mPrefHelper;
+    @Inject PreferencesHelper mPreferencesHelper;
     @Inject PermissionHelper mPermissionHelper;
 
     @Nullable
@@ -39,11 +39,11 @@ public class JobService extends android.app.Service {
     }
 
     void adjustSoundStreams() {
-        if (!mPrefHelper.getMuteState()
+        if (!mPreferencesHelper.getMuteState()
                 //current time in milliseconds bigger or equal to sleep time
                 // but smaller than wakeup time
-                && getCurrentTime() >= mPrefHelper.getSleepTime()
-                && getCurrentTime() <= mPrefHelper.getWakeUpTime()
+                && getCurrentTime() >= mPreferencesHelper.getSleepTime()
+                && getCurrentTime() <= mPreferencesHelper.getWakeUpTime()
         ) {
             muteAllStreams();
         } else {
@@ -55,7 +55,7 @@ public class JobService extends android.app.Service {
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
         //setting mute pref on
-        mPrefHelper.addMuteState(true);
+        mPreferencesHelper.addMuteState(true);
         Log.d("App", "setRingerMode: SILENT");
     }
 
@@ -63,7 +63,7 @@ public class JobService extends android.app.Service {
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 
         //setting mute pref off
-        mPrefHelper.addMuteState(false);
+        mPreferencesHelper.addMuteState(false);
         Log.d("App", "setRingerMode: UNSILENT");
     }
 

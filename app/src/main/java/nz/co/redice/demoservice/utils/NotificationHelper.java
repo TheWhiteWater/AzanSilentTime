@@ -24,6 +24,8 @@ public class NotificationHelper {
 
     private static final String FOREGROUND_CHANNEL_ID = "channelId";
     public static final String QUIT_APP = "quit app";
+    // The identifier for the notification displayed for the foreground service.
+    public static final int NOTIFICATION_ID = 12345678;
 
     private Context mContext;
 
@@ -60,8 +62,8 @@ public class NotificationHelper {
         PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0, activityLaunchingIntent, 0);
 
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-                .addAction(R.drawable.ic_settings, "Show Settings", activityPendingIntent)
-                .addAction(R.drawable.ic_cancel, "Quit App", servicePendingIntent)
+                .addAction(R.drawable.ic_settings, "Home", activityPendingIntent)
+                .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
                 .setContentTitle("Content Title")
                 .setContentText("Content Text")
                 .setSmallIcon(R.drawable.ic_android)

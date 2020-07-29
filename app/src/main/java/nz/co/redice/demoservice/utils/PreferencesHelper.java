@@ -13,7 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import static android.content.Context.MODE_PRIVATE;
 
 @Singleton
-public class PrefHelper {
+public class PreferencesHelper {
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
@@ -30,7 +30,7 @@ public class PrefHelper {
     private Context mContext;
 
     @Inject
-    public PrefHelper(@ApplicationContext Context context) {
+    public PreferencesHelper(@ApplicationContext Context context) {
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
