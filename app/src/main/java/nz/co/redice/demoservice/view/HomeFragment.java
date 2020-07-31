@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -52,26 +53,33 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //setting date picker
-        mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
-
-        mViewBinding.asrBtn.setOnClickListener(this::onClick);
-        mViewBinding.fajrBtn.setOnClickListener(this::onClick);
-        mViewBinding.ishaBtn.setOnClickListener(this::onClick);
-        mViewBinding.maghribBtn.setOnClickListener(this::onClick);
-        mViewBinding.dhuhrBtn.setOnClickListener(this::onClick);
-
-        // setting timings for current day
-        Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-        getTimingsForSelectedDate(currentDayEpoch);
-
+        //annual calendar request
         mRepository.getDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
             if (integer == 0) {
                 mRepository.requestStandardAnnualCalendar(-40.3596, 175.61);
             } else {
                 Log.d("App", "onChanged: database size: " + integer);
+
+                // setting timings for current day
+                Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+                getTimingsForSelectedDate(currentDayEpoch);
             }
         });
+
+
+        setViewListeners();
+    }
+
+    private void setViewListeners() {
+        //setting date picker
+        mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
+
+        //setting mute buttons
+        mViewBinding.asrBtn.setOnClickListener(this::onClick);
+        mViewBinding.fajrBtn.setOnClickListener(this::onClick);
+        mViewBinding.ishaBtn.setOnClickListener(this::onClick);
+        mViewBinding.maghribBtn.setOnClickListener(this::onClick);
+        mViewBinding.dhuhrBtn.setOnClickListener(this::onClick);
     }
 
 
@@ -89,7 +97,8 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        LocalDate selectedDate = LocalDate.of(year, ++month, dayOfMonth);
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
         Long selectedEpoch = selectedDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         getTimingsForSelectedDate(selectedEpoch);
     }
@@ -109,7 +118,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 mViewBinding.setReadableTimings(result);
             }
         });
-
 
 
     }
