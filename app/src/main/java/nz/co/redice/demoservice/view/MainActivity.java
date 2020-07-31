@@ -38,14 +38,6 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
-        // TODO: 27.07.2020
-        if (mRepository.getDatabaseSize().getValue() == null) {
-//            mRepository.requestAnnualCalendar(-40.3596, 175.61);
-           mRepository.requestStandardAnnualCalendar(-40.3596, 175.61);
-            Log.d("App", "onCreate: " + mRepository.getDatabaseSize().getValue());
-
-        }
-
         List<Category> categories = Arrays.asList(
                 Category.HOME,
                 Category.SETTINGS);

@@ -42,8 +42,8 @@ public class ForegroundService extends Service {
             stopSelf();
         }
 
-        setCurrentDay(mTimings);
-        setNextAlarm();
+//        setCurrentDay(mTimings);
+//        setNextAlarm();
         Log.d("App", "onStartCommand: service started");
         return START_REDELIVER_INTENT;
     }

@@ -4,8 +4,8 @@
     <data>
 
 <variable
-    name="timeTable"
-    type="nz.co.redice.demoservice.view.presentation.TimeTable" />
+    name="readableTimings"
+    type="nz.co.redice.demoservice.view.presentation.ReadableTimings" />
 
 
     </data>
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="@{timeTable.date}"
+            android:text="@{readableTimings.date}"
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +62,7 @@
         <TextView
             android:id="@+id/fajr_time"
             style="@style/prayer_time"
-            android:text="@{timeTable.fajr}"
+            android:text="@{readableTimings.fajr}"
             app:layout_constraintBottom_toBottomOf="@+id/fajr_name"
             app:layout_constraintEnd_toStartOf="@+id/fajr_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -96,7 +96,7 @@
         <TextView
             android:id="@+id/zhuhr_time"
             style="@style/prayer_time"
-            android:text="@{timeTable.dhuhr}"
+            android:text="@{readableTimings.dhuhr}"
             app:layout_constraintBottom_toBottomOf="@+id/zhuhr_name"
             app:layout_constraintEnd_toStartOf="@+id/dhuhr_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -130,7 +130,7 @@
         <TextView
             android:id="@+id/asr_time"
             style="@style/prayer_time"
-            android:text="@{timeTable.asr}"
+            android:text="@{readableTimings.asr}"
             app:layout_constraintBottom_toBottomOf="@+id/asr_name"
             app:layout_constraintEnd_toStartOf="@+id/asr_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -164,7 +164,7 @@
         <TextView
             android:id="@+id/maghrib_time"
             style="@style/prayer_time"
-            android:text="@{timeTable.maghrib}"
+            android:text="@{readableTimings.maghrib}"
             app:layout_constraintBottom_toBottomOf="@+id/maghrib_name"
             app:layout_constraintEnd_toStartOf="@+id/maghrib_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -198,7 +198,7 @@
         <TextView
             android:id="@+id/isha_time"
             style="@style/prayer_time"
-            android:text="@{timeTable.isha}"
+            android:text="@{readableTimings.isha}"
             app:layout_constraintBottom_toBottomOf="@+id/isha_name"
             app:layout_constraintEnd_toStartOf="@+id/isha_btn"
             app:layout_constraintHorizontal_bias="0.5"

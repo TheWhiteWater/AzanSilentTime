@@ -3,6 +3,7 @@ package nz.co.redice.demoservice.repo;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import java.util.Calendar;
 
@@ -16,6 +17,7 @@ import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.repo.remote.AzanService;
 import nz.co.redice.demoservice.repo.remote.models.ApiResponse;
 import nz.co.redice.demoservice.repo.remote.models.Day;
+import nz.co.redice.demoservice.view.presentation.ReadableTimings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,36 +35,17 @@ public class Repository {
         mDao = dao;
     }
 
-//    public void requestAnnualCalendar(Double latitude, Double longitude) {
-//        mAzanService.requestAnnualTimeTable(latitude, longitude,
-//                MUSLIM_WORLD_LEAGUE_METHOD,
-//                Calendar.getInstance().get(Calendar.YEAR), true)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .flatMap(s -> Observable.fromIterable(s.data._7))
-//                .map(s -> s.toEntry())
-//                .subscribe(s -> {
-//                            mDao.insertEntry(s);
-//                        },
-//                        error -> {
-//                            Log.d(TAG, "requestAnnualCalendar: " + error.getMessage());
-//                            Log.d(TAG, "requestAnnualCalendar: " + error.getStackTrace());
-//                            Log.d(TAG, "requestAnnualCalendar: " + error.getCause());
-//                        });
-//    }
-
     public void requestStandardAnnualCalendar(Double lat, Double lon) {
         mAzanService.requestStandardAnnualTimeTable(lat, lon, MUSLIM_WORLD_LEAGUE_METHOD,
                 Calendar.getInstance().get(Calendar.YEAR), true).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    for (Day day : response.body().data._7) {
+                    for (Day day : response.body().data.getAnnualList()) {
                         Completable.fromAction(() -> {
                             EntryModel newEntryModel = day.toEntry();
                             Log.d(TAG, "onResponse: " + newEntryModel.toString());
                             mDao.insertEntry(newEntryModel);
-                            Log.d(TAG, "onResponse: " + mDao.getRowCount().getValue());
                         })
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
@@ -87,13 +70,6 @@ public class Repository {
     }
 
 
-    public void testInsert() {
-        Completable.fromAction(() -> mDao.insertEntry(new EntryModel()))
-                .subscribeOn(Schedulers.io())
-                .subscribe();
-
-
-    }
 
 
 }

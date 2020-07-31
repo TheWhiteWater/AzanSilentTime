@@ -1,6 +1,6 @@
 package nz.co.redice.demoservice.view.presentation;
 
-public class TimeTable {
+public class ReadableTimings {
 
     private String date;
     private String fajr;
