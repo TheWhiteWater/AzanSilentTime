@@ -75,7 +75,7 @@
         <TextView
             android:id="@+id/zhuhr_name"
             style="@style/prayer_name"
-            android:text="Zhuhr"
+            android:text="Dhuhr"
             app:layout_constraintEnd_toStartOf="@+id/zhuhr_time"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
@@ -83,7 +83,7 @@
             app:layout_constraintTop_toBottomOf="@+id/fajr_name" />
 
         <ImageButton
-            android:id="@+id/zhuhr_btn"
+            android:id="@+id/dhuhr_btn"
             style="@style/prayer_btn"
             android:src="@drawable/ic_volume_off"
             app:layout_constraintBottom_toBottomOf="@+id/zhuhr_time"
@@ -98,7 +98,7 @@
             style="@style/prayer_time"
             android:text="@{timeTable.dhuhr}"
             app:layout_constraintBottom_toBottomOf="@+id/zhuhr_name"
-            app:layout_constraintEnd_toStartOf="@+id/zhuhr_btn"
+            app:layout_constraintEnd_toStartOf="@+id/dhuhr_btn"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/zhuhr_name"

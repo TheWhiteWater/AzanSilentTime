@@ -8,6 +8,11 @@ public class TimeTable {
     private String asr;
     private String maghrib;
     private String isha;
+    private Boolean fajrMuteOn;
+    private Boolean dhuhrMuteOn;
+    private Boolean asrMuteOn;
+    private Boolean maghribMuteOn;
+    private Boolean ishaMuteOn;
 
     public String getDate() {
         return date;
@@ -55,5 +60,45 @@ public class TimeTable {
 
     public void setIsha(String isha) {
         this.isha = isha;
+    }
+
+    public Boolean getFajrMuteOn() {
+        return fajrMuteOn;
+    }
+
+    public void setFajrMuteOn(Boolean fajrMuteOn) {
+        this.fajrMuteOn = fajrMuteOn;
+    }
+
+    public Boolean getDhuhrMuteOn() {
+        return dhuhrMuteOn;
+    }
+
+    public void setDhuhrMuteOn(Boolean dhuhrMuteOn) {
+        this.dhuhrMuteOn = dhuhrMuteOn;
+    }
+
+    public Boolean getAsrMuteOn() {
+        return asrMuteOn;
+    }
+
+    public void setAsrMuteOn(Boolean asrMuteOn) {
+        this.asrMuteOn = asrMuteOn;
+    }
+
+    public Boolean getMaghribMuteOn() {
+        return maghribMuteOn;
+    }
+
+    public void setMaghribMuteOn(Boolean maghribMuteOn) {
+        this.maghribMuteOn = maghribMuteOn;
+    }
+
+    public Boolean getIshaMuteOn() {
+        return ishaMuteOn;
+    }
+
+    public void setIshaMuteOn(Boolean ishaMuteOn) {
+        this.ishaMuteOn = ishaMuteOn;
     }
 }

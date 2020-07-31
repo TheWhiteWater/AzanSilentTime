@@ -6,12 +6,17 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import nz.co.redice.demoservice.databinding.ActivityMainBinding;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.utils.PreferencesHelper;
@@ -33,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
+        // TODO: 27.07.2020
+        if (mRepository.getDatabaseSize().getValue() == null) {
+//            mRepository.requestAnnualCalendar(-40.3596, 175.61);
+           mRepository.requestStandardAnnualCalendar(-40.3596, 175.61);
+            Log.d("App", "onCreate: " + mRepository.getDatabaseSize().getValue());
+
+        }
 
         List<Category> categories = Arrays.asList(
                 Category.HOME,
@@ -42,13 +54,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = mBinding.viewpager;
         mViewPager.setAdapter(mPagerAdapter);
 
-        // TODO: 27.07.2020
-//        mPreferencesHelper.setDatabaseUpdateStatus(false);
-        Log.d("App", "onCreate: " + mPreferencesHelper.getDatabaseUpdateStatus());
-        if (!mPreferencesHelper.getDatabaseUpdateStatus()) {
-            mRepository.requestAnnualCalendar(-40.3596, 175.61);
-            mPreferencesHelper.setDatabaseUpdateStatus(true);
-        }
 
 
     }

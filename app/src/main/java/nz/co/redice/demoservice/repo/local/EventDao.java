@@ -7,21 +7,22 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import java.util.List;
-
-import nz.co.redice.demoservice.repo.local.models.Azan;
+import io.reactivex.Completable;
+import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 
 
 @Dao
 public interface EventDao {
 
-    @Query("SELECT * FROM data_table")
-    LiveData<List<Azan>> getAnnualCalendar ();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertEntry(Azan entry);
+    void insertEntry(EntryModel entryModel);
 
     @Query("SELECT * FROM data_table WHERE date = :selectedDate ")
-    LiveData<Azan> getAzanTimesForDate(Long selectedDate);
+    LiveData<EntryModel> getAzanTimesForDate(Long selectedDate);
+
+
+    @Query("SELECT COUNT(date) FROM data_table")
+    LiveData<Integer> getRowCount();
 
 }

@@ -1,26 +1,29 @@
 package nz.co.redice.demoservice.repo.remote;
 
-import io.reactivex.Single;
-import nz.co.redice.demoservice.repo.local.models.ResponseModel;
+import java.util.List;
+
+import io.reactivex.Observable;
+import nz.co.redice.demoservice.repo.remote.models.ApiResponse;
+import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface AzanService {
 
-
     @GET("calendar")
-    Single<ResponseModel> requestAnnualTimeTable(
+    Observable<ApiResponse> requestAnnualTimeTable(
             @Query("latitude") Double latitude,
             @Query("longitude") Double longitude,
+            @Query("method") Integer method,
             @Query("year") Integer year,
-            @Query("annual") Boolean annual,
-            @Query("method") Integer method);
-
+            @Query("annual") Boolean annual);
 
     @GET("calendar")
-    Single<ResponseModel> requestTimeTableForMonth(
+    Call<ApiResponse> requestStandardAnnualTimeTable(
             @Query("latitude") Double latitude,
             @Query("longitude") Double longitude,
+            @Query("method") Integer method,
             @Query("year") Integer year,
-            @Query("method") Integer method);
+            @Query("annual") Boolean annual);
+
 }

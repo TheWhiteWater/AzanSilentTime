@@ -18,7 +18,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.repo.Repository;
-import nz.co.redice.demoservice.repo.local.models.Azan;
+import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.utils.NotificationHelper;
 import nz.co.redice.demoservice.utils.PreferencesHelper;
 
@@ -31,7 +31,7 @@ public class ForegroundService extends Service {
     @Inject PreferencesHelper mPreferencesHelper;
     @Inject NotificationHelper mNotificationHelper;
     private IBinder mBinder = new LocalBinder();
-    private Azan mTimings;
+    private EntryModel mTimings;
     private boolean mChangingConfiguration = false;
 
     @Override
@@ -79,7 +79,7 @@ public class ForegroundService extends Service {
         return true;
     }
 
-    private void setCurrentDay(Azan timings) {
+    private void setCurrentDay(EntryModel timings) {
         Long currentDayEpoch = LocalDate.now()
                 .atStartOfDay(ZoneId.of(mPreferencesHelper.getTimeZone()))
                 .toEpochSecond();
