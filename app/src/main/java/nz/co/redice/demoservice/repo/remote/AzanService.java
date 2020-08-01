@@ -9,8 +9,8 @@ public interface AzanService {
 
     @GET("calendar")
     Call<ApiResponse> requestStandardAnnualTimeTable(
-            @Query("latitude") Double latitude,
-            @Query("longitude") Double longitude,
+            @Query("latitude") Float latitude,
+            @Query("longitude") Float longitude,
             @Query("method") Integer method,
             @Query("year") Integer year,
             @Query("annual") Boolean annual);

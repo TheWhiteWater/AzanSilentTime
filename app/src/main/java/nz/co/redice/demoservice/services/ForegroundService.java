@@ -81,12 +81,12 @@ public class ForegroundService extends Service {
 
     private void setCurrentDay(EntryModel timings) {
         Long currentDayEpoch = LocalDate.now()
-                .atStartOfDay(ZoneId.of(mPreferencesHelper.getTimeZone()))
+                .atStartOfDay(ZoneId.systemDefault())
                 .toEpochSecond();
 
-        if (mTimings == null || !mTimings.getDate().equals(currentDayEpoch)) {
-            mTimings = mRepository.getTimesForSelectedDate(currentDayEpoch).getValue();
-        }
+//        if (mTimings == null || !mTimings.getDate().equals(currentDayEpoch)) {
+//            mTimings = mRepository.getTimesForSelectedDate(currentDayEpoch).getValue();
+//        }
     }
 
     private void setNextAlarm() {

@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
@@ -45,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
         mPagerAdapter = new PagerAdapter(this, categories);
         mViewPager = mBinding.viewpager;
         mViewPager.setAdapter(mPagerAdapter);
-
-
 
     }
 

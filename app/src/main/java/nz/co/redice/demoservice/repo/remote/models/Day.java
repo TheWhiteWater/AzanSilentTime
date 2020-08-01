@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
-import nz.co.redice.demoservice.utils.Converters;
+import nz.co.redice.demoservice.view.presentation.Converters;
 
 public class Day {
 

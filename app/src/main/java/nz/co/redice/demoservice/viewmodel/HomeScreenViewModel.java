@@ -1,6 +1,7 @@
 package nz.co.redice.demoservice.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.hilt.Assisted;
@@ -14,15 +15,13 @@ import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.utils.PreferencesHelper;
 import nz.co.redice.demoservice.utils.ServiceHelper;
-import nz.co.redice.demoservice.view.presentation.ReadableTimings;
 
 public class HomeScreenViewModel extends AndroidViewModel {
 
     private final SavedStateHandle savedStateHandle;
+    public LiveData<EntryModel> model = new MutableLiveData<>();
     private Repository mRepository;
     private ServiceHelper mServiceHelper;
-    private MutableLiveData<ReadableTimings> mReadableData = new MutableLiveData<>();
-
     private PreferencesHelper mPreferencesHelper;
 
 
@@ -42,7 +41,7 @@ public class HomeScreenViewModel extends AndroidViewModel {
 
 
     public LiveData<EntryModel> getTimesForSelectedDate(Long date) {
-        return mRepository.getTimesForSelectedDate(date);
+        return mRepository.getSelectedDate(date);
     }
 
 
@@ -50,5 +49,18 @@ public class HomeScreenViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         mServiceHelper.doUnbindService(getApplication());
+    }
+
+    public LiveData<Integer> getDatabaseSize() {
+        return mRepository.getDatabaseSize();
+    }
+
+    public void fillUpDatabase() {
+        mRepository.requestStandardAnnualCalendar(mPreferencesHelper.getLatitude(), mPreferencesHelper.getLongitude());
+    }
+
+    public LiveData<EntryModel> updateEntry(EntryModel model) {
+        mRepository.updateSelectedEntry(model);
+        return mRepository.getSelectedDate(model.getDate());
     }
 }

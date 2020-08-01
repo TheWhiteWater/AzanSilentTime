@@ -1,6 +1,7 @@
 package nz.co.redice.demoservice.view;
 
 import android.app.DatePickerDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,13 +23,12 @@ import java.util.Calendar;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import nz.co.redice.demoservice.R;
 import nz.co.redice.demoservice.databinding.HomeFragmentBinding;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
-import nz.co.redice.demoservice.utils.Converters;
 import nz.co.redice.demoservice.utils.PreferencesHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
-import nz.co.redice.demoservice.view.presentation.ReadableTimings;
 import nz.co.redice.demoservice.viewmodel.HomeScreenViewModel;
 
 @AndroidEntryPoint
@@ -38,6 +38,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Inject PreferencesHelper mPreferencesHelper;
     private HomeScreenViewModel mViewModel;
     private HomeFragmentBinding mViewBinding;
+    private EntryModel mEntryModel;
+    private boolean mFragmentCreated = false;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -45,29 +48,27 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         mViewBinding = HomeFragmentBinding.inflate(inflater, container, false);
         View view = mViewBinding.getRoot();
         mViewModel = new ViewModelProvider(this).get(HomeScreenViewModel.class);
-
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setViewListeners();
 
-        //annual calendar request
-        mRepository.getDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
-            if (integer == 0) {
-                mRepository.requestStandardAnnualCalendar(-40.3596, 175.61);
-            } else {
-                Log.d("App", "onChanged: database size: " + integer);
-
-                // setting timings for current day
-                Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-                getTimingsForSelectedDate(currentDayEpoch);
+        mViewModel.getDatabaseSize().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer >= 365 ) {
+                    // setting up current day
+                    Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+                    Log.d("App", "onViewCreated: " + currentDayEpoch);
+                    getTimingsForSelectedDate(currentDayEpoch);
+                } else {
+                    mViewModel.fillUpDatabase();
+                }
             }
         });
-
-
-        setViewListeners();
     }
 
     private void setViewListeners() {
@@ -81,7 +82,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         mViewBinding.maghribBtn.setOnClickListener(this::onClick);
         mViewBinding.dhuhrBtn.setOnClickListener(this::onClick);
     }
-
 
     private void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment(getContext(), this);
@@ -105,24 +105,42 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
 
     private void getTimingsForSelectedDate(Long date) {
-        mViewModel.getTimesForSelectedDate(date).observe(getViewLifecycleOwner(), new Observer<EntryModel>() {
-            @Override
-            public void onChanged(EntryModel selected) {
-                ReadableTimings result = new ReadableTimings();
-                result.setDate(Converters.convertLongValueOfLocalDateIntoString(selected.getDate(), mPreferencesHelper.getLocalDateFormatPattern()));
-                result.setFajr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getFajr(), mPreferencesHelper.getLocalTimeFormatPattern()));
-                result.setAsr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getAsr(), mPreferencesHelper.getLocalTimeFormatPattern()));
-                result.setDhuhr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getDhuhr(), mPreferencesHelper.getLocalTimeFormatPattern()));
-                result.setIsha(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getIsha(), mPreferencesHelper.getLocalTimeFormatPattern()));
-                result.setMaghrib(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getMaghrib(), mPreferencesHelper.getLocalTimeFormatPattern()));
-                mViewBinding.setReadableTimings(result);
+        mViewModel.getTimesForSelectedDate(date).observe(getViewLifecycleOwner(), selected -> {
+            if (selected != null) {
+                Log.d("App", "getTimingsForSelectedDate: " + selected.getDateString());
+                mEntryModel = selected;
+                mViewBinding.setEntry(mEntryModel);
+
+            } else {
+                mViewModel.fillUpDatabase();
             }
+
         });
-
-
     }
 
     public void onClick(View view) {
-
+        switch (view.getId()) {
+            case R.id.dhuhr_btn:
+                mEntryModel.setDhuhrMuteOn(!mEntryModel.getDhuhrMuteOn());
+                mViewModel.updateEntry(mEntryModel);
+                break;
+            case R.id.asr_btn:
+                mEntryModel.setAsrMuteOn(!mEntryModel.getAsrMuteOn());
+                mViewModel.updateEntry(mEntryModel);
+                break;
+            case R.id.fajr_btn:
+                mEntryModel.setFajrMuteOn(!mEntryModel.getFajrMuteOn());
+                mViewModel.updateEntry(mEntryModel);
+                break;
+            case R.id.maghrib_btn:
+                mEntryModel.setMaghribMuteOn(!mEntryModel.getMaghribMuteOn());
+                mViewModel.updateEntry(mEntryModel);
+                break;
+            case R.id.isha_btn:
+            default:
+                mEntryModel.setIshaMuteOn(!mEntryModel.getIshaMuteOn());
+                mViewModel.updateEntry(mEntryModel);
+                break;
+        }
     }
 }

@@ -14,6 +14,8 @@ public class ReadableTimings {
     private Boolean maghribMuteOn;
     private Boolean ishaMuteOn;
 
+
+
     public String getDate() {
         return date;
     }

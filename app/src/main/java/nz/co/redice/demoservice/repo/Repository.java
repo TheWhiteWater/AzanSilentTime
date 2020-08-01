@@ -3,7 +3,6 @@ package nz.co.redice.demoservice.repo;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.util.Calendar;
 
@@ -17,7 +16,6 @@ import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.repo.remote.AzanService;
 import nz.co.redice.demoservice.repo.remote.models.ApiResponse;
 import nz.co.redice.demoservice.repo.remote.models.Day;
-import nz.co.redice.demoservice.view.presentation.ReadableTimings;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,7 +33,7 @@ public class Repository {
         mDao = dao;
     }
 
-    public void requestStandardAnnualCalendar(Double lat, Double lon) {
+    public void requestStandardAnnualCalendar(Float lat, Float lon) {
         mAzanService.requestStandardAnnualTimeTable(lat, lon, MUSLIM_WORLD_LEAGUE_METHOD,
                 Calendar.getInstance().get(Calendar.YEAR), true).enqueue(new Callback<ApiResponse>() {
             @Override
@@ -44,7 +42,6 @@ public class Repository {
                     for (Day day : response.body().data.getAnnualList()) {
                         Completable.fromAction(() -> {
                             EntryModel newEntryModel = day.toEntry();
-                            Log.d(TAG, "onResponse: " + newEntryModel.toString());
                             mDao.insertEntry(newEntryModel);
                         })
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -61,15 +58,19 @@ public class Repository {
         });
     }
 
-    public LiveData<EntryModel> getTimesForSelectedDate(Long value) {
-        return mDao.getAzanTimesForDate(value);
+    public LiveData<EntryModel> getSelectedDate(Long value) {
+        return mDao.getSelectedEntry(value);
     }
 
     public LiveData<Integer> getDatabaseSize() {
-        return mDao.getRowCount();
+         return mDao.getRowCount();
     }
 
-
+    public void updateSelectedEntry(EntryModel model){
+        mDao.updateEntry(model)
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
 
 
 }
