@@ -20,11 +20,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.R;
-import nz.co.redice.demoservice.utils.PreferencesHelper;
+import nz.co.redice.demoservice.utils.PrefHelper;
 
 @AndroidEntryPoint
 public class SplashFragment extends Fragment {
-    @Inject PreferencesHelper mPreferencesHelper;
+    @Inject PrefHelper mPrefHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,8 @@ public class SplashFragment extends Fragment {
     }
 
     private void shiftToNextScreen() {
-        if (!mPreferencesHelper.getLocationScreenStatus()) {
-            NavHostFragment.findNavController(this).navigate(R.id.fromSplashScreenToAutoLocation);
+        if (!mPrefHelper.getLocationPermissionStatus()) {
+            NavHostFragment.findNavController(this).navigate(R.id.fromSplashToLocation);
         } else {
             NavHostFragment.findNavController(this).navigate(R.id.fromSplashScreenToHome);
         }

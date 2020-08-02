@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.utils.NotificationHelper;
-import nz.co.redice.demoservice.utils.PreferencesHelper;
+import nz.co.redice.demoservice.utils.PrefHelper;
 
 import static nz.co.redice.demoservice.utils.NotificationHelper.QUIT_APP;
 
@@ -28,7 +28,7 @@ import static nz.co.redice.demoservice.utils.NotificationHelper.QUIT_APP;
 public class ForegroundService extends Service {
 
     @Inject Repository mRepository;
-    @Inject PreferencesHelper mPreferencesHelper;
+    @Inject PrefHelper mPrefHelper;
     @Inject NotificationHelper mNotificationHelper;
     private final IBinder mBinder = new LocalBinder();
     private EntryModel mTimings;

@@ -3,24 +3,18 @@ package nz.co.redice.demoservice.view;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
-
-import java.util.Arrays;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.databinding.ActivityMainBinding;
 import nz.co.redice.demoservice.repo.Repository;
-import nz.co.redice.demoservice.utils.PreferencesHelper;
-import nz.co.redice.demoservice.view.presentation.Category;
-import nz.co.redice.demoservice.view.presentation.PagerAdapter;
+import nz.co.redice.demoservice.utils.PrefHelper;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
-    @Inject PreferencesHelper mPreferencesHelper;
+    @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
     private ActivityMainBinding mBinding;
 

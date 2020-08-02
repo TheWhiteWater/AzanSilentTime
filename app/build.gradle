@@ -45,7 +45,9 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
+
+    implementation 'com.google.android.material:material:1.1.0'
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
@@ -99,7 +101,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
 
-    //navigation
+    //Navigation
     def nav_version = "2.3.0"
 
     // Java language implementation
@@ -112,4 +114,7 @@ dependencies {
     // Testing Navigation
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
+
+    //Fused Location Provider
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 }

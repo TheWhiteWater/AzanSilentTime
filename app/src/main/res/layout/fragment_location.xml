@@ -5,11 +5,11 @@
     android:id="@+id/auto_location_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.AutoLocationFragment">
+    tools:context=".view.LocationFragment">
 
 
     <ImageView
-        android:id="@+id/logo_image"
+        android:id="@+id/location_logo_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
@@ -17,29 +17,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:transitionName="transition_logo"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/location_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:text="Location"
-        android:textSize="22sp"
+        android:textAlignment="center"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo_image" />
+        app:layout_constraintTop_toBottomOf="@+id/location_logo_image" />
 
     <Button
         android:id="@+id/auto_locate_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="Auto Locate"
+        android:text="Locate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/location_tv" />
 
     <Button
         android:id="@+id/save_location_btn"

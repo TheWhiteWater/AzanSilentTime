@@ -13,7 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import static android.content.Context.MODE_PRIVATE;
 
 @Singleton
-public class PreferencesHelper {
+public class PrefHelper {
 
     private static final String MY_PREFS = "my prefs";
     private static final String MUTE_STATE = "mute state";
@@ -21,14 +21,13 @@ public class PreferencesHelper {
     private static final String WAKEUP_TIME = "wakeup time";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
-    private static final String LOCATION_SCREEN_STATUS = "location_screen_status";
     private static final String LOCATION_PERMISSION_STATUS = "location_permission_status";
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private Context mContext;
 
     @Inject
-    public PreferencesHelper(@ApplicationContext Context context) {
+    public PrefHelper(@ApplicationContext Context context) {
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
@@ -75,15 +74,7 @@ public class PreferencesHelper {
         mEditor.putFloat(LATITUDE, longitude).apply();
     }
 
-    public Boolean getLocationScreenStatus() {
-        return mSharedPreferences.getBoolean(LOCATION_SCREEN_STATUS, false);
-    }
-
-    public void setLocationScreenStatus(Boolean status) {
-        mEditor.putBoolean(LOCATION_SCREEN_STATUS, status).apply();
-    }
-
-    public boolean getAppsLocationPermissionStatus() {
+    public boolean getLocationPermissionStatus() {
         return mSharedPreferences.getBoolean(LOCATION_PERMISSION_STATUS, false);
     }
 

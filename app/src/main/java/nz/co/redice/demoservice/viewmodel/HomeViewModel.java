@@ -11,7 +11,7 @@ import androidx.lifecycle.SavedStateHandle;
 
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
-import nz.co.redice.demoservice.utils.PreferencesHelper;
+import nz.co.redice.demoservice.utils.PrefHelper;
 import nz.co.redice.demoservice.utils.ServiceHelper;
 
 public class HomeViewModel extends AndroidViewModel {
@@ -19,13 +19,13 @@ public class HomeViewModel extends AndroidViewModel {
     private final SavedStateHandle savedStateHandle;
     private Repository mRepository;
     private ServiceHelper mServiceHelper;
-    private PreferencesHelper mPreferencesHelper;
+    private PrefHelper mPrefHelper;
 
 
     @ViewModelInject
     public HomeViewModel(@NonNull Application application,
                          Repository repository, ServiceHelper serviceHelper,
-                         PreferencesHelper preferencesHelper,
+                         PrefHelper prefHelper,
                          @Assisted SavedStateHandle savedStateHandle) {
         super(application);
         mRepository = repository;
@@ -33,7 +33,7 @@ public class HomeViewModel extends AndroidViewModel {
         mServiceHelper = serviceHelper;
         mServiceHelper.startService(application);
         mServiceHelper.doBindService(application);
-        mPreferencesHelper = preferencesHelper;
+        mPrefHelper = prefHelper;
     }
 
 
@@ -53,7 +53,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void fillUpDaBase() {
-        mRepository.requestStandardAnnualCalendar(mPreferencesHelper.getLatitude(), mPreferencesHelper.getLongitude());
+        mRepository.requestStandardAnnualCalendar(mPrefHelper.getLatitude(), mPrefHelper.getLongitude());
     }
 
     public LiveData<EntryModel> updateEntry(EntryModel model) {

@@ -5,12 +5,9 @@
 
     <data>
 
-
         <variable
             name="entry"
             type="nz.co.redice.demoservice.repo.local.entity.EntryModel" />
-
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,19 +18,20 @@
 
         <TextView
             android:id="@+id/date_view"
+            style="@style/data_style"
+            android:layout_marginTop="84dp"
             android:text="@{entry.dateString}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Thu, 23 July 2020"
-            style="@style/data_style" />
+            tools:text="Thu, 23 July 2020" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="150dp" />
+            app:layout_constraintGuide_begin="182dp" />
 
 
         <TextView
@@ -50,14 +48,14 @@
         <ImageButton
             android:id="@+id/fajr_btn"
             style="@style/prayer_btn"
+            android:contentDescription="TODO"
             android:src="@{entry.fajrMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/fajr_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/fajr_time"
-            app:layout_constraintTop_toTopOf="@+id/fajr_time"
-            android:contentDescription="TODO" />
+            app:layout_constraintTop_toTopOf="@+id/fajr_time" />
 
         <TextView
             android:id="@+id/fajr_time"
@@ -86,14 +84,14 @@
         <ImageButton
             android:id="@+id/dhuhr_btn"
             style="@style/prayer_btn"
+            android:contentDescription="TODO"
             android:src="@{entry.dhuhrMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/dhuhr_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/dhuhr_time"
-            app:layout_constraintTop_toTopOf="@+id/dhuhr_time"
-            android:contentDescription="TODO" />
+            app:layout_constraintTop_toTopOf="@+id/dhuhr_time" />
 
         <TextView
             android:id="@+id/dhuhr_time"
@@ -122,14 +120,14 @@
         <ImageButton
             android:id="@+id/asr_btn"
             style="@style/prayer_btn"
+            android:contentDescription="TODO"
             android:src="@{entry.asrMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/asr_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/asr_time"
-            app:layout_constraintTop_toTopOf="@+id/asr_time"
-            android:contentDescription="TODO" />
+            app:layout_constraintTop_toTopOf="@+id/asr_time" />
 
         <TextView
             android:id="@+id/asr_time"
@@ -158,14 +156,14 @@
         <ImageButton
             android:id="@+id/maghrib_btn"
             style="@style/prayer_btn"
+            android:contentDescription="TODO"
             android:src="@{entry.maghribMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/maghrib_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/maghrib_time"
-            app:layout_constraintTop_toTopOf="@+id/maghrib_time"
-            android:contentDescription="TODO" />
+            app:layout_constraintTop_toTopOf="@+id/maghrib_time" />
 
         <TextView
             android:id="@+id/maghrib_time"
@@ -194,14 +192,14 @@
         <ImageButton
             android:id="@+id/isha_btn"
             style="@style/prayer_btn"
+            android:contentDescription="TODO"
             android:src="@{entry.ishaMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/isha_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/isha_time"
-            app:layout_constraintTop_toTopOf="@+id/isha_time"
-            android:contentDescription="TODO" />
+            app:layout_constraintTop_toTopOf="@+id/isha_time" />
 
         <TextView
             android:id="@+id/isha_time"

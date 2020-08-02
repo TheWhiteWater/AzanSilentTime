@@ -3,29 +3,32 @@ package nz.co.redice.demoservice.view;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
-
-import javax.inject.Inject;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.R;
 import nz.co.redice.demoservice.databinding.FragmentHomeBinding;
-import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
-import nz.co.redice.demoservice.utils.PreferencesHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
 import nz.co.redice.demoservice.viewmodel.HomeViewModel;
 
@@ -36,6 +39,34 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private FragmentHomeBinding mViewBinding;
     private EntryModel mEntryModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.settings, menu);
+    }
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //Override it for handling items
+        int menuItemId = item.getItemId();
+        switch (menuItemId) {
+            case R.id.settings_id:
+                NavHostFragment.findNavController(this).navigate(R.id.fromHomeToSettings);
+                return true; //return true, if is handled
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -43,6 +74,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
         View view = mViewBinding.getRoot();
         mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
         return view;
     }
 
