@@ -7,13 +7,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="prayer_name">
+    <style name="time_title">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">26dp</item>
+        <item name="android:layout_marginStart">16dp</item>
         <item name="android:gravity">start</item>
-        <item name="android:textSize">22sp</item>
-        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginTop">22dp</item>
     </style>
 
     <style name="prayer_btn">
@@ -26,8 +26,16 @@
     <style name="prayer_time">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="data_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

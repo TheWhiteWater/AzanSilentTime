@@ -30,7 +30,7 @@ public class ForegroundService extends Service {
     @Inject Repository mRepository;
     @Inject PreferencesHelper mPreferencesHelper;
     @Inject NotificationHelper mNotificationHelper;
-    private IBinder mBinder = new LocalBinder();
+    private final IBinder mBinder = new LocalBinder();
     private EntryModel mTimings;
     private boolean mChangingConfiguration = false;
 

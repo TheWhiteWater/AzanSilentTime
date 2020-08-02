@@ -5,7 +5,6 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import nz.co.redice.demoservice.view.presentation.Converters;
-import nz.co.redice.demoservice.view.presentation.ReadableTimings;
 
 
 @Entity(tableName = "data_table")
@@ -27,7 +26,6 @@ public class EntryModel {
     private Long isha;
 
     @Ignore private String dateString;
-
     @Ignore private String fajrString;
     @Ignore private String dhuhrString;
     @Ignore private String asrString;
@@ -159,25 +157,6 @@ public class EntryModel {
 
     public String getDateString() {
         return Converters.setDateFromLong(date);
-    }
-
-    public ReadableTimings toReadableTimings() {
-        ReadableTimings readableTimings = new ReadableTimings();
-        readableTimings.setAsr(Converters.setTimeFromLong(asr));
-        readableTimings.setFajr(Converters.setTimeFromLong(fajr));
-        readableTimings.setDhuhr(Converters.setTimeFromLong(dhuhr));
-        readableTimings.setMaghrib(Converters.setTimeFromLong(maghrib));
-        readableTimings.setIsha(Converters.setTimeFromLong(isha));
-
-        readableTimings.setFajrMuteOn(true);
-        readableTimings.setDhuhrMuteOn(true);
-        readableTimings.setMaghribMuteOn(true);
-        readableTimings.setIshaMuteOn(true);
-        readableTimings.setAsrMuteOn(true);
-
-        readableTimings.setDate(Converters.setDateFromLong(date));
-
-        return readableTimings;
     }
 
 }

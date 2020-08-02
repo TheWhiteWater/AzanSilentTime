@@ -7,18 +7,21 @@ import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
 
 public class DatePickerFragment extends DialogFragment {
 
-    private DatePickerDialog.OnDateSetListener mListener;
-    private Context mContext;
+    private final DatePickerDialog.OnDateSetListener mListener;
+    private final Context mContext;
 
     public DatePickerFragment(Context context, DatePickerDialog.OnDateSetListener listener) {
         mListener = listener;
         mContext = context;
     }
 
+    @NotNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker

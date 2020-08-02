@@ -1,6 +1,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+<!--    <Preference-->
+<!--        app:fragment="nz.co.redice.demoservice.view.SettingsFragment"/>-->
+
     <PreferenceCategory android:title="Location">
 
         <EditTextPreference
@@ -12,8 +15,7 @@
         <SwitchPreference
             app:key="auto_detect_location"
             app:summary="Requires location tracking permission"
-            app:title="Auto detect your location"
-            app:useSimpleSummaryProvider="true" />
+            app:title="Auto detect your location"/>
 
     </PreferenceCategory>
 

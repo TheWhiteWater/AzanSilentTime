@@ -9,7 +9,5 @@ public class Gregorian {
     @SerializedName("date")
     @Expose
     public String date;
-    @SerializedName("format")
-    @Expose
-    public String format;
+
 }

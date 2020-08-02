@@ -1,7 +1,6 @@
 package nz.co.redice.demoservice.view;
 
 import android.app.DatePickerDialog;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.time.LocalDate;
@@ -24,30 +22,27 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.R;
-import nz.co.redice.demoservice.databinding.HomeFragmentBinding;
+import nz.co.redice.demoservice.databinding.FragmentHomeBinding;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.utils.PreferencesHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
-import nz.co.redice.demoservice.viewmodel.HomeScreenViewModel;
+import nz.co.redice.demoservice.viewmodel.HomeViewModel;
 
 @AndroidEntryPoint
 public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
-    @Inject Repository mRepository;
-    @Inject PreferencesHelper mPreferencesHelper;
-    private HomeScreenViewModel mViewModel;
-    private HomeFragmentBinding mViewBinding;
+    private HomeViewModel mViewModel;
+    private FragmentHomeBinding mViewBinding;
     private EntryModel mEntryModel;
-    private boolean mFragmentCreated = false;
 
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mViewBinding = HomeFragmentBinding.inflate(inflater, container, false);
+        mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
         View view = mViewBinding.getRoot();
-        mViewModel = new ViewModelProvider(this).get(HomeScreenViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         return view;
     }
 
@@ -56,17 +51,14 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         super.onViewCreated(view, savedInstanceState);
         setViewListeners();
 
-        mViewModel.getDatabaseSize().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if (integer >= 365 ) {
-                    // setting up current day
-                    Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-                    Log.d("App", "onViewCreated: " + currentDayEpoch);
-                    getTimingsForSelectedDate(currentDayEpoch);
-                } else {
-                    mViewModel.fillUpDatabase();
-                }
+        mViewModel.getDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
+            if (integer >= 365) {
+                // setting up current day
+                Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+                Log.d("App", "onViewCreated: " + currentDayEpoch);
+                getTimingsForSelectedDate(currentDayEpoch);
+            } else {
+                mViewModel.fillUpDaBase();
             }
         });
     }
@@ -85,7 +77,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment(getContext(), this);
-        newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+        newFragment.show(requireActivity().getSupportFragmentManager(), "datePicker");
     }
 
     @Override
@@ -112,7 +104,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 mViewBinding.setEntry(mEntryModel);
 
             } else {
-                mViewModel.fillUpDatabase();
+                mViewModel.fillUpDaBase();
             }
 
         });

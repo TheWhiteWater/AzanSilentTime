@@ -21,16 +21,12 @@
 
         <TextView
             android:id="@+id/date_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:text="@{entry.dateString}"
-            android:textSize="22sp"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Thu, 23 July 2020" />
+            tools:text="Thu, 23 July 2020"
+            style="@style/data_style" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_horizontal"
@@ -42,11 +38,11 @@
 
         <TextView
             android:id="@+id/fajr_name"
-            style="@style/prayer_name"
+            style="@style/time_title"
             android:text="Fajr"
             app:layout_constraintEnd_toStartOf="@+id/fajr_time"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline_horizontal" />
 
@@ -60,7 +56,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/fajr_time"
-            app:layout_constraintTop_toTopOf="@+id/fajr_time" />
+            app:layout_constraintTop_toTopOf="@+id/fajr_time"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/fajr_time"
@@ -77,11 +74,11 @@
 
         <TextView
             android:id="@+id/dhuhr_name"
-            style="@style/prayer_name"
+            style="@style/time_title"
             android:text="Dhuhr"
             app:layout_constraintEnd_toStartOf="@+id/dhuhr_time"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/fajr_name" />
 
@@ -95,7 +92,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/dhuhr_time"
-            app:layout_constraintTop_toTopOf="@+id/dhuhr_time" />
+            app:layout_constraintTop_toTopOf="@+id/dhuhr_time"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/dhuhr_time"
@@ -112,11 +110,11 @@
 
         <TextView
             android:id="@+id/asr_name"
-            style="@style/prayer_name"
+            style="@style/time_title"
             android:text="Asr"
             app:layout_constraintEnd_toStartOf="@+id/asr_time"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dhuhr_name" />
 
@@ -130,7 +128,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/asr_time"
-            app:layout_constraintTop_toTopOf="@+id/asr_time" />
+            app:layout_constraintTop_toTopOf="@+id/asr_time"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/asr_time"
@@ -147,11 +146,11 @@
 
         <TextView
             android:id="@+id/maghrib_name"
-            style="@style/prayer_name"
+            style="@style/time_title"
             android:text="Maghrib"
             app:layout_constraintEnd_toStartOf="@+id/maghrib_time"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/asr_name" />
 
@@ -165,7 +164,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/maghrib_time"
-            app:layout_constraintTop_toTopOf="@+id/maghrib_time" />
+            app:layout_constraintTop_toTopOf="@+id/maghrib_time"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/maghrib_time"
@@ -182,11 +182,11 @@
 
         <TextView
             android:id="@+id/isha_name"
-            style="@style/prayer_name"
+            style="@style/time_title"
             android:text="Isha"
             app:layout_constraintEnd_toStartOf="@+id/isha_time"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/maghrib_name" />
 
@@ -200,7 +200,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/isha_time"
-            app:layout_constraintTop_toTopOf="@+id/isha_time" />
+            app:layout_constraintTop_toTopOf="@+id/isha_time"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/isha_time"
@@ -211,7 +212,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/isha_name"
-            app:layout_constraintTop_toTopOf="@+id/isha_name" />
+            app:layout_constraintTop_toTopOf="@+id/isha_name"
+            tools:text="20:20 AM" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

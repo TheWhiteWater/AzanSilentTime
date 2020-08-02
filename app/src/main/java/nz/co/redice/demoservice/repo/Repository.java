@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
 
 import javax.inject.Inject;
@@ -37,7 +39,7 @@ public class Repository {
         mAzanService.requestStandardAnnualTimeTable(lat, lon, MUSLIM_WORLD_LEAGUE_METHOD,
                 Calendar.getInstance().get(Calendar.YEAR), true).enqueue(new Callback<ApiResponse>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     for (Day day : response.body().data.getAnnualList()) {
                         Completable.fromAction(() -> {
@@ -52,7 +54,7 @@ public class Repository {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
                 Log.d(TAG, "onFailure: standard request" + t.getMessage());
             }
         });

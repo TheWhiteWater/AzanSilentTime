@@ -10,50 +10,42 @@ public class Data {
 
     @SerializedName("1")
     @Expose
-    public List<Day> _1 = new ArrayList<>();
+    public final List<Day> _1 = new ArrayList<>();
     @SerializedName("2")
     @Expose
-    public List<Day> _2 = new ArrayList<>();
+    public final List<Day> _2 = new ArrayList<>();
     @SerializedName("3")
     @Expose
-    public List<Day> _3 = new ArrayList<>();
+    public final List<Day> _3 = new ArrayList<>();
     @SerializedName("4")
     @Expose
-    public List<Day> _4 = new ArrayList<>();
+    public final List<Day> _4 = new ArrayList<>();
     @SerializedName("5")
     @Expose
-    public List<Day> _5 = new ArrayList<>();
+    public final List<Day> _5 = new ArrayList<>();
     @SerializedName("6")
     @Expose
-    public List<Day> _6 = new ArrayList<>();
+    public final List<Day> _6 = new ArrayList<>();
     @SerializedName("7")
     @Expose
-    public List<Day> _7 = new ArrayList<>();
+    public final List<Day> _7 = new ArrayList<>();
     @SerializedName("8")
     @Expose
-    public List<Day> _8 = new ArrayList<>();
+    public final List<Day> _8 = new ArrayList<>();
     @SerializedName("9")
     @Expose
-    public List<Day> _9 = new ArrayList<>();
+    public final List<Day> _9 = new ArrayList<>();
     @SerializedName("10")
     @Expose
-    public List<Day> _10 = new ArrayList<>();
+    public final List<Day> _10 = new ArrayList<>();
     @SerializedName("11")
     @Expose
-    public List<Day> _11 = new ArrayList<>();
+    public final List<Day> _11 = new ArrayList<>();
     @SerializedName("12")
     @Expose
-    public List<Day> _12 = new ArrayList<>();
+    public final List<Day> _12 = new ArrayList<>();
 
-    private List<Day> annualList = new ArrayList<>();
-
-//    public List<Day> getAnnualList() {
-//         List<Day> annualList = Stream.of(_1, _2, _3,_4, _5, _6, _7, _8, _9, _10, _11, _12)
-//                .flatMap(Collection::stream)
-//                .collect(Collectors.toList());
-//         return annualList;
-//    }
-
+    private final List<Day> annualList = new ArrayList<>();
 
     public List<Day> getAnnualList() {
         annualList.addAll(_1);
