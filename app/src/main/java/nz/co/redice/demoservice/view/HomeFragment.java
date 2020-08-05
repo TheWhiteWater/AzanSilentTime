@@ -82,12 +82,12 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setViewListeners();
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
         mViewModel.getDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
             if (integer >= 365) {
                 // setting up current day
                 Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-                Log.d("App", "onViewCreated: " + currentDayEpoch);
                 getTimingsForSelectedDate(currentDayEpoch);
             } else {
                 mViewModel.fillUpDaBase();
@@ -131,10 +131,8 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private void getTimingsForSelectedDate(Long date) {
         mViewModel.getTimesForSelectedDate(date).observe(getViewLifecycleOwner(), selected -> {
             if (selected != null) {
-                Log.d("App", "getTimingsForSelectedDate: " + selected.getDateString());
                 mEntryModel = selected;
                 mViewBinding.setEntry(mEntryModel);
-
             } else {
                 mViewModel.fillUpDaBase();
             }
@@ -145,26 +143,37 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.dhuhr_btn:
-                mEntryModel.setDhuhrMuteOn(!mEntryModel.getDhuhrMuteOn());
-                mViewModel.updateEntry(mEntryModel);
+                if (mEntryModel != null) {
+                    mEntryModel.setDhuhrMuteOn(!mEntryModel.getDhuhrMuteOn());
+                    mViewModel.updateEntry(mEntryModel);
+                }
                 break;
             case R.id.asr_btn:
-                mEntryModel.setAsrMuteOn(!mEntryModel.getAsrMuteOn());
-                mViewModel.updateEntry(mEntryModel);
+                if (mEntryModel != null) {
+                    mEntryModel.setAsrMuteOn(!mEntryModel.getAsrMuteOn());
+                    mViewModel.updateEntry(mEntryModel);
+                }
                 break;
             case R.id.fajr_btn:
-                mEntryModel.setFajrMuteOn(!mEntryModel.getFajrMuteOn());
-                mViewModel.updateEntry(mEntryModel);
+                if (mEntryModel != null) {
+                    mEntryModel.setFajrMuteOn(!mEntryModel.getFajrMuteOn());
+                    mViewModel.updateEntry(mEntryModel);
+                }
                 break;
             case R.id.maghrib_btn:
-                mEntryModel.setMaghribMuteOn(!mEntryModel.getMaghribMuteOn());
-                mViewModel.updateEntry(mEntryModel);
+                if (mEntryModel != null) {
+                    mEntryModel.setMaghribMuteOn(!mEntryModel.getMaghribMuteOn());
+                    mViewModel.updateEntry(mEntryModel);
+                }
                 break;
             case R.id.isha_btn:
             default:
-                mEntryModel.setIshaMuteOn(!mEntryModel.getIshaMuteOn());
-                mViewModel.updateEntry(mEntryModel);
+                if (mEntryModel != null) {
+                    mEntryModel.setIshaMuteOn(!mEntryModel.getIshaMuteOn());
+                    mViewModel.updateEntry(mEntryModel);
+                }
                 break;
         }
     }
+
 }

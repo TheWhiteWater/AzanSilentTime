@@ -2,6 +2,7 @@ package nz.co.redice.demoservice.view;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,10 +39,11 @@ public class SplashFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_splash, container, false);
 
-        Observable.timer(3000, TimeUnit.MILLISECONDS)
+        Observable.timer(1200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(s -> shiftToNextScreen());
+                .subscribe(s -> shiftToNextScreen(),
+                        error -> Log.d("App", "onCreateView rxtimer error: " + error.getMessage() ));
         return view;
     }
 

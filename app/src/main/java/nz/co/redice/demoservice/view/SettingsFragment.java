@@ -2,17 +2,11 @@ package nz.co.redice.demoservice.view;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -32,13 +26,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Inject PrefHelper mPrefHelper;
 
 
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -46,9 +33,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         EditTextPreference location = findPreference("location");
         Log.d(TAG, "onCreatePreferences: " + (location != null ? location.getText() : "null"));
 
-        location.setOnPreferenceChangeListener(this);
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        if (location != null) {
+            location.setOnPreferenceChangeListener(this);
+        }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Log.d(TAG, "onOptionsItemSelected: !!!!!!!!!!!!");
+                NavHostFragment.findNavController(this).navigate(R.id.fromSettingsToHome);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {

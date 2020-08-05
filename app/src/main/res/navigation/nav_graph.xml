@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/splashScreenFragment"
         android:name="nz.co.redice.demoservice.view.SplashFragment"
-        android:label="fragment_splash_screen"
+        android:label="SplashFragment"
         tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/fromSplashToLocation"
@@ -20,7 +20,7 @@
     <fragment
         android:id="@+id/locationFragment"
         android:name="nz.co.redice.demoservice.view.LocationFragment"
-        android:label="fragment_auto_location"
+        android:label="LocationFragment"
         tools:layout="@layout/fragment_location">
         <action
             android:id="@+id/fromLocationToHome"
@@ -38,9 +38,10 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="nz.co.redice.demoservice.view.SettingsFragment"
-        android:label="SettingsFragment">
+        android:label="SettingsFragment"
+        >
         <action
-            android:id="@+id/action_settingsFragment_to_homeFragment"
+            android:id="@+id/fromSettingsToHome"
             app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

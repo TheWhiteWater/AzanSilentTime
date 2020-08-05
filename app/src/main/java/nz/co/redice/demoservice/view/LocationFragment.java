@@ -51,7 +51,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         View view = mViewBinding.getRoot();
         mViewModel = new ViewModelProvider(this).get(AutoLocationViewModel.class);
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
-
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         return view;
     }
 

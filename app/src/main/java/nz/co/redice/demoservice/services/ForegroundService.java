@@ -10,6 +10,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LifecycleService;
+import androidx.lifecycle.Observer;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -17,6 +20,9 @@ import java.time.ZoneId;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.utils.NotificationHelper;
@@ -25,28 +31,31 @@ import nz.co.redice.demoservice.utils.PrefHelper;
 import static nz.co.redice.demoservice.utils.NotificationHelper.QUIT_APP;
 
 @AndroidEntryPoint
-public class ForegroundService extends Service {
+public class ForegroundService extends LifecycleService {
 
+    private final IBinder mBinder = new LocalBinder();
     @Inject Repository mRepository;
     @Inject PrefHelper mPrefHelper;
     @Inject NotificationHelper mNotificationHelper;
-    private final IBinder mBinder = new LocalBinder();
-    private EntryModel mTimings;
     private boolean mChangingConfiguration = false;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        super.onStartCommand(intent, flags, startId);
         if (intent.getBooleanExtra(QUIT_APP, false)) {
-
             stopSelf();
         }
 
-//        setCurrentDay(mTimings);
-//        setNextAlarm();
+        mRepository.getDatabaseSize().observe(this, integer -> {
+            if (integer>= 365) {
+                setObserverOnCurrentDay();
+            }
+        });
+
         Log.d("App", "onStartCommand: service started");
         return START_REDELIVER_INTENT;
     }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -57,6 +66,7 @@ public class ForegroundService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        super.onBind(intent);
         Log.d("App", "onBind: Service bound");
         stopForeground(true);
         mChangingConfiguration = false;
@@ -67,30 +77,31 @@ public class ForegroundService extends Service {
     public void onRebind(Intent intent) {
         stopForeground(true);
         mChangingConfiguration = false;
+        Log.d("App", "onRebind: ");
         super.onRebind(intent);
     }
 
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d("App", "onUnbind: !!!!!!!!");
+        Log.d("App", "onUnbind: ");
         if (!mChangingConfiguration)
             startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.createForegroundNotification(this));
         return true;
     }
 
-    private void setCurrentDay(EntryModel timings) {
-        Long currentDayEpoch = LocalDate.now()
-                .atStartOfDay(ZoneId.systemDefault())
-                .toEpochSecond();
+    private void setObserverOnCurrentDay() {
+        Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
 
-//        if (mTimings == null || !mTimings.getDate().equals(currentDayEpoch)) {
-//            mTimings = mRepository.getTimesForSelectedDate(currentDayEpoch).getValue();
-//        }
+        mRepository.getSelectedDate(currentDayEpoch).observe(this, new Observer<EntryModel>() {
+            @Override
+            public void onChanged(EntryModel model) {
+                Log.d("App", "setObserverOnCurrentDay() current day is " + model.getDateString());
+            }
+        });
     }
 
-    private void setNextAlarm() {
-
+    private void setNextAlarm(EntryModel model) {
     }
 
     public boolean serviceIsRunningInForeground(Context context) {
