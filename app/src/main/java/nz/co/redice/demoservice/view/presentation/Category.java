@@ -29,10 +29,7 @@ public enum Category {
         }
         public String getTag() {return "map";}
 
-    };
-
-    public abstract String getTag();
-
+    }
 
 
 }

@@ -1,18 +1,27 @@
 package nz.co.redice.demoservice.repo;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
-import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.local.EventDao;
-import nz.co.redice.demoservice.repo.local.models.Azan;
+import nz.co.redice.demoservice.repo.local.entity.EntryModel;
+import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.repo.remote.AzanService;
-import nz.co.redice.demoservice.utils.PrefHelper;
+import nz.co.redice.demoservice.repo.remote.models.ApiResponse;
+import nz.co.redice.demoservice.repo.remote.models.Day;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Repository {
 
@@ -20,7 +29,6 @@ public class Repository {
     private static final int MUSLIM_WORLD_LEAGUE_METHOD = 3;
     private final AzanService mAzanService;
     private final EventDao mDao;
-    @Inject PrefHelper mPrefHelper;
 
     @Inject
     public Repository(AzanService newsService, EventDao dao) {
@@ -28,35 +36,58 @@ public class Repository {
         mDao = dao;
     }
 
-    public void requestAnnualCalendar(Double latitude, Double longitude) {
-        mAzanService.requestAnnualTimeTable(latitude, longitude,
-                Calendar.getInstance().get(Calendar.YEAR), false,
-                MUSLIM_WORLD_LEAGUE_METHOD)
+    public void requestPrayerCalendar(Float lat, Float lon) {
+        mAzanService.requestStandardAnnualTimeTable(lat, lon, MUSLIM_WORLD_LEAGUE_METHOD,
+                Calendar.getInstance().get(Calendar.YEAR), true).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (Day day : response.body().data.getAnnualList()) {
+                        Completable.fromAction(() -> {
+                            EntryModel newEntryModel = day.toEntry();
+                            mDao.insertEntry(newEntryModel);
+                        })
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
+                Log.d(TAG, "onFailure: standard request" + t.getMessage());
+            }
+        });
+    }
+
+    public LiveData<EntryModel> getRegularEntry(Long value) {
+        return mDao.getSelectedEntry(value);
+    }
+
+    public LiveData<Integer> getRegularTableSize() {
+         return mDao.getRowCount();
+    }
+
+    public LiveData<Integer> getFridayTableSize() {
+         return mDao.getFridaysCount();
+    }
+
+    public void updateRegularEntry(EntryModel model){
+        mDao.updateEntry(model)
                 .subscribeOn(Schedulers.io())
-                .toObservable()
-                .flatMap(s -> Observable.fromIterable(s.data))
-                .map(s -> {
-                    mPrefHelper.setLocalTimeZone(s.meta.timezone);
-                    return new Azan(
-                            s.date.gregorian.date,
-                            mPrefHelper.getTimeZone(),
-                            s.timings.fajr,
-                            s.timings.dhuhr,
-                            s.timings.asr,
-                            s.timings.maghrib,
-                            s.timings.isha);
-
-                })
-                .subscribe(s -> mDao.insertEntry(s),
-                        error -> System.err.println("" + error.getStackTrace()));
+                .subscribe();
     }
 
-    public LiveData<List<Azan>> getAnnualTables() {
-        return mDao.getAnnualCalendar();
+    public void insertFridayEntry(FridayEntry fridayEntry) {
+        mDao.insertFridayEntry(fridayEntry);
     }
 
-    public LiveData<Azan> getTimesForSelectedDate(Long value) {
-        return mDao.getAzanTimesForDate(value);
+    public LiveData<FridayEntry> getFridayEntry(Long value) {
+        return mDao.getSelectedFridayEntry(value);
+    }
+    public void updateFridayEntry(FridayEntry fridayEntry) {
+        mDao.updateFridayEntry(fridayEntry);
     }
 
 }

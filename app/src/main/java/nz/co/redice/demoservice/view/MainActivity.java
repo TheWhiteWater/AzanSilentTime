@@ -2,25 +2,27 @@ package nz.co.redice.demoservice.view;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.Navigation;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import nz.co.redice.demoservice.R;
 import nz.co.redice.demoservice.databinding.ActivityMainBinding;
-import nz.co.redice.demoservice.view.presentation.Category;
-import nz.co.redice.demoservice.view.presentation.PagerAdapter;
+import nz.co.redice.demoservice.repo.Repository;
+import nz.co.redice.demoservice.utils.PrefHelper;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
-    private PagerAdapter mPagerAdapter;
-    private ViewPager2 mViewPager;
+    @Inject PrefHelper mPrefHelper;
+    @Inject Repository mRepository;
     private ActivityMainBinding mBinding;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,16 +30,22 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
+    }
 
-        List<Category> categories = Arrays.asList(
-                Category.HOME,
-                Category.SETTINGS);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBinding = null;
+    }
 
-        mPagerAdapter = new PagerAdapter(this, categories);
-        mViewPager = mBinding.viewpager;
-        mViewPager.setAdapter(mPagerAdapter);
-
-
-
+    @Override
+    public void onBackPressed() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        if (navController.getCurrentDestination().getLabel().equals("HomeFragment") ||
+                navController.getCurrentDestination().getLabel().equals("LocationFragment")) {
+            // do nothing
+        } else {
+            super.onBackPressed();
+        }
     }
 }

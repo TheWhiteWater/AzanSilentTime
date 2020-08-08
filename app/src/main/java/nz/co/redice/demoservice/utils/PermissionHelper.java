@@ -1,21 +1,33 @@
 package nz.co.redice.demoservice.utils;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.Log;
+import android.view.View;
+
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import nz.co.redice.demoservice.R;
+import nz.co.redice.demoservice.view.MainActivity;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
-
+@Singleton
 public class PermissionHelper {
 
+    private static final String TAG = PermissionHelper.class.getSimpleName();
     private Context mContext;
 
     @Inject
@@ -33,5 +45,13 @@ public class PermissionHelper {
         }
     }
 
+    public boolean isLocationPermissionGranted() {
+        return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(mContext,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+
 
 }
+
+

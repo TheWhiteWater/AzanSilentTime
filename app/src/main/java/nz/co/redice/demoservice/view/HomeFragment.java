@@ -1,118 +1,296 @@
 package nz.co.redice.demoservice.view;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import nz.co.redice.demoservice.databinding.HomeFragmentBinding;
-import nz.co.redice.demoservice.repo.Repository;
-import nz.co.redice.demoservice.utils.Converters;
+import nz.co.redice.demoservice.R;
+import nz.co.redice.demoservice.databinding.FragmentHomeBinding;
+import nz.co.redice.demoservice.repo.local.entity.EntryModel;
 import nz.co.redice.demoservice.utils.PrefHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
-import nz.co.redice.demoservice.view.presentation.TimeTable;
-import nz.co.redice.demoservice.viewmodel.HomeScreenViewModel;
+import nz.co.redice.demoservice.view.presentation.TimePickerFragment;
+import nz.co.redice.demoservice.viewmodel.HomeViewModel;
 
 @AndroidEntryPoint
-public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
+public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
-    @Inject Repository mRepository;
     @Inject PrefHelper mPrefHelper;
-    private HomeScreenViewModel mViewModel;
-    private HomeFragmentBinding mBinding;
-    private TimeTable mTimeTable;
+    private HomeViewModel mViewModel;
+    private FragmentHomeBinding mViewBinding;
+    private EntryModel mEntryModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.settings, menu);
+    }
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int menuItemId = item.getItemId();
+        switch (menuItemId) {
+            case R.id.settings_id:
+                NavHostFragment.findNavController(this).navigate(R.id.fromHomeToSettings);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mBinding = HomeFragmentBinding.inflate(inflater, container, false);
-        View view = mBinding.getRoot();
-        mBinding.setLifecycleOwner(getViewLifecycleOwner());
-        mViewModel = new ViewModelProvider(this).get(HomeScreenViewModel.class);
-        mTimeTable = new TimeTable();
+        mViewBinding = FragmentHomeBinding.inflate(inflater, container, false);
+        View view = mViewBinding.getRoot();
+        mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setViewListeners();
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
+        mViewBinding.fridayCheckBox.setChecked(mPrefHelper.getDndOnFridaysOnly());
+
+        mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
+            if (integer >= 365 ) {
+                Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+                displaySelectedEntry(currentDayEpoch);
+            } else {
+                mViewModel.requestPrayerCalendar();
+            }
+        });
+
+        mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
+            if (integer > 0 ) {
+                mViewModel.getNextFridayEntry().observe(getViewLifecycleOwner(),
+                        fridayEntry -> {
+                            if (fridayEntry != null) {
+                                mViewBinding.setFriday(fridayEntry);
+                                mViewBinding.progressBar.setVisibility(View.INVISIBLE);
+                            } else {
+                                Log.d("App", "onViewCreated:  fridayEntry is null");
+                            }
+                        });
+            } else {
+                mViewModel.populateFridayTable();
+            }
+        });
+    }
+
+
+    private void setViewListeners() {
         //setting date picker
-        mBinding.dateTv.setOnClickListener(this::showDatePickerDialog);
+        mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
+        mViewBinding.fridayDateView.setOnClickListener(this::showDatePickerDialog);
 
-        // setting timings for current day
-        Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.of(mPrefHelper.getTimeZone())).toEpochSecond();
-        setDataBindingByStringValue(currentDayEpoch);
+        mViewBinding.fridayTime.setOnClickListener(this::showTimePickerDialog);
+
+        mViewBinding.fridayCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+                if (b) {
+
+                    mPrefHelper.setDndOnFridaysOnly(true);
+
+                    mViewBinding.dateView.setVisibility(View.GONE);
+
+                    mViewBinding.fajrBtn.setVisibility(View.GONE);
+                    mViewBinding.fajrTime.setVisibility(View.GONE);
+                    mViewBinding.fajrName.setVisibility(View.GONE);
+
+                    mViewBinding.dhuhrBtn.setVisibility(View.GONE);
+                    mViewBinding.dhuhrTime.setVisibility(View.GONE);
+                    mViewBinding.dhuhrName.setVisibility(View.GONE);
+
+                    mViewBinding.asrBtn.setVisibility(View.GONE);
+                    mViewBinding.asrTime.setVisibility(View.GONE);
+                    mViewBinding.asrName.setVisibility(View.GONE);
+
+                    mViewBinding.maghribBtn.setVisibility(View.GONE);
+                    mViewBinding.maghribTime.setVisibility(View.GONE);
+                    mViewBinding.maghribName.setVisibility(View.GONE);
+
+                    mViewBinding.ishaBtn.setVisibility(View.GONE);
+                    mViewBinding.ishaTime.setVisibility(View.GONE);
+                    mViewBinding.ishaName.setVisibility(View.GONE);
+
+                    mViewBinding.fridayDateView.setVisibility(View.VISIBLE);
+                    mViewBinding.fridayName.setVisibility(View.VISIBLE);
+                    mViewBinding.fridayTime.setVisibility(View.VISIBLE);
+                    mViewBinding.fridayBtn.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    mPrefHelper.setDndOnFridaysOnly(false);
+
+                    mViewBinding.dateView.setVisibility(View.VISIBLE);
+
+                    mViewBinding.fajrBtn.setVisibility(View.VISIBLE);
+                    mViewBinding.fajrTime.setVisibility(View.VISIBLE);
+                    mViewBinding.fajrName.setVisibility(View.VISIBLE);
+
+                    mViewBinding.dhuhrBtn.setVisibility(View.VISIBLE);
+                    mViewBinding.dhuhrTime.setVisibility(View.VISIBLE);
+                    mViewBinding.dhuhrName.setVisibility(View.VISIBLE);
+
+                    mViewBinding.asrBtn.setVisibility(View.VISIBLE);
+                    mViewBinding.asrTime.setVisibility(View.VISIBLE);
+                    mViewBinding.asrName.setVisibility(View.VISIBLE);
+
+                    mViewBinding.maghribBtn.setVisibility(View.VISIBLE);
+                    mViewBinding.maghribTime.setVisibility(View.VISIBLE);
+                    mViewBinding.maghribName.setVisibility(View.VISIBLE);
+
+                    mViewBinding.ishaBtn.setVisibility(View.VISIBLE);
+                    mViewBinding.ishaTime.setVisibility(View.VISIBLE);
+                    mViewBinding.ishaName.setVisibility(View.VISIBLE);
+
+                    mViewBinding.fridayDateView.setVisibility(View.GONE);
+                    mViewBinding.fridayName.setVisibility(View.GONE);
+                    mViewBinding.fridayTime.setVisibility(View.GONE);
+                    mViewBinding.fridayBtn.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        //setting mute buttons
+        mViewBinding.asrBtn.setOnClickListener(this::onClick);
+        mViewBinding.fajrBtn.setOnClickListener(this::onClick);
+        mViewBinding.ishaBtn.setOnClickListener(this::onClick);
+        mViewBinding.maghribBtn.setOnClickListener(this::onClick);
+        mViewBinding.dhuhrBtn.setOnClickListener(this::onClick);
+    }
+
+    private void showTimePickerDialog(View view) {
+        DialogFragment newFragment = new TimePickerFragment(getContext(), this);
+        newFragment.show(requireActivity().getSupportFragmentManager(), "timePicker");
     }
 
     private void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment(getContext(), this);
-        newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+        newFragment.show(requireActivity().getSupportFragmentManager(), "datePicker");
     }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        // TODO: 27.07.2020
-//        Intent intent = new Intent(this, Service.class);
-//        startService(intent);
-
-
-        // TODO: 27.07.2020
-//        mPrefHelper.setDatabaseUpdateStatus(false);
-        Log.d("App", "onCreate: " + mPrefHelper.getDatabaseUpdateStatus());
-        if (!mPrefHelper.getDatabaseUpdateStatus()) {
-            mRepository.requestAnnualCalendar(-40.3596, 175.61);
-            mPrefHelper.setDatabaseUpdateStatus(true);
-        }
-
-    }
-
 
     @Override
     public void onDestroyView() {
+        mViewBinding = null;
         super.onDestroyView();
-        mBinding = null;
     }
 
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        LocalDate newDate = LocalDate.of(year, ++month, dayOfMonth);
-        Long longDate = newDate.atStartOfDay(ZoneId.of(mPrefHelper.getTimeZone())).toEpochSecond();
-        Log.d("App", "onDateSet: " + longDate);
-        setDataBindingByStringValue(longDate);
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
+
+        if (!mPrefHelper.getDndOnFridaysOnly()) {
+            Long selectedEpoch = selectedDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+            displaySelectedEntry(selectedEpoch);
+        } else {
+            displayNextFridayEntry(selectedDate);
+
+        }
+    }
+
+    private void displayNextFridayEntry(LocalDate selectedDate) {
+
     }
 
 
-    private void setDataBindingByStringValue(Long date) {
-        mViewModel.getTimesForSelectedDate(date).observe(getViewLifecycleOwner(), selected -> {
-            mTimeTable.setDate(Converters.convertLongValueOfLocalDateIntoString(selected.getDate(), selected.getTimeZone(), mPrefHelper.getLocalDateFormatPattern()));
-            mTimeTable.setFajr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getFajr(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setAsr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getAsr(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setDhuhr(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getDhuhr(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setIsha(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getIsha(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mTimeTable.setMaghrib(Converters.convertLongValueOfLocalDateTimeIntoString(selected.getMaghrib(), selected.getTimeZone(), mPrefHelper.getLocalTimeFormatPattern()));
-            mBinding.setTimeTable(mTimeTable);
+    private void displaySelectedEntry(Long date) {
+        mViewModel.getSelectedEntry(date).observe(getViewLifecycleOwner(), selected -> {
+            if (selected != null) {
+                mEntryModel = selected;
+                mViewBinding.setEntry(mEntryModel);
+                mViewBinding.progressBar.setVisibility(View.INVISIBLE);
+            } else {
+                mViewModel.requestPrayerCalendar();
+            }
+
         });
+    }
 
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.dhuhr_btn:
+                if (mEntryModel != null) {
+                    mEntryModel.setDhuhrSilent(!mEntryModel.getDhuhrSilent());
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.asr_btn:
+                if (mEntryModel != null) {
+                    mEntryModel.setAsrSilent(!mEntryModel.getAsrSilent());
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.fajr_btn:
+                if (mEntryModel != null) {
+                    mEntryModel.setFajrSilent(!mEntryModel.getFajrSilent());
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.maghrib_btn:
+                if (mEntryModel != null) {
+                    mEntryModel.setMaghribSilent(!mEntryModel.getMaghribSilent());
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.isha_btn:
+            default:
+                if (mEntryModel != null) {
+                    mEntryModel.setIshaSilent(!mEntryModel.getIshaSilent());
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+        }
+    }
 
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        mViewModel.updateFridaysTable(hourOfDay, minute);
     }
 }

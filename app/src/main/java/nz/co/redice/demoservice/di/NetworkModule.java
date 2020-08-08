@@ -20,7 +20,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkModule {
 
 
+    private static final String BASE_URL = "https://api.aladhan.com/v1/";
+
     @Provides
+    @Singleton
     HttpLoggingInterceptor provideInterceptor() {
         return new HttpLoggingInterceptor()
                 .setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -41,13 +44,14 @@ public class NetworkModule {
                 .client(client)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("https://api.aladhan.com/v1/")
+                .baseUrl(BASE_URL)
                 .build();
     }
 
 
     @Provides
-    AzanService provideAzanService(Retrofit retrofit) {
+    @Singleton
+    AzanService provideNewsService(Retrofit retrofit) {
         return retrofit.create(AzanService.class);
     }
 

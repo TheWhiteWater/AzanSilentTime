@@ -1,5 +1,5 @@
 
-package nz.co.redice.demoservice.repo.local.models;
+package nz.co.redice.demoservice.repo.remote.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
