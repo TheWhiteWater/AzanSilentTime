@@ -79,12 +79,17 @@ public class HomeViewModel extends AndroidViewModel {
 
         while (currentDay.isBefore(endOfTheYear)) {
             currentDay = calcNextFriday(currentDay);
-            Observable.just(new FridayEntry(currentDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()))
+            Long date = currentDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+            Long time = currentDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+
+            Observable.just(new FridayEntry(date, true, time))
                     .subscribeOn(Schedulers.io())
                     .subscribe(s -> {
                         mRepository.insertFridayEntry(s);
                     });
         }
+
+        nextFriday = getNextFridayEntry(LocalDate.now());
     }
 
     public LiveData<FridayEntry> getNextFridayEntry(LocalDate selectedDate) {

@@ -34,7 +34,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.R;
 import nz.co.redice.demoservice.databinding.FragmentHomeBinding;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
-import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.utils.PrefHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
 import nz.co.redice.demoservice.view.presentation.TimePickerFragment;
@@ -231,7 +230,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         mViewModel.getNextFridayEntry(selectedDate).observe(getViewLifecycleOwner(),
                 fridayEntry -> {
                     if (fridayEntry != null) {
-                        Log.d("App", "new Friday : " + fridayEntry.getFridayDateString());
+                        Log.d("App", "new Friday : " + fridayEntry.getDateString());
                         mViewBinding.setFriday(fridayEntry);
                         mViewBinding.progressBar.setVisibility(View.INVISIBLE);
                     } else {

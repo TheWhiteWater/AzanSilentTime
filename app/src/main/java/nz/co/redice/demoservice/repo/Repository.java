@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 
 import javax.inject.Inject;
@@ -62,6 +64,7 @@ public class Repository {
     }
 
     public LiveData<EntryModel> getRegularEntry(Long value) {
+        LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         return mDao.getSelectedEntry(value);
     }
 

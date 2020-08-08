@@ -11,10 +11,10 @@ public class FridayEntry {
 
     @PrimaryKey
     private Long date;
-    private Boolean isFridaySilent = true;
-    private Long fridayEpoch;
-    private String fridayTimeString;
-    private String fridayDateString;
+    private Boolean isSilent = true;
+    private Long timeEpoch;
+    private String TimeString;
+    private String DateString;
     private String blank;
 
     public FridayEntry() {
@@ -23,19 +23,19 @@ public class FridayEntry {
     @Ignore
     public FridayEntry(Long date) {
         this.date = date;
-        this.isFridaySilent = true;
-        this.fridayTimeString = Converters.setTimeFromLong(fridayEpoch);
-        this.fridayDateString = Converters.setDateFromLong(date);
+        this.isSilent = true;
+        this.TimeString = Converters.setTimeFromLong(timeEpoch);
+        this.DateString = Converters.setDateFromLong(date);
         this.blank = "Select";
     }
 
     @Ignore
-    public FridayEntry(Long date, Boolean isFridaySilent, Long fridayEpoch) {
+    public FridayEntry(Long date, Boolean isFridaySilent, Long timeEpoch) {
         this.date = date;
-        this.isFridaySilent = isFridaySilent;
-        this.fridayEpoch = fridayEpoch;
-        this.fridayTimeString = Converters.setTimeFromLong(fridayEpoch);
-        this.fridayDateString = Converters.setDateFromLong(date);
+        this.isSilent = isFridaySilent;
+        this.timeEpoch = timeEpoch;
+        this.TimeString = Converters.setTimeFromLong(timeEpoch);
+        this.DateString = Converters.setDateFromLong(date);
     }
 
 
@@ -47,36 +47,36 @@ public class FridayEntry {
         this.date = date;
     }
 
-    public Boolean getFridaySilent() {
-        return isFridaySilent;
+    public Boolean getSilent() {
+        return isSilent;
     }
 
-    public void setFridaySilent(Boolean fridaySilent) {
-        isFridaySilent = fridaySilent;
+    public void setSilent(Boolean fridaySilent) {
+        isSilent = fridaySilent;
     }
 
-    public Long getFridayEpoch() {
-        return fridayEpoch;
+    public Long getTimeEpoch() {
+        return timeEpoch;
     }
 
-    public void setFridayEpoch(Long fridayEpoch) {
-        this.fridayEpoch = fridayEpoch;
+    public void setTimeEpoch(Long timeEpoch) {
+        this.timeEpoch = timeEpoch;
     }
 
-    public String getFridayTimeString() {
-        return fridayTimeString;
+    public String getTimeString() {
+        return TimeString;
     }
 
-    public void setFridayTimeString(String fridayString) {
-        this.fridayTimeString = fridayString;
+    public void setTimeString(String fridayTimeString) {
+        this.TimeString = fridayTimeString;
     }
 
-    public String getFridayDateString() {
-        return fridayDateString;
+    public String getDateString() {
+        return DateString;
     }
 
-    public void setFridayDateString(String fridayDateString) {
-        this.fridayDateString = fridayDateString;
+    public void setDateString(String fridayDateString) {
+        this.DateString = fridayDateString;
     }
 
     public String getBlank() {

@@ -1,5 +1,6 @@
 package nz.co.redice.demoservice.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -7,6 +8,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -20,7 +24,12 @@ public class PrefHelper {
     private static final String MUTE_ON_FRIDAYS_ONLY = "mute on fridays only";
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
+    private Subject<Boolean> fridayOnly = PublishSubject.create();
     private Context mContext;
+
+    public Observable<Boolean> getFridayOnly() {
+        return fridayOnly;
+    }
 
     @Inject
     public PrefHelper(@ApplicationContext Context context) {
@@ -55,6 +64,7 @@ public class PrefHelper {
 
     public void setDndOnFridaysOnly(boolean b) {
         mEditor.putBoolean(MUTE_ON_FRIDAYS_ONLY, b).apply();
+        fridayOnly.onNext(getDndOnFridaysOnly());
     }
 
     public boolean getDndOnFridaysOnly() {

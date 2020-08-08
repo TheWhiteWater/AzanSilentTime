@@ -1,5 +1,6 @@
 package nz.co.redice.demoservice.services;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,16 +14,21 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleService;
+import androidx.lifecycle.Observer;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.Repository;
+import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.utils.NotificationHelper;
 import nz.co.redice.demoservice.utils.PrefHelper;
 
@@ -36,7 +42,8 @@ public class ForegroundService extends LifecycleService {
     private static final int ASR_ALARM = 3;
     private static final int MAGHRIB_ALARM = 4;
     private static final int ISHA_ALARM = 5;
-    private static final int NEXT_DAY = 6;
+    private static final int NEXT_DAY_MORNING_ALARM = 6;
+    private static final int FRIDAY_ALARM = 7;
 
     private static final long ONE_DAY = 1;
     private static final String WAKE_UP = "wake_up";
@@ -44,30 +51,47 @@ public class ForegroundService extends LifecycleService {
     @Inject Repository mRepository;
     @Inject PrefHelper mPrefHelper;
     @Inject NotificationHelper mNotificationHelper;
-    private boolean mFajrAlarmStatus;
-    private boolean mDhurAlarmStatus;
-    private boolean mAsrAlarmStatus;
-    private boolean mMaghribAlarmStatus;
-    private boolean mIshaAlarmStatus;
+    private boolean mFajrAlarmActivated;
+    private boolean mDhurAlarmActivated;
+    private boolean mAsrAlarmActivated;
+    private boolean mMaghribAlarmActivated;
+    private boolean mIshaAlarmActivated;
+
+    private boolean mFridayAlarmActivated;
+
     private boolean mChangingConfiguration = false;
     private AlarmManager alarmMgr;
     private AudioManager mAudioManager;
-    private ZonedDateTime mTargetDayTime;
 
 
+    @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         alarmMgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
-        mTargetDayTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
 
         if (intent.getBooleanExtra(QUIT_APP, false)) {
             stopSelf();
         }
-        if (!mPrefHelper.getDndOnFridaysOnly())
-            observeTargetDay(mTargetDayTime);
+
+        if (!mPrefHelper.getDndOnFridaysOnly()) {
+            setAlarmForRegularDay(LocalDate.now());
+        } else {
+            setAlarmForNextFriday(LocalDate.now());
+        }
+
+        mPrefHelper.getFridayOnly()
+                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> {
+                            Log.d("App", "onStartCommand: DND status = " + s);
+                            setAlarmForRegularDay(LocalDate.now());
+                            setAlarmForNextFriday(LocalDate.now());
+                        }
+                );
+
 
         if (intent.getBooleanExtra(WAKE_UP, false)) {
             Log.d("App", "onStartCommand:  trigger activated");
@@ -77,6 +101,29 @@ public class ForegroundService extends LifecycleService {
 
         Log.d("App", "onStartCommand: service started");
         return START_REDELIVER_INTENT;
+    }
+
+    private void setAlarmForNextFriday(LocalDate date) {
+        LocalDate targetDay = date.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+        Long targetEpoch = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        mRepository.getFridayEntry(targetEpoch).observe(this, new Observer<FridayEntry>() {
+            @Override
+            public void onChanged(FridayEntry fridayEntry) {
+                if (fridayEntry != null) {
+                    if (getCurrentTimeInSeconds() <= fridayEntry.getTimeEpoch()) {
+                        if (fridayEntry.getSilent() && mPrefHelper.getDndOnFridaysOnly()) {
+                            setAlarmManager(fridayEntry.getTimeEpoch(), FRIDAY_ALARM, true);
+                            mFridayAlarmActivated = true;
+                            Log.d("App", "Alarm set for friday. " + fridayEntry.getDateString() + ", " + fridayEntry.getTimeString());
+                        }
+                        if (!fridayEntry.getSilent() && mFridayAlarmActivated || mFridayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
+                            setAlarmManager(fridayEntry.getTimeEpoch(), FRIDAY_ALARM, false);
+                            Log.d("App", "Alarm canceled for friday. " + fridayEntry.getDateString() + ", " + fridayEntry.getTimeString());
+                        }
+                    }
+                }
+            }
+        });
     }
 
 
@@ -113,74 +160,78 @@ public class ForegroundService extends LifecycleService {
         return true;
     }
 
-    private void observeTargetDay(ZonedDateTime day) {
-        Long targetDayEpoch = day.toEpochSecond();
+    @SuppressLint("CheckResult")
+    private void setAlarmForRegularDay(LocalDate day) {
+        Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         mRepository.getRegularEntry(targetDayEpoch).observe(this, model -> {
             if (model != null) {
                 Log.d("App", "setObserverOnTargetDay: " + getCurrentTimeInSeconds());
                 if (getCurrentTimeInSeconds() <= model.getFajrEpoch()) {
-                    if (model.getFajrSilent()) {
+                    if (model.getFajrSilent() && !mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getFajrEpoch(), FAJR_ALARM, true);
-                        mFajrAlarmStatus = true;
+                        mFajrAlarmActivated = true;
                         Log.d("App", "Alarm set on fajr. " + model.getDateString() + ", " + model.getFajrString());
                     }
-                    if (!model.getFajrSilent() && mFajrAlarmStatus) {
+                    if (!model.getFajrSilent() && mFajrAlarmActivated || mFajrAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getFajrEpoch(), FAJR_ALARM, false);
                         Log.d("App", "Alarm canceled on fajr. " + model.getDateString() + ", " + model.getFajrString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch()) {
-                    if (model.getDhuhrSilent()) {
+                    if (model.getDhuhrSilent() && !mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getDhuhrEpoch(), DHUR_ALARM, true);
-                        mDhurAlarmStatus = true;
+                        mDhurAlarmActivated = true;
                         Log.d("App", "Alarm set on dhuhr. " + model.getDateString() + ", " + model.getDhuhrString());
                     }
-                    if (!model.getDhuhrSilent() && mDhurAlarmStatus) {
+                    if (!model.getDhuhrSilent() && mDhurAlarmActivated || mDhurAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getDhuhrEpoch(), DHUR_ALARM, false);
                         Log.d("App", "Alarm canceled on dhuhr. " + model.getDateString() + ", " + model.getDhuhrString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getAsrEpoch()) {
-                    if (model.getAsrSilent()) {
+                    if (model.getAsrSilent() && !mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getAsrEpoch(), ASR_ALARM, true);
-                        mAsrAlarmStatus = true;
+                        mAsrAlarmActivated = true;
                         Log.d("App", "Alarm set on asr. " + model.getDateString() + ", " + model.getAsrString());
                     }
-                    if (!model.getAsrSilent() && mAsrAlarmStatus) {
+                    if (!model.getAsrSilent() && mAsrAlarmActivated || mAsrAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getAsrEpoch(), ASR_ALARM, false);
                         Log.d("App", "Alarm canceled on asr. " + model.getDateString() + ", " + model.getAsrString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getMaghribEpoch()) {
-                    if (model.getMaghribSilent()) {
+                    if (model.getMaghribSilent() && !mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getMaghribEpoch(), MAGHRIB_ALARM, true);
-                        mMaghribAlarmStatus = true;
+                        mMaghribAlarmActivated = true;
                         Log.d("App", "Alarm set on maghrib. " + model.getDateString() + ", " + model.getMaghribString());
                     }
-                    if (!model.getMaghribSilent() && mMaghribAlarmStatus) {
+                    if (!model.getMaghribSilent() && mMaghribAlarmActivated || mMaghribAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getMaghribEpoch(), MAGHRIB_ALARM, false);
                         Log.d("App", "Alarm canceled on maghrib. " + model.getDateString() + ", " + model.getMaghribString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getIshaEpoch()) {
-                    if (model.getIshaSilent()) {
+                    if (model.getIshaSilent() && !mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getIshaEpoch(), ISHA_ALARM, true);
-                        mIshaAlarmStatus = true;
+                        mIshaAlarmActivated = true;
                         Log.d("App", "Alarm set on isha. " + model.getDateString() + ", " + model.getIshaString());
                     }
-                    if (!model.getIshaSilent() && mIshaAlarmStatus) {
+                    if (!model.getIshaSilent() && mIshaAlarmActivated || mIshaAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(model.getIshaEpoch(), ISHA_ALARM, false);
                         Log.d("App", "Alarm canceled on isha. " + model.getDateString() + ", " + model.getIshaString());
                     }
                 } else {
-                    Log.d("App", "setObserverOnTargetDay current target : " + mTargetDayTime);
-                    ZonedDateTime newTarget = mTargetDayTime.plusDays(ONE_DAY);
-                    Log.d("App", "setObserverOnTargetDay new target : " + newTarget);
-                    setAlarmManager(newTarget.toEpochSecond(), NEXT_DAY, true);
-                    Log.d("App", "setObserverOnTargetDay: observer set on the next day");
+                    if (!mPrefHelper.getDndOnFridaysOnly()) {
+                        Log.d("App", "setObserverOnTargetDay current target : " + day);
+                        Long nextDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).plusDays(ONE_DAY).toEpochSecond();
+                        Log.d("App", "setObserverOnTargetDay new target : " + nextDay);
+                        setAlarmManager(nextDay, NEXT_DAY_MORNING_ALARM, true);
+                        Log.d("App", "setObserverOnTargetDay: observer set on the next day");
+                    }
                 }
             }
         });
+
     }
 
 
