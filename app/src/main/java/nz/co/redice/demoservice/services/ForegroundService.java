@@ -40,17 +40,15 @@ public class ForegroundService extends LifecycleService {
 
     private static final long ONE_DAY = 1;
     private static final String WAKE_UP = "wake_up";
-
-    private  boolean mFajrAlarmStatus;
-    private  boolean mDhurAlarmStatus;
-    private  boolean mAsrAlarmStatus;
-    private  boolean mMaghribAlarmStatus;
-    private  boolean mIshaAlarmStatus;
-
     private final IBinder mBinder = new LocalBinder();
     @Inject Repository mRepository;
     @Inject PrefHelper mPrefHelper;
     @Inject NotificationHelper mNotificationHelper;
+    private boolean mFajrAlarmStatus;
+    private boolean mDhurAlarmStatus;
+    private boolean mAsrAlarmStatus;
+    private boolean mMaghribAlarmStatus;
+    private boolean mIshaAlarmStatus;
     private boolean mChangingConfiguration = false;
     private AlarmManager alarmMgr;
     private AudioManager mAudioManager;
@@ -68,8 +66,8 @@ public class ForegroundService extends LifecycleService {
         if (intent.getBooleanExtra(QUIT_APP, false)) {
             stopSelf();
         }
-
-        observeTargetDay(mTargetDayTime);
+        if (!mPrefHelper.getDndOnFridaysOnly())
+            observeTargetDay(mTargetDayTime);
 
         if (intent.getBooleanExtra(WAKE_UP, false)) {
             Log.d("App", "onStartCommand:  trigger activated");
@@ -118,56 +116,61 @@ public class ForegroundService extends LifecycleService {
     private void observeTargetDay(ZonedDateTime day) {
         Long targetDayEpoch = day.toEpochSecond();
         mRepository.getRegularEntry(targetDayEpoch).observe(this, model -> {
-            if (model != null && !mPrefHelper.getDndOnFridaysOnly()) {
+            if (model != null) {
                 Log.d("App", "setObserverOnTargetDay: " + getCurrentTimeInSeconds());
                 if (getCurrentTimeInSeconds() <= model.getFajrEpoch()) {
                     if (model.getFajrSilent()) {
                         setAlarmManager(model.getFajrEpoch(), FAJR_ALARM, true);
                         mFajrAlarmStatus = true;
-                        Log.d("App", "Alarm set on fajr. " + model.getDateString() + ", "+ model.getFajrString());
-                    } if (!model.getFajrSilent() && mFajrAlarmStatus){
+                        Log.d("App", "Alarm set on fajr. " + model.getDateString() + ", " + model.getFajrString());
+                    }
+                    if (!model.getFajrSilent() && mFajrAlarmStatus) {
                         setAlarmManager(model.getFajrEpoch(), FAJR_ALARM, false);
-                        Log.d("App", "Alarm canceled on fajr. " + model.getDateString() + ", "+ model.getFajrString());
+                        Log.d("App", "Alarm canceled on fajr. " + model.getDateString() + ", " + model.getFajrString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch()) {
                     if (model.getDhuhrSilent()) {
                         setAlarmManager(model.getDhuhrEpoch(), DHUR_ALARM, true);
                         mDhurAlarmStatus = true;
-                        Log.d("App", "Alarm set on dhuhr. " + model.getDateString() + ", "+ model.getDhuhrString());
-                    } if (!model.getDhuhrSilent() && mDhurAlarmStatus) {
+                        Log.d("App", "Alarm set on dhuhr. " + model.getDateString() + ", " + model.getDhuhrString());
+                    }
+                    if (!model.getDhuhrSilent() && mDhurAlarmStatus) {
                         setAlarmManager(model.getDhuhrEpoch(), DHUR_ALARM, false);
-                        Log.d("App", "Alarm canceled on dhuhr. " + model.getDateString() + ", "+ model.getDhuhrString());
+                        Log.d("App", "Alarm canceled on dhuhr. " + model.getDateString() + ", " + model.getDhuhrString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getAsrEpoch()) {
                     if (model.getAsrSilent()) {
                         setAlarmManager(model.getAsrEpoch(), ASR_ALARM, true);
                         mAsrAlarmStatus = true;
-                        Log.d("App", "Alarm set on asr. " + model.getDateString() + ", "+ model.getAsrString());
-                    } if (!model.getAsrSilent() && mAsrAlarmStatus) {
+                        Log.d("App", "Alarm set on asr. " + model.getDateString() + ", " + model.getAsrString());
+                    }
+                    if (!model.getAsrSilent() && mAsrAlarmStatus) {
                         setAlarmManager(model.getAsrEpoch(), ASR_ALARM, false);
-                        Log.d("App", "Alarm canceled on asr. " + model.getDateString() + ", "+ model.getAsrString());
+                        Log.d("App", "Alarm canceled on asr. " + model.getDateString() + ", " + model.getAsrString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getMaghribEpoch()) {
                     if (model.getMaghribSilent()) {
                         setAlarmManager(model.getMaghribEpoch(), MAGHRIB_ALARM, true);
                         mMaghribAlarmStatus = true;
-                        Log.d("App", "Alarm set on maghrib. " + model.getDateString() + ", "+ model.getMaghribString());
-                    } if (!model.getMaghribSilent() && mMaghribAlarmStatus) {
+                        Log.d("App", "Alarm set on maghrib. " + model.getDateString() + ", " + model.getMaghribString());
+                    }
+                    if (!model.getMaghribSilent() && mMaghribAlarmStatus) {
                         setAlarmManager(model.getMaghribEpoch(), MAGHRIB_ALARM, false);
-                        Log.d("App", "Alarm canceled on maghrib. " + model.getDateString() + ", "+ model.getMaghribString());
+                        Log.d("App", "Alarm canceled on maghrib. " + model.getDateString() + ", " + model.getMaghribString());
                     }
                 }
                 if (getCurrentTimeInSeconds() <= model.getIshaEpoch()) {
                     if (model.getIshaSilent()) {
                         setAlarmManager(model.getIshaEpoch(), ISHA_ALARM, true);
                         mIshaAlarmStatus = true;
-                        Log.d("App", "Alarm set on isha. " + model.getDateString() + ", "+ model.getIshaString());
-                    } if (!model.getIshaSilent() && mIshaAlarmStatus) {
+                        Log.d("App", "Alarm set on isha. " + model.getDateString() + ", " + model.getIshaString());
+                    }
+                    if (!model.getIshaSilent() && mIshaAlarmStatus) {
                         setAlarmManager(model.getIshaEpoch(), ISHA_ALARM, false);
-                        Log.d("App", "Alarm canceled on isha. " + model.getDateString() + ", "+ model.getIshaString());
+                        Log.d("App", "Alarm canceled on isha. " + model.getDateString() + ", " + model.getIshaString());
                     }
                 } else {
                     Log.d("App", "setObserverOnTargetDay current target : " + mTargetDayTime);

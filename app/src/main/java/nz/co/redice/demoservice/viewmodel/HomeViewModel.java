@@ -27,6 +27,7 @@ import nz.co.redice.demoservice.utils.ServiceHelper;
 public class HomeViewModel extends AndroidViewModel {
 
     private final SavedStateHandle savedStateHandle;
+    public LiveData<FridayEntry> nextFriday;
     private Repository mRepository;
     private ServiceHelper mServiceHelper;
     private PrefHelper mPrefHelper;
@@ -86,8 +87,8 @@ public class HomeViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<FridayEntry> getNextFridayEntry() {
-        Long nextFriday = calcNextFriday(LocalDate.now()).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+    public LiveData<FridayEntry> getNextFridayEntry(LocalDate selectedDate) {
+        Long nextFriday = calcNextFriday(selectedDate).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         return mRepository.getFridayEntry(nextFriday);
     }
 

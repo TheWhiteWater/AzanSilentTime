@@ -34,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.demoservice.R;
 import nz.co.redice.demoservice.databinding.FragmentHomeBinding;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
+import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.utils.PrefHelper;
 import nz.co.redice.demoservice.view.presentation.DatePickerFragment;
 import nz.co.redice.demoservice.view.presentation.TimePickerFragment;
@@ -95,8 +96,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
             if (integer >= 365 ) {
-                Long currentDayEpoch = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-                displaySelectedEntry(currentDayEpoch);
+                displaySelectedEntry(LocalDate.now());
             } else {
                 mViewModel.requestPrayerCalendar();
             }
@@ -104,15 +104,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
             if (integer > 0 ) {
-                mViewModel.getNextFridayEntry().observe(getViewLifecycleOwner(),
-                        fridayEntry -> {
-                            if (fridayEntry != null) {
-                                mViewBinding.setFriday(fridayEntry);
-                                mViewBinding.progressBar.setVisibility(View.INVISIBLE);
-                            } else {
-                                Log.d("App", "onViewCreated:  fridayEntry is null");
-                            }
-                        });
+                displayNextFridayEntry(LocalDate.now());
             } else {
                 mViewModel.populateFridayTable();
             }
@@ -227,21 +219,31 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
 
         if (!mPrefHelper.getDndOnFridaysOnly()) {
-            Long selectedEpoch = selectedDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-            displaySelectedEntry(selectedEpoch);
+            displaySelectedEntry(selectedDate);
         } else {
+            Log.d("App", "onDateSet:  picked date = " + selectedDate);
             displayNextFridayEntry(selectedDate);
 
         }
     }
 
     private void displayNextFridayEntry(LocalDate selectedDate) {
-
+        mViewModel.getNextFridayEntry(selectedDate).observe(getViewLifecycleOwner(),
+                fridayEntry -> {
+                    if (fridayEntry != null) {
+                        Log.d("App", "new Friday : " + fridayEntry.getFridayDateString());
+                        mViewBinding.setFriday(fridayEntry);
+                        mViewBinding.progressBar.setVisibility(View.INVISIBLE);
+                    } else {
+                        Log.d("App", "onViewCreated:  fridayEntry is null");
+                    }
+                });
     }
 
 
-    private void displaySelectedEntry(Long date) {
-        mViewModel.getSelectedEntry(date).observe(getViewLifecycleOwner(), selected -> {
+    private void displaySelectedEntry(LocalDate date) {
+
+        mViewModel.getSelectedEntry(date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()).observe(getViewLifecycleOwner(), selected -> {
             if (selected != null) {
                 mEntryModel = selected;
                 mViewBinding.setEntry(mEntryModel);
