@@ -6,7 +6,7 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.util.Log;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.hilt.Assisted;
@@ -17,11 +17,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import nz.co.redice.demoservice.utils.LocationHelper;
@@ -34,10 +35,17 @@ public class AutoLocationViewModel extends AndroidViewModel {
     private Context mContext;
     private LocationHelper mLocationHelper;
     private PrefHelper mPrefHelper;
+
+
     private Location mLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private MutableLiveData<String> _lastAddress = new MutableLiveData<>();
-    private LiveData<String> mLastAddress = _lastAddress;
+    private LocationRequest mLocationRequest;
+    private LocationCallback mLocationCallback;
+
+
+    private MutableLiveData<String> position = new MutableLiveData<>();
+    public LiveData<String> lastKnownPosition = position;
+
 
     @SuppressLint("MissingPermission")
     @ViewModelInject
@@ -49,41 +57,58 @@ public class AutoLocationViewModel extends AndroidViewModel {
         mLocationHelper = locationHelper;
         mPrefHelper = prefHelper;
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(application);
+
+        mLocationRequest = new LocationRequest()
+                .setInterval(1)
+                .setFastestInterval(1)
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    mLocation = locationResult.getLastLocation();
+                    String locationText = getAdminArea(locationResult.getLastLocation());
+                    if (!locationText.isEmpty()) {
+                        position.setValue(locationText);
+                    }
+                }
+            }
+        };
+
         getLastKnownAddress();
     }
 
     @SuppressLint("MissingPermission")
     public void getLastKnownAddress() {
         mFusedLocationProviderClient
-                .getLastLocation()
-                .addOnSuccessListener(location ->
-                {
-                    mLocation = location;
-                    _lastAddress.setValue(getAdminArea(location));
-                });
+                .requestLocationUpdates(mLocationRequest, mLocationCallback,
+                        Looper.getMainLooper());
     }
 
-    public LiveData<String> getLastAddress() {
-        getLastKnownAddress();
-        return mLastAddress;
-    }
 
     private String getAdminArea(Location location) {
         Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-        List<Address> addresses = new ArrayList<>();
+        String addressText = "";
         try {
-            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (location != null) {
+                Address address = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+                addressText = address.getLocality() + ",\n " + address.getCountryName();
+            }
         } catch (IOException e) {
-            Log.e(this.getClass().getSimpleName(), "Cannot find Address.");
             e.printStackTrace();
         }
-        return addresses.get(0) == null ? "Address is not found" :
-                addresses.get(0).getLocality() + ",\n " + addresses.get(0).getCountryName();
+
+        return addressText;
     }
 
     public void setLocation() {
+        mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
         mPrefHelper.setLocationPermissionStatus(true);
         mPrefHelper.setLatitude((float) mLocation.getLatitude());
         mPrefHelper.setLongitude((float) mLocation.getLongitude());
     }
+
+
 }

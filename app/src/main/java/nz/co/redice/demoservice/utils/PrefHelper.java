@@ -3,8 +3,6 @@ package nz.co.redice.demoservice.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Calendar;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -16,12 +14,10 @@ import static android.content.Context.MODE_PRIVATE;
 public class PrefHelper {
 
     private static final String MY_PREFS = "my prefs";
-    private static final String MUTE_STATE = "mute state";
-    private static final String SLEEP_TIME = "sleep time";
-    private static final String WAKEUP_TIME = "wakeup time";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
     private static final String LOCATION_PERMISSION_STATUS = "location_permission_status";
+    private static final String MUTE_ON_FRIDAYS_ONLY = "mute on fridays only";
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private Context mContext;
@@ -31,31 +27,6 @@ public class PrefHelper {
         mContext = context;
         mSharedPreferences = mContext.getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
-    }
-
-    public void addMuteState(Boolean state) {
-        mEditor.putBoolean(MUTE_STATE, state);
-        mEditor.apply();
-    }
-
-    public Boolean getMuteState() {
-        return mSharedPreferences.getBoolean(MUTE_STATE, false);
-    }
-
-    public Long getSleepTime() {
-        return mSharedPreferences.getLong(SLEEP_TIME, Calendar.getInstance().getTimeInMillis());
-    }
-
-    public void setSleepTime(Long time) {
-        mEditor.putLong(SLEEP_TIME, time).apply();
-    }
-
-    public Long getWakeUpTime() {
-        return mSharedPreferences.getLong(WAKEUP_TIME, Calendar.getInstance().getTimeInMillis());
-    }
-
-    public void setWakeUpTime(Long time) {
-        mEditor.putLong(WAKEUP_TIME, time).apply();
     }
 
     public float getLongitude() {
@@ -80,5 +51,13 @@ public class PrefHelper {
 
     public void setLocationPermissionStatus(Boolean status) {
         mEditor.putBoolean(LOCATION_PERMISSION_STATUS, status).apply();
+    }
+
+    public void setDndOnFridaysOnly(boolean b) {
+        mEditor.putBoolean(MUTE_ON_FRIDAYS_ONLY, b).apply();
+    }
+
+    public boolean getDndOnFridaysOnly() {
+        return mSharedPreferences.getBoolean(MUTE_ON_FRIDAYS_ONLY, false);
     }
 }

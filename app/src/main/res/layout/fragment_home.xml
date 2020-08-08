@@ -8,6 +8,11 @@
         <variable
             name="entry"
             type="nz.co.redice.demoservice.repo.local.entity.EntryModel" />
+
+        <variable
+            name="friday"
+            type="nz.co.redice.demoservice.repo.local.entity.FridayEntry" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,19 +24,30 @@
         <TextView
             android:id="@+id/date_view"
             style="@style/data_style"
-            android:layout_marginTop="84dp"
-            android:text="@{entry.dateString}"
+            android:layout_marginTop="72dp"
+            android:text="@{entry.getDateString}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Thu, 23 July 2020" />
+
+        <TextView
+            android:id="@+id/friday_date_view"
+            style="@style/data_style"
+            android:layout_marginTop="72dp"
+            android:text="@{friday.fridayDateString}"
+            android:visibility="gone"
+            tools:text="Thu, 23 July 2020"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="182dp" />
+            app:layout_constraintGuide_begin="149dp" />
 
 
         <TextView
@@ -44,12 +60,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline_horizontal" />
 
+        <TextView
+            android:id="@+id/friday_name"
+            style="@style/time_title"
+            android:text="Friday Prayer"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/friday_time"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline_horizontal" />
+
 
         <ImageButton
             android:id="@+id/fajr_btn"
             style="@style/prayer_btn"
             android:contentDescription="TODO"
-            android:src="@{entry.fajrMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            android:src="@{entry.getFajrSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/fajr_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -57,16 +84,42 @@
             app:layout_constraintStart_toEndOf="@+id/fajr_time"
             app:layout_constraintTop_toTopOf="@+id/fajr_time" />
 
+        <ImageButton
+            android:id="@+id/friday_btn"
+            style="@style/prayer_btn"
+            android:contentDescription="TODO"
+            android:src="@{friday.getFridaySilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            app:layout_constraintBottom_toBottomOf="@+id/friday_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:visibility="gone"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@+id/friday_time"
+            app:layout_constraintTop_toTopOf="@+id/friday_time" />
+
         <TextView
             android:id="@+id/fajr_time"
             style="@style/prayer_time"
-            android:text="@{entry.fajrString}"
+            android:text="@{entry.getFajrString}"
             app:layout_constraintBottom_toBottomOf="@+id/fajr_name"
             app:layout_constraintEnd_toStartOf="@+id/fajr_btn"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_weight="2"
             app:layout_constraintStart_toEndOf="@+id/fajr_name"
             app:layout_constraintTop_toTopOf="@+id/fajr_name"
+            tools:text="20:20 AM" />
+
+        <TextView
+            android:id="@+id/friday_time"
+            style="@style/prayer_time"
+            android:text="@{friday.fridayEpoch == null ? friday.blank : friday.fridayTimeString}"
+            app:layout_constraintBottom_toBottomOf="@+id/friday_name"
+            app:layout_constraintEnd_toStartOf="@+id/friday_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:visibility="gone"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@+id/friday_name"
+            app:layout_constraintTop_toTopOf="@+id/friday_name"
             tools:text="20:20 AM" />
 
 
@@ -85,7 +138,7 @@
             android:id="@+id/dhuhr_btn"
             style="@style/prayer_btn"
             android:contentDescription="TODO"
-            android:src="@{entry.dhuhrMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            android:src="@{entry.getDhuhrSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/dhuhr_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -96,7 +149,7 @@
         <TextView
             android:id="@+id/dhuhr_time"
             style="@style/prayer_time"
-            android:text="@{entry.dhuhrString}"
+            android:text="@{entry.getDhuhrString}"
             app:layout_constraintBottom_toBottomOf="@+id/dhuhr_name"
             app:layout_constraintEnd_toStartOf="@+id/dhuhr_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -121,7 +174,7 @@
             android:id="@+id/asr_btn"
             style="@style/prayer_btn"
             android:contentDescription="TODO"
-            android:src="@{entry.asrMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            android:src="@{entry.getAsrSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/asr_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -132,7 +185,7 @@
         <TextView
             android:id="@+id/asr_time"
             style="@style/prayer_time"
-            android:text="@{entry.asrString}"
+            android:text="@{entry.getAsrString}"
             app:layout_constraintBottom_toBottomOf="@+id/asr_name"
             app:layout_constraintEnd_toStartOf="@+id/asr_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -157,7 +210,7 @@
             android:id="@+id/maghrib_btn"
             style="@style/prayer_btn"
             android:contentDescription="TODO"
-            android:src="@{entry.maghribMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            android:src="@{entry.getMaghribSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/maghrib_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -168,7 +221,7 @@
         <TextView
             android:id="@+id/maghrib_time"
             style="@style/prayer_time"
-            android:text="@{entry.maghribString}"
+            android:text="@{entry.getMaghribString}"
             app:layout_constraintBottom_toBottomOf="@+id/maghrib_name"
             app:layout_constraintEnd_toStartOf="@+id/maghrib_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -193,7 +246,7 @@
             android:id="@+id/isha_btn"
             style="@style/prayer_btn"
             android:contentDescription="TODO"
-            android:src="@{entry.ishaMuteOn == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            android:src="@{entry.getIshaSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/isha_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -204,7 +257,7 @@
         <TextView
             android:id="@+id/isha_time"
             style="@style/prayer_time"
-            android:text="@{entry.ishaString}"
+            android:text="@{entry.getIshaString}"
             app:layout_constraintBottom_toBottomOf="@+id/isha_name"
             app:layout_constraintEnd_toStartOf="@+id/isha_btn"
             app:layout_constraintHorizontal_bias="0.5"
@@ -212,6 +265,28 @@
             app:layout_constraintStart_toEndOf="@+id/isha_name"
             app:layout_constraintTop_toTopOf="@+id/isha_name"
             tools:text="20:20 AM" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/fridayCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="160dp"
+            android:text="Do Not Disturb for The Friday Prayer only"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

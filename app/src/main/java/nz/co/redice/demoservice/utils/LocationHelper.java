@@ -65,7 +65,7 @@ public class LocationHelper {
             Log.e(this.getClass().getSimpleName(), "Cannot find Address.");
             e.printStackTrace();
         }
-        return addresses.get(0) == null ? "Address is not found" : String.valueOf(addresses.get(0).getAddressLine(0));
+        return addresses.get(0) == null ? "Check your internet connection" : String.valueOf(addresses.get(0).getAddressLine(0));
     }
 
     public String getAdminArea (Location location) {

@@ -1,13 +1,11 @@
 package nz.co.redice.demoservice.view;
 
 import android.Manifest;
+import android.content.Context;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -52,6 +51,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         mViewModel = new ViewModelProvider(this).get(AutoLocationViewModel.class);
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
+
         return view;
     }
 
@@ -65,9 +65,20 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                 requestLocationPermissions();
             }
         }
+
+        mPermissionHelper.getDNDPermission();
+
         mViewBinding.autoLocateBtn.setOnClickListener(this);
         mViewBinding.saveLocationBtn.setOnClickListener(this);
+
         getLastKnownAddress();
+
+        mViewModel.lastKnownPosition.observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                mViewBinding.locationTv.setText(s);
+            }
+        });
     }
 
 
@@ -116,7 +127,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getLastKnownAddress() {
-        mViewModel.getLastAddress().observe(getViewLifecycleOwner(), s -> mViewBinding.locationTv.setText(s));
+        mViewModel.getLastKnownAddress();
     }
 
 

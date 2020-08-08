@@ -1,5 +1,6 @@
 package nz.co.redice.demoservice.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
@@ -9,8 +10,17 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.SavedStateHandle;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
+
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.Repository;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
+import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.utils.PrefHelper;
 import nz.co.redice.demoservice.utils.ServiceHelper;
 
@@ -37,8 +47,8 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    public LiveData<EntryModel> getTimesForSelectedDate(Long date) {
-        return mRepository.getSelectedDate(date);
+    public LiveData<EntryModel> getSelectedEntry(Long date) {
+        return mRepository.getRegularEntry(date);
     }
 
 
@@ -48,16 +58,63 @@ public class HomeViewModel extends AndroidViewModel {
         mServiceHelper.doUnbindService(getApplication());
     }
 
-    public LiveData<Integer> getDatabaseSize() {
-        return mRepository.getDatabaseSize();
+    public LiveData<Integer> getRegularDatabaseSize() {
+        return mRepository.getRegularTableSize();
     }
 
-    public void fillUpDaBase() {
-        mRepository.requestStandardAnnualCalendar(mPrefHelper.getLatitude(), mPrefHelper.getLongitude());
+    public void requestPrayerCalendar() {
+        mRepository.requestPrayerCalendar(mPrefHelper.getLatitude(), mPrefHelper.getLongitude());
     }
 
-    public LiveData<EntryModel> updateEntry(EntryModel model) {
-        mRepository.updateSelectedEntry(model);
-        return mRepository.getSelectedDate(model.getDate());
+    public LiveData<EntryModel> updateRegularEntry(EntryModel model) {
+        mRepository.updateRegularEntry(model);
+        return mRepository.getRegularEntry(model.getDate());
+    }
+
+    @SuppressLint("CheckResult")
+    public void populateFridayTable() {
+        LocalDate currentDay = LocalDate.now();
+        LocalDate endOfTheYear = LocalDate.of(2020, 12, 31);
+
+        while (currentDay.isBefore(endOfTheYear)) {
+            currentDay = calcNextFriday(currentDay);
+            Observable.just(new FridayEntry(currentDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(s -> {
+                        mRepository.insertFridayEntry(s);
+                    });
+        }
+    }
+
+    public LiveData<FridayEntry> getNextFridayEntry() {
+        Long nextFriday = calcNextFriday(LocalDate.now()).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        return mRepository.getFridayEntry(nextFriday);
+    }
+
+    private LocalDate calcNextFriday(LocalDate d) {
+        return d.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+    }
+
+    public LiveData<Integer> getFridayTableCount() {
+        return mRepository.getFridayTableSize();
+    }
+
+
+    @SuppressLint("CheckResult")
+    public void updateFridaysTable(int hourOfDay, int minute) {
+        LocalDate targetDay = LocalDate.now();
+        LocalDate endOfTheYear = LocalDate.of(2020, 12, 31);
+
+        while (targetDay.isBefore(endOfTheYear)) {
+            targetDay = calcNextFriday(targetDay);
+            Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+            Long time = targetDay.atTime(LocalTime.of(hourOfDay, minute)).atZone(ZoneId.systemDefault()).toEpochSecond();
+
+            Observable.just(new FridayEntry(date, true, time))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(s -> {
+                        mRepository.updateFridayEntry(new FridayEntry(date, true, time));
+                    });
+        }
     }
 }

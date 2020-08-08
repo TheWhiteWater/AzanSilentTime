@@ -7,23 +7,23 @@ import androidx.room.PrimaryKey;
 import nz.co.redice.demoservice.view.presentation.Converters;
 
 
-@Entity(tableName = "data_table")
+@Entity(tableName = "regular_table")
 public class EntryModel {
 
     @PrimaryKey
     private Long date;
 
-    private Boolean fajrMuteOn = true;
-    private Boolean dhuhrMuteOn = true;
-    private Boolean asrMuteOn = true;
-    private Boolean maghribMuteOn = true;
-    private Boolean ishaMuteOn = true;
+    private Boolean isFajrSilent = true;
+    private Boolean isDhuhrSilent = true;
+    private Boolean isAsrSilent = true;
+    private Boolean isMaghribSilent = true;
+    private Boolean isIshaSilent = true;
 
-    private Long fajr;
-    private Long dhuhr;
-    private Long asr;
-    private Long maghrib;
-    private Long isha;
+    private Long fajrEpoch;
+    private Long dhuhrEpoch;
+    private Long asrEpoch;
+    private Long maghribEpoch;
+    private Long ishaEpoch;
 
     @Ignore private String dateString;
     @Ignore private String fajrString;
@@ -37,13 +37,13 @@ public class EntryModel {
     }
 
     @Ignore
-    public EntryModel(Long date, Long fajr, Long dhuhr, Long asr, Long maghrib, Long isha) {
+    public EntryModel(Long date, Long fajrEpoch, Long dhuhrEpoch, Long asrEpoch, Long maghribEpoch, Long ishaEpoch) {
         this.date = date;
-        this.fajr = fajr;
-        this.dhuhr = dhuhr;
-        this.asr = asr;
-        this.maghrib = maghrib;
-        this.isha = isha;
+        this.fajrEpoch = fajrEpoch;
+        this.dhuhrEpoch = dhuhrEpoch;
+        this.asrEpoch = asrEpoch;
+        this.maghribEpoch = maghribEpoch;
+        this.ishaEpoch = ishaEpoch;
     }
 
 
@@ -55,104 +55,104 @@ public class EntryModel {
         this.date = date;
     }
 
-    public Long getFajr() {
-        return fajr;
+    public Boolean getFajrSilent() {
+        return isFajrSilent;
     }
 
-    public void setFajr(Long fajr) {
-        this.fajr = fajr;
+    public void setFajrSilent(Boolean fajrSilent) {
+        isFajrSilent = fajrSilent;
     }
 
-    public Long getDhuhr() {
-        return dhuhr;
+    public Boolean getDhuhrSilent() {
+        return isDhuhrSilent;
     }
 
-    public void setDhuhr(Long dhuhr) {
-        this.dhuhr = dhuhr;
+    public void setDhuhrSilent(Boolean dhuhrSilent) {
+        isDhuhrSilent = dhuhrSilent;
     }
 
-    public Long getAsr() {
-        return asr;
+    public Boolean getAsrSilent() {
+        return isAsrSilent;
     }
 
-    public void setAsr(Long asr) {
-        this.asr = asr;
+    public void setAsrSilent(Boolean asrSilent) {
+        isAsrSilent = asrSilent;
     }
 
-    public Long getMaghrib() {
-        return maghrib;
+    public Boolean getMaghribSilent() {
+        return isMaghribSilent;
     }
 
-    public void setMaghrib(Long maghrib) {
-        this.maghrib = maghrib;
+    public void setMaghribSilent(Boolean maghribSilent) {
+        isMaghribSilent = maghribSilent;
     }
 
-    public Long getIsha() {
-        return isha;
+    public Boolean getIshaSilent() {
+        return isIshaSilent;
     }
 
-    public void setIsha(Long isha) {
-        this.isha = isha;
+    public void setIshaSilent(Boolean ishaSilent) {
+        isIshaSilent = ishaSilent;
     }
 
-    public Boolean getFajrMuteOn() {
-        return fajrMuteOn;
+    public Long getFajrEpoch() {
+        return fajrEpoch;
     }
 
-    public void setFajrMuteOn(Boolean fajrMuteOn) {
-        this.fajrMuteOn = fajrMuteOn;
+    public void setFajrEpoch(Long fajrEpoch) {
+        this.fajrEpoch = fajrEpoch;
     }
 
-    public Boolean getDhuhrMuteOn() {
-        return dhuhrMuteOn;
+    public Long getDhuhrEpoch() {
+        return dhuhrEpoch;
     }
 
-    public void setDhuhrMuteOn(Boolean dhuhrMuteOn) {
-        this.dhuhrMuteOn = dhuhrMuteOn;
+    public void setDhuhrEpoch(Long dhuhrEpoch) {
+        this.dhuhrEpoch = dhuhrEpoch;
     }
 
-    public Boolean getAsrMuteOn() {
-        return asrMuteOn;
+    public Long getAsrEpoch() {
+        return asrEpoch;
     }
 
-    public void setAsrMuteOn(Boolean asrMuteOn) {
-        this.asrMuteOn = asrMuteOn;
+    public void setAsrEpoch(Long asrEpoch) {
+        this.asrEpoch = asrEpoch;
     }
 
-    public Boolean getMaghribMuteOn() {
-        return maghribMuteOn;
+    public Long getMaghribEpoch() {
+        return maghribEpoch;
     }
 
-    public void setMaghribMuteOn(Boolean maghribMuteOn) {
-        this.maghribMuteOn = maghribMuteOn;
+    public void setMaghribEpoch(Long maghribEpoch) {
+        this.maghribEpoch = maghribEpoch;
     }
 
-    public Boolean getIshaMuteOn() {
-        return ishaMuteOn;
+    public Long getIshaEpoch() {
+        return ishaEpoch;
     }
 
-    public void setIshaMuteOn(Boolean ishaMuteOn) {
-        this.ishaMuteOn = ishaMuteOn;
+    public void setIshaEpoch(Long ishaEpoch) {
+        this.ishaEpoch = ishaEpoch;
     }
 
     public String getFajrString() {
-        return Converters.setTimeFromLong(fajr);
+        return Converters.setTimeFromLong(fajrEpoch);
     }
 
     public String getDhuhrString() {
-        return Converters.setTimeFromLong(dhuhr);
+        return Converters.setTimeFromLong(dhuhrEpoch);
     }
 
     public String getAsrString() {
-        return Converters.setTimeFromLong(asr);
+        return Converters.setTimeFromLong(asrEpoch);
     }
 
     public String getMaghribString() {
-        return Converters.setTimeFromLong(maghrib);
+        return Converters.setTimeFromLong(maghribEpoch);
     }
 
     public String getIshaString() {
-        return Converters.setTimeFromLong(isha);
+        return Converters.setTimeFromLong(ishaEpoch);
     }
 
     public String getDateString() {

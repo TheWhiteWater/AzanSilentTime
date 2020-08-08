@@ -15,6 +15,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.demoservice.repo.local.EventDao;
 import nz.co.redice.demoservice.repo.local.entity.EntryModel;
+import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.repo.remote.AzanService;
 import nz.co.redice.demoservice.repo.remote.models.ApiResponse;
 import nz.co.redice.demoservice.repo.remote.models.Day;
@@ -35,7 +36,7 @@ public class Repository {
         mDao = dao;
     }
 
-    public void requestStandardAnnualCalendar(Float lat, Float lon) {
+    public void requestPrayerCalendar(Float lat, Float lon) {
         mAzanService.requestStandardAnnualTimeTable(lat, lon, MUSLIM_WORLD_LEAGUE_METHOD,
                 Calendar.getInstance().get(Calendar.YEAR), true).enqueue(new Callback<ApiResponse>() {
             @Override
@@ -60,19 +61,33 @@ public class Repository {
         });
     }
 
-    public LiveData<EntryModel> getSelectedDate(Long value) {
+    public LiveData<EntryModel> getRegularEntry(Long value) {
         return mDao.getSelectedEntry(value);
     }
 
-    public LiveData<Integer> getDatabaseSize() {
+    public LiveData<Integer> getRegularTableSize() {
          return mDao.getRowCount();
     }
 
-    public void updateSelectedEntry(EntryModel model){
+    public LiveData<Integer> getFridayTableSize() {
+         return mDao.getFridaysCount();
+    }
+
+    public void updateRegularEntry(EntryModel model){
         mDao.updateEntry(model)
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
 
+    public void insertFridayEntry(FridayEntry fridayEntry) {
+        mDao.insertFridayEntry(fridayEntry);
+    }
+
+    public LiveData<FridayEntry> getFridayEntry(Long value) {
+        return mDao.getSelectedFridayEntry(value);
+    }
+    public void updateFridayEntry(FridayEntry fridayEntry) {
+        mDao.updateFridayEntry(fridayEntry);
+    }
 
 }
