@@ -30,7 +30,7 @@ public class SplashFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).hide();
+        Objects.requireNonNull(((AppCompatActivity)requireActivity()).getSupportActionBar()).hide();
     }
 
     @SuppressLint("CheckResult")
@@ -48,7 +48,7 @@ public class SplashFragment extends Fragment {
     }
 
     private void shiftToNextScreen() {
-        if (!mPrefHelper.getLocationPermissionStatus()) {
+        if (!mPrefHelper.getLocationStatus()) {
             NavHostFragment.findNavController(this).navigate(R.id.fromSplashToLocation);
         } else {
             NavHostFragment.findNavController(this).navigate(R.id.fromSplashScreenToHome);

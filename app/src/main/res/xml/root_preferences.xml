@@ -1,62 +1,56 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<!--    <Preference-->
-<!--        app:fragment="nz.co.redice.demoservice.view.SettingsFragment"/>-->
+
 
     <PreferenceCategory android:title="Location">
 
-        <EditTextPreference
+        <Preference
             android:summary="Tap to change"
             app:key="location"
-            app:title="Your location"
-            app:useSimpleSummaryProvider="true" />
-
-        <SwitchPreference
-            app:key="auto_detect_location"
-            app:summary="Requires location tracking permission"
-            app:title="Auto detect your location"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="Mute Mode Options">
-
-        <SwitchPreference
-            app:key="auto_mute"
-            app:summary="Requires location autodetect"
-            app:title="Auto mute in prayer locations"
-            app:useSimpleSummaryProvider="true" />
-
-        <SwitchPreference
-            app:key="auto_reply"
-            app:title="Auto reply missed calls"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            android:defaultValue="Sorry, I'm busy now. I'll call back later"
-            android:summary="Tap to change"
-            app:key="auto_reply_message"
-            app:title="Reply message"
+            app:title="Location"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
+
+
 
     <PreferenceCategory app:title="Mute Timings">
 
         <DropDownPreference
-            android:entries="@array/mute_period_entries"
-            android:entryValues="@array/mute_period_values"
+            android:entries="@array/dnd_period_entries"
+            android:entryValues="@array/dnd_period_values"
             android:key="mute_period"
-            android:title="Mute period"
-            app:useSimpleSummaryProvider="true" />
-
-        <DropDownPreference
-            android:entries="@array/notification_entries"
-            android:entryValues="@array/notification_values"
-            android:key="notification_period"
-            android:title="Notification period"
+            android:title="Mute Period"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
+
+
+    <PreferenceCategory app:title="Request Settings">
+
+        <DropDownPreference
+            android:entries="@array/calculation_methods_entries"
+            android:entryValues="@array/calculation_method_values"
+            android:key="calculation_method"
+            android:title="Calculation Method"
+            app:useSimpleSummaryProvider="true" />
+
+        <DropDownPreference
+            android:entries="@array/school_entries"
+            android:entryValues="@array/school_values"
+            android:key="school"
+            android:title="School"
+            app:useSimpleSummaryProvider="true" />
+
+        <DropDownPreference
+            android:entries="@array/midnight_mode_entries"
+            android:entryValues="@array/midnight_mode_values"
+            android:key="midnight_mode"
+            android:title="Midnight Mode"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

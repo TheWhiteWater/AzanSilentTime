@@ -27,7 +27,7 @@ public interface EventDao {
     void insertFridayEntry(FridayEntry fridayEntry);
 
     @Update(onConflict = REPLACE)
-    void updateFridayEntry (FridayEntry fridayEntry);
+    void updateFridayEntry(FridayEntry fridayEntry);
 
     @Query("SELECT * FROM friday_table WHERE date = :selectedDate ")
     LiveData<FridayEntry> getSelectedFridayEntry(Long selectedDate);
@@ -45,4 +45,6 @@ public interface EventDao {
     @Query("SELECT COUNT(date) FROM friday_table")
     LiveData<Integer> getFridaysCount();
 
+    @Query("DELETE FROM regular_table")
+    public void deleteCalendar();
 }

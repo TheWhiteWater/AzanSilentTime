@@ -1,8 +1,6 @@
 package nz.co.redice.demoservice.view;
 
 import android.Manifest;
-import android.content.Context;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +28,7 @@ import nz.co.redice.demoservice.databinding.FragmentLocationBinding;
 import nz.co.redice.demoservice.utils.LocationHelper;
 import nz.co.redice.demoservice.utils.PermissionHelper;
 import nz.co.redice.demoservice.utils.PrefHelper;
-import nz.co.redice.demoservice.viewmodel.AutoLocationViewModel;
+import nz.co.redice.demoservice.viewmodel.LocationViewModel;
 
 @AndroidEntryPoint
 public class LocationFragment extends Fragment implements View.OnClickListener {
@@ -40,7 +38,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
     @Inject PrefHelper mPrefHelper;
     @Inject LocationHelper mLocationHelper;
     private FragmentLocationBinding mViewBinding;
-    private AutoLocationViewModel mViewModel;
+    private LocationViewModel mViewModel;
 
 
     @Override
@@ -48,7 +46,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         mViewBinding = FragmentLocationBinding.inflate(inflater, container, false);
         View view = mViewBinding.getRoot();
-        mViewModel = new ViewModelProvider(this).get(AutoLocationViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
@@ -60,7 +58,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         // Check that the user hasn't revoked permissions by going to Settings.
-        if (!mPrefHelper.getLocationPermissionStatus()) {
+        if (!mPrefHelper.getLocationStatus()) {
             if (!mPermissionHelper.isLocationPermissionGranted()) {
                 requestLocationPermissions();
             }
@@ -71,7 +69,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         mViewBinding.autoLocateBtn.setOnClickListener(this);
         mViewBinding.saveLocationBtn.setOnClickListener(this);
 
-        getLastKnownAddress();
+        getAdminArea();
 
         mViewModel.lastKnownPosition.observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -97,7 +95,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                     .setAction(R.string.ok, view -> {
                         // Request permission
                         ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-                        mPrefHelper.setLocationPermissionStatus(true);
+                        mPrefHelper.setLocationStatus(true);
                     }).show();
         } else {
             Log.i("App", "Requesting permission");
@@ -116,18 +114,19 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.auto_locate_btn:
-                getLastKnownAddress();
+                getAdminArea();
                 break;
             case R.id.save_location_btn:
             default:
-                mViewModel.setLocation();
+                mViewModel.saveLocationInPrefs();
+                mViewModel.removeLocationRequest();
                 NavHostFragment.findNavController(this).navigate(R.id.fromLocationToHome);
                 break;
         }
     }
 
-    private void getLastKnownAddress() {
-        mViewModel.getLastKnownAddress();
+    private void getAdminArea() {
+        mViewModel.getAdminArea();
     }
 
 

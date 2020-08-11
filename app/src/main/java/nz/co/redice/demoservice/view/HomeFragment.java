@@ -23,6 +23,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -91,10 +94,10 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         setViewListeners();
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
-        mViewBinding.fridayCheckBox.setChecked(mPrefHelper.getDndOnFridaysOnly());
+        mViewBinding.checkbox.setChecked(mPrefHelper.getDndOnFridaysOnly());
 
         mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
-            if (integer >= 365 ) {
+            if (integer >= 365) {
                 displaySelectedEntry(LocalDate.now());
             } else {
                 mViewModel.requestPrayerCalendar();
@@ -102,7 +105,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         });
 
         mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
-            if (integer > 0 ) {
+            if (integer > 0) {
                 displayNextFridayEntry(LocalDate.now());
             } else {
                 mViewModel.populateFridayTable();
@@ -118,7 +121,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         mViewBinding.fridayTime.setOnClickListener(this::showTimePickerDialog);
 
-        mViewBinding.fridayCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mViewBinding.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
@@ -127,7 +130,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                     mPrefHelper.setDndOnFridaysOnly(true);
 
                     mViewBinding.dateView.setVisibility(View.GONE);
-
                     mViewBinding.fajrBtn.setVisibility(View.GONE);
                     mViewBinding.fajrTime.setVisibility(View.GONE);
                     mViewBinding.fajrName.setVisibility(View.GONE);
@@ -211,34 +213,17 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         super.onDestroyView();
     }
 
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
-
-        if (!mPrefHelper.getDndOnFridaysOnly()) {
-            displaySelectedEntry(selectedDate);
-        } else {
-            Log.d("App", "onDateSet:  picked date = " + selectedDate);
-            displayNextFridayEntry(selectedDate);
-
-        }
-    }
-
     private void displayNextFridayEntry(LocalDate selectedDate) {
         mViewModel.getNextFridayEntry(selectedDate).observe(getViewLifecycleOwner(),
                 fridayEntry -> {
                     if (fridayEntry != null) {
                         Log.d("App", "new Friday : " + fridayEntry.getDateString());
                         mViewBinding.setFriday(fridayEntry);
-                        mViewBinding.progressBar.setVisibility(View.INVISIBLE);
                     } else {
                         Log.d("App", "onViewCreated:  fridayEntry is null");
                     }
                 });
     }
-
 
     private void displaySelectedEntry(LocalDate date) {
 
@@ -246,7 +231,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
             if (selected != null) {
                 mEntryModel = selected;
                 mViewBinding.setEntry(mEntryModel);
-                mViewBinding.progressBar.setVisibility(View.INVISIBLE);
             } else {
                 mViewModel.requestPrayerCalendar();
             }
@@ -294,4 +278,19 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         mViewModel.updateFridaysTable(hourOfDay, minute);
     }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
+
+        if (!mPrefHelper.getDndOnFridaysOnly()) {
+            displaySelectedEntry(selectedDate);
+        } else {
+            Log.d("App", "onDateSet:  picked date = " + selectedDate);
+            displayNextFridayEntry(selectedDate);
+
+        }
+    }
+
 }

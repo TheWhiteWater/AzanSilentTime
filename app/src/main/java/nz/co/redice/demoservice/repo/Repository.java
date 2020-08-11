@@ -21,6 +21,7 @@ import nz.co.redice.demoservice.repo.local.entity.FridayEntry;
 import nz.co.redice.demoservice.repo.remote.AzanService;
 import nz.co.redice.demoservice.repo.remote.models.ApiResponse;
 import nz.co.redice.demoservice.repo.remote.models.Day;
+import nz.co.redice.demoservice.utils.PrefHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,16 +32,25 @@ public class Repository {
     private static final int MUSLIM_WORLD_LEAGUE_METHOD = 3;
     private final AzanService mAzanService;
     private final EventDao mDao;
+    private PrefHelper mPrefHelper;
 
     @Inject
-    public Repository(AzanService newsService, EventDao dao) {
+    public Repository(AzanService newsService, EventDao dao, PrefHelper prefHelper) {
         mAzanService = newsService;
         mDao = dao;
+        mPrefHelper = prefHelper;
     }
 
-    public void requestPrayerCalendar(Float lat, Float lon) {
-        mAzanService.requestStandardAnnualTimeTable(lat, lon, MUSLIM_WORLD_LEAGUE_METHOD,
-                Calendar.getInstance().get(Calendar.YEAR), true).enqueue(new Callback<ApiResponse>() {
+    public void requestPrayerCalendar() {
+        mAzanService.requestStandardAnnualTimeTable(
+                mPrefHelper.getLatitude(),
+                mPrefHelper.getLongitude(),
+                mPrefHelper.getCalculationMethod(),
+                mPrefHelper.getCalculationSchool(),
+                mPrefHelper.getMidnightMode(),
+                Calendar.getInstance().get(Calendar.YEAR),
+                true
+        ).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -63,20 +73,26 @@ public class Repository {
         });
     }
 
+    public void deletePrayerCalendar(){
+        Completable.fromAction(() ->mDao.deleteCalendar())
+        .subscribeOn(Schedulers.io())
+        .subscribe();
+    }
+
     public LiveData<EntryModel> getRegularEntry(Long value) {
         LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         return mDao.getSelectedEntry(value);
     }
 
     public LiveData<Integer> getRegularTableSize() {
-         return mDao.getRowCount();
+        return mDao.getRowCount();
     }
 
     public LiveData<Integer> getFridayTableSize() {
-         return mDao.getFridaysCount();
+        return mDao.getFridaysCount();
     }
 
-    public void updateRegularEntry(EntryModel model){
+    public void updateRegularEntry(EntryModel model) {
         mDao.updateEntry(model)
                 .subscribeOn(Schedulers.io())
                 .subscribe();
@@ -89,6 +105,7 @@ public class Repository {
     public LiveData<FridayEntry> getFridayEntry(Long value) {
         return mDao.getSelectedFridayEntry(value);
     }
+
     public void updateFridayEntry(FridayEntry fridayEntry) {
         mDao.updateFridayEntry(fridayEntry);
     }

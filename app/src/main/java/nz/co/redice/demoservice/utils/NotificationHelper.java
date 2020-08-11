@@ -37,10 +37,11 @@ public class NotificationHelper {
             NotificationChannel foregroundNotificationChannel = new NotificationChannel(
                     FOREGROUND_CHANNEL_ID,
                     "ForegroundChannelId",
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_LOW);
 
             NotificationManager manager = mContext.getSystemService(NotificationManager.class);
             manager.createNotificationChannel(foregroundNotificationChannel);
+
         }
     }
 

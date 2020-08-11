@@ -11,7 +11,7 @@
     </string-array>
 
 
-    <string-array name="mute_period_entries">
+    <string-array name="dnd_period_entries">
         <item>10 min</item>
         <item>15 min</item>
         <item>20 min</item>
@@ -19,7 +19,7 @@
         <item>1 hour</item>
     </string-array>
 
-    <string-array name="mute_period_values">
+    <string-array name="dnd_period_values">
         <item>10</item>
         <item>15</item>
         <item>20</item>
@@ -27,15 +27,61 @@
         <item>60</item>
     </string-array>
 
-    <string-array name="notification_entries">
-        <item>0 min</item>
-        <item>5 min</item>
-        <item>10 min</item>
+    <string-array name="school_entries">
+        <item>Shafi</item>
+        <item>Hanafi</item>
     </string-array>
 
-    <string-array name="notification_values">
+    <string-array name="school_values">
         <item>0</item>
-        <item>5</item>
-        <item>10</item>
+        <item>1</item>
     </string-array>
+
+    <string-array name="midnight_mode_entries">
+        <item>Mid Sunset to Sunrise</item>
+        <item>Mid Sunset to Fajr</item>
+    </string-array>
+
+    <string-array name="midnight_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+
+    <string-array name="calculation_methods_entries">
+        <item>Shia Ithna-Ansari</item>
+        <item>University of Islamic Sciences, Karachi</item>
+        <item>Islamic Society of North America</item>
+        <item>Muslim World League</item>
+        <item>Umm Al-Qura University, Makkah</item>
+        <item>Egyptian General Authority of Survey</item>
+        <item>Institute of Geophysics, University of Tehran</item>
+        <item>Gulf Region</item>
+        <item>Kuwait</item>
+        <item>Qatar</item>
+        <item>Majlis Ugama Islam Singapura, Singapore</item>
+        <item>Union Organization islamic de France</item>
+        <item>Diyanet İşleri Başkanlığı, Turkey</item>
+        <item>Spiritual Administration of Muslims of Russia</item>
+    </string-array>
+
+    <string-array name="calculation_method_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+    </string-array>
+
+
+
 </resources>

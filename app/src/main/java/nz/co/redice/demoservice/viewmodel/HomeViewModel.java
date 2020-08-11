@@ -29,21 +29,16 @@ public class HomeViewModel extends AndroidViewModel {
     private final SavedStateHandle savedStateHandle;
     public LiveData<FridayEntry> nextFriday;
     private Repository mRepository;
-    private ServiceHelper mServiceHelper;
     private PrefHelper mPrefHelper;
 
 
     @ViewModelInject
     public HomeViewModel(@NonNull Application application,
-                         Repository repository, ServiceHelper serviceHelper,
-                         PrefHelper prefHelper,
+                         Repository repository, PrefHelper prefHelper,
                          @Assisted SavedStateHandle savedStateHandle) {
         super(application);
         mRepository = repository;
         this.savedStateHandle = savedStateHandle;
-        mServiceHelper = serviceHelper;
-        mServiceHelper.startService(application);
-        mServiceHelper.doBindService(application);
         mPrefHelper = prefHelper;
     }
 
@@ -56,7 +51,6 @@ public class HomeViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        mServiceHelper.doUnbindService(getApplication());
     }
 
     public LiveData<Integer> getRegularDatabaseSize() {
@@ -64,7 +58,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void requestPrayerCalendar() {
-        mRepository.requestPrayerCalendar(mPrefHelper.getLatitude(), mPrefHelper.getLongitude());
+        mRepository.requestPrayerCalendar();
     }
 
     public LiveData<EntryModel> updateRegularEntry(EntryModel model) {
