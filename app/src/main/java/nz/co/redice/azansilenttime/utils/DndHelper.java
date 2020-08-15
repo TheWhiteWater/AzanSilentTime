@@ -11,11 +11,14 @@ import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -150,8 +153,7 @@ public class DndHelper {
                 }
 
                 if (!mPrefHelper.getDndOnFridaysOnly() && getCurrentTimeInSeconds() > model.getIshaEpoch()) {
-                    Long nextDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).plusDays(ONE_DAY).toEpochSecond();
-                    setAlarmManager(nextDay, NEXT_DAY_MORNING_ALARM, true);
+                    setAlarmForRegularDay(lifecycleOwner, day.plusDays(ONE_DAY));
                     Log.d(TAG, "setObserverOnTargetDay: observer set on the next day");
                 }
 
@@ -205,7 +207,14 @@ public class DndHelper {
 
     public String getNextAlarmTime() {
         if (mAlarmManager.getNextAlarmClock() != null) {
-            return "Next DND: ";
+            Date date = new Date(mAlarmManager.getNextAlarmClock().getTriggerTime());
+            DateFormat onlyTimeFormat = new SimpleDateFormat("hh:mm a");
+            if (date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
+                return "Today at " + onlyTimeFormat.format(date);
+            }
+            DateFormat onlyDayFormat = new SimpleDateFormat("dd MMM");
+            Log.d(TAG, "getNextAlarmTime: " + onlyDayFormat.format(date) + " at " + onlyTimeFormat.format(date));
+            return "Next DND on " + onlyDayFormat.format(date) + " at " + onlyTimeFormat.format(date);
         } else
             return "DND hasn't set";
     }
