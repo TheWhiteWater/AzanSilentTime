@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AzanTime</string>
+    <string name="app_name">AzanSilentTime</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>

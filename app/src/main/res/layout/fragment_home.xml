@@ -9,11 +9,11 @@
 
         <variable
             name="entry"
-            type="nz.co.redice.demoservice.repo.local.entity.EntryModel" />
+            type="nz.co.redice.azansilenttime.repo.local.entity.EntryModel" />
 
         <variable
             name="friday"
-            type="nz.co.redice.demoservice.repo.local.entity.FridayEntry" />
+            type="nz.co.redice.azansilenttime.repo.local.entity.FridayEntry" />
 
     </data>
 
@@ -132,7 +132,7 @@
             android:id="@+id/dhuhr_btn"
             style="@style/prayer_btn"
             android:contentDescription="TODO"
-            android:src="@{entry.getDhuhrSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
+            android:src="@{entry.dhuhrSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
             app:layout_constraintBottom_toBottomOf="@+id/dhuhr_time"
             app:layout_constraintStart_toStartOf="@+id/fajr_btn"
             app:layout_constraintTop_toTopOf="@+id/dhuhr_time" />
