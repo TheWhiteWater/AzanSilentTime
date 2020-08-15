@@ -98,15 +98,12 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
             if (integer >= 365) {
-//                Log.d(TAG, "onViewCreated: localdate is " + LocalDate.now(ZoneId.systemDefault()));
-//                Log.d(TAG, "onViewCreated: localzondeddate is " + LocalDate.from(ZonedDateTime.now(ZoneId.systemDefault())));
                 displaySelectedEntry(LocalDate.from(ZonedDateTime.now(ZoneId.systemDefault())));
             } else {
                 mViewModel.requestPrayerCalendar();
             }
         });
 
-//        if (mPrefHelper.getDndOnFridaysOnly()) {
             mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
                 if (integer > 0) {
                     displayNextFridayEntry(LocalDate.now(ZoneId.systemDefault()));
@@ -114,7 +111,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                     mViewModel.populateFridayTable();
                 }
             });
-//        }
     }
 
 
@@ -157,7 +153,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                     mViewBinding.fridayDateView.setVisibility(View.VISIBLE);
                     mViewBinding.fridayName.setVisibility(View.VISIBLE);
                     mViewBinding.fridayTime.setVisibility(View.VISIBLE);
-                    mViewBinding.fridayBtn.setVisibility(View.VISIBLE);
 
                 } else {
 
@@ -188,7 +183,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                     mViewBinding.fridayDateView.setVisibility(View.GONE);
                     mViewBinding.fridayName.setVisibility(View.GONE);
                     mViewBinding.fridayTime.setVisibility(View.GONE);
-                    mViewBinding.fridayBtn.setVisibility(View.GONE);
                 }
             }
         });

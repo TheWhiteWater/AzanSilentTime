@@ -5,7 +5,7 @@
     android:id="@+id/auto_location_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#03A9F4"
+    android:background="@color/backgroundColor"
     tools:context=".view.LocationFragment">
 
 
@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:src="@drawable/ic_logo"
+        android:src="@drawable/ic_svg_bl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+        setSupportActionBar(mBinding.toolbar);
         mServiceHelper.startService(this);
     }
 
@@ -35,6 +36,12 @@ public class MainActivity extends AppCompatActivity  {
     protected void onStart() {
         super.onStart();
         mServiceHelper.doBindService(this);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     @Override

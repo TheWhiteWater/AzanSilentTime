@@ -5,6 +5,7 @@
     android:id="@+id/splashScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     tools:context=".view.SplashFragment">
 
 
@@ -12,7 +13,7 @@
         android:id="@+id/splash_logo_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_logo"
+        android:src="@drawable/ic_svg_bl"
         android:transitionName="transition_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

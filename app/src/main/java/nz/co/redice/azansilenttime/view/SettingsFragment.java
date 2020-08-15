@@ -2,9 +2,14 @@ package nz.co.redice.azansilenttime.view;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.DropDownPreference;
 import androidx.preference.Preference;
@@ -12,6 +17,8 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
+
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -58,9 +65,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     }
 
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayShowHomeEnabled(true);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
     private void getBackToHomeScreen() {
         NavHostFragment.findNavController(this).navigate(R.id.fromSettingsToHome);
     }
+
 
 
     @Override

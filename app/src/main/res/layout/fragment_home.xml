@@ -21,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@color/backgroundColor"
         tools:context=".view.HomeFragment">
 
 
@@ -63,11 +64,11 @@
         <TextView
             android:id="@+id/friday_name"
             style="@style/time_title"
-            android:text="Friday\nPrayer"
+            android:text="Friday Prayer"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.10"
+            app:layout_constraintHorizontal_bias="0.2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.25"/>
@@ -84,17 +85,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/fajr_time" />
 
-        <ImageButton
-            android:id="@+id/friday_btn"
-            style="@style/prayer_btn"
-            android:contentDescription="TODO"
-            android:src="@{friday.getSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.9"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/friday_time"
-            app:layout_constraintTop_toTopOf="@+id/friday_time" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/friday_btn"-->
+<!--            style="@style/prayer_btn"-->
+<!--            android:contentDescription="TODO"-->
+<!--            android:src="@{friday.getSilent == true ? @drawable/ic_volume_off : @drawable/ic_volume_up}"-->
+<!--            android:visibility="gone"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.9"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/friday_time"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/friday_time" />-->
 
         <TextView
             android:id="@+id/fajr_time"
@@ -113,7 +114,7 @@
             android:text="@{friday.timeEpoch == null ? friday.blank : friday.TimeString}"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.7"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/friday_name"
             app:layout_constraintTop_toTopOf="@+id/friday_name"
@@ -242,6 +243,7 @@
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
             android:text="Do Not Disturb for \nThe Friday Prayer only"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

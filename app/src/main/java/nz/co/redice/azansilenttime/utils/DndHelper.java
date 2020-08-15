@@ -38,7 +38,6 @@ public class DndHelper {
     private static final int ASR_ALARM = 3;
     private static final int MAGHRIB_ALARM = 4;
     private static final int ISHA_ALARM = 5;
-    private static final int NEXT_DAY_MORNING_ALARM = 6;
     private static final int FRIDAY_ALARM = 7;
     private static final long ONE_DAY = 1;
     @Inject PrefHelper mPrefHelper;
@@ -230,7 +229,7 @@ public class DndHelper {
         intent.setAction(DND_OFF);
         PendingIntent dndOffIntent = PendingIntent.getService(mContext, 999, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long delayTime = (getCurrentTimeInSeconds() * 1000) + (1 * 60 * 1000);
+        long delayTime = (getCurrentTimeInSeconds() * 1000) + (mPrefHelper.getDndPeriod() * 60 * 1000);
         mAlarmManager.setExact(AlarmManager.RTC, delayTime, dndOffIntent);
     }
 
