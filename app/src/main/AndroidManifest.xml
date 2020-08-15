@@ -18,7 +18,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="nz.co.redice.azansilenttime.view.MainActivity">
+        <activity
+            android:name="nz.co.redice.azansilenttime.view.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,7 +31,6 @@
             android:name="nz.co.redice.azansilenttime.services.ForegroundService"
             android:enabled="true"
             android:exported="true" />
-
 
 
     </application>
