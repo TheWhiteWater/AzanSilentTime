@@ -216,7 +216,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 fridayEntry -> {
                     if (fridayEntry != null) {
                         mViewBinding.setFriday(fridayEntry);
-                    } else {
                     }
                 });
     }

@@ -25,14 +25,6 @@ public class EntryModel {
     private Long maghribEpoch;
     private Long ishaEpoch;
 
-    @Ignore private String dateString;
-    @Ignore private String fajrString;
-    @Ignore private String dhuhrString;
-    @Ignore private String asrString;
-    @Ignore private String maghribString;
-    @Ignore private String ishaString;
-
-
     public EntryModel() {
     }
 

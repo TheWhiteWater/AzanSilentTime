@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.services.ForegroundService;
+import nz.co.redice.azansilenttime.view.presentation.Converters;
 
 @Singleton
 public class DndHelper {
@@ -42,13 +43,14 @@ public class DndHelper {
     private static final long ONE_DAY = 1;
     @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
-    private Context mContext;
     private boolean mFajrAlarmActivated;
-    private boolean mDhurAlarmActivated;
+    private boolean mDhuhrAlarmActivated;
     private boolean mAsrAlarmActivated;
     private boolean mMaghribAlarmActivated;
     private boolean mIshaAlarmActivated;
     private boolean mFridayAlarmActivated;
+    private boolean mNextDayAlarmActivated;
+    private Context mContext;
     private AlarmManager mAlarmManager;
     private AudioManager mAudioManager;
 
@@ -65,100 +67,49 @@ public class DndHelper {
     }
 
 
-    public void setAlarmForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
+    public void setObserverForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
         Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-
-
         mRepository.getRegularEntry(targetDayEpoch).observe(lifecycleOwner, model -> {
             if (model != null) {
-                boolean notTooLateForFajr = getCurrentTimeInSeconds() <= model.getFajrEpoch();
-                boolean isFajrActive = model.getFajrSilent();
-                boolean notFridayDnd = !mPrefHelper.getDndOnFridaysOnly();
-                boolean isFajrGood2Go = notTooLateForFajr && isFajrActive && notFridayDnd;
-                boolean fajrDeactivated = mFajrAlarmActivated && !notFridayDnd || mFajrAlarmActivated && !isFajrActive;
+                mFajrAlarmActivated = doTiming(model.getFajrEpoch(), model.getFajrSilent(), FAJR_ALARM, mFajrAlarmActivated);
+                mDhuhrAlarmActivated = doTiming(model.getDhuhrEpoch(), model.getDhuhrSilent(), DHUR_ALARM, mDhuhrAlarmActivated);
+                mMaghribAlarmActivated = doTiming(model.getMaghribEpoch(), model.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmActivated);
+                mAsrAlarmActivated = doTiming(model.getAsrEpoch(), model.getAsrSilent(), ASR_ALARM, mAsrAlarmActivated);
+                mIshaAlarmActivated = doTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmActivated);
 
-                if (!mFajrAlarmActivated && isFajrGood2Go) {
-                    setAlarmManager(model.getFajrEpoch(), FAJR_ALARM, true);
-                    mFajrAlarmActivated = true;
-                    Log.d(TAG, "Alarm set on fajr. " + model.getDateString() + ", " + model.getFajrString());
-                }
-                if (fajrDeactivated) {
-                    setAlarmManager(model.getFajrEpoch(), FAJR_ALARM, false);
-                    Log.d(TAG, "Alarm canceled on fajr. " + model.getDateString() + ", " + model.getFajrString());
-                }
-
-
-                boolean notTooLateForDhuhr = getCurrentTimeInSeconds() <= model.getDhuhrEpoch();
-                boolean isDhuhrActive = model.getDhuhrSilent();
-                boolean isDhuhrGood2Go = notTooLateForDhuhr && isDhuhrActive && notFridayDnd;
-                boolean dhurDeactivated = mDhurAlarmActivated && !notFridayDnd || mDhurAlarmActivated && !isDhuhrActive;
-
-                if (!mDhurAlarmActivated && isDhuhrGood2Go) {
-                    setAlarmManager(model.getDhuhrEpoch(), DHUR_ALARM, true);
-                    mDhurAlarmActivated = true;
-                    Log.d(TAG, "Alarm set on dhuhr. " + model.getDateString() + ", " + model.getDhuhrString());
-                }
-                if (dhurDeactivated) {
-                    setAlarmManager(model.getDhuhrEpoch(), DHUR_ALARM, false);
-                    Log.d(TAG, "Alarm canceled on dhuhr. " + model.getDateString() + ", " + model.getDhuhrString());
-                }
-
-
-                boolean notTooLateForAsr = getCurrentTimeInSeconds() <= model.getAsrEpoch();
-                boolean isAsrActive = model.getAsrSilent();
-                boolean isAsrGood2Go = notTooLateForAsr && isAsrActive && notFridayDnd;
-                boolean asrDeactivated = mAsrAlarmActivated && !notFridayDnd || mAsrAlarmActivated && !isAsrActive;
-
-                if (!mAsrAlarmActivated && isAsrGood2Go) {
-                    setAlarmManager(model.getAsrEpoch(), ASR_ALARM, true);
-                    mAsrAlarmActivated = true;
-                    Log.d(TAG, "Alarm set on asr. " + model.getDateString() + ", " + model.getAsrString());
-                }
-                if (asrDeactivated) {
-                    setAlarmManager(model.getAsrEpoch(), ASR_ALARM, false);
-                    Log.d(TAG, "Alarm canceled on asr. " + model.getDateString() + ", " + model.getAsrString());
-                }
-
-
-                boolean notTooLateForMaghrib = getCurrentTimeInSeconds() <= model.getMaghribEpoch();
-                boolean isMaghribActive = model.getMaghribSilent();
-                boolean isMaghribGood2Go = notTooLateForMaghrib && isMaghribActive && notFridayDnd;
-                boolean maghribDeactivated = mMaghribAlarmActivated && !notFridayDnd || mMaghribAlarmActivated && !isMaghribActive;
-
-                if (!mMaghribAlarmActivated && isMaghribGood2Go) {
-                    setAlarmManager(model.getMaghribEpoch(), MAGHRIB_ALARM, true);
-                    mMaghribAlarmActivated = true;
-                    Log.d(TAG, "Alarm set on maghrib. " + model.getDateString() + ", " + model.getMaghribString());
-                }
-                if (maghribDeactivated) {
-                    setAlarmManager(model.getMaghribEpoch(), MAGHRIB_ALARM, false);
-                    Log.d(TAG, "Alarm canceled on maghrib. " + model.getDateString() + ", " + model.getMaghribString());
-                }
-
-
-                boolean notTooLateForIsha = getCurrentTimeInSeconds() <= model.getIshaEpoch();
-                boolean isIshaActive = model.getIshaSilent();
-                boolean isIshaGood2Go = notTooLateForIsha && isIshaActive && notFridayDnd;
-                boolean ishaDeactivated = mIshaAlarmActivated && !notFridayDnd || mIshaAlarmActivated && !isIshaActive;
-
-                if (!mIshaAlarmActivated && isIshaGood2Go) {
-                    setAlarmManager(model.getIshaEpoch(), ISHA_ALARM, true);
-                    mIshaAlarmActivated = true;
-                    Log.d(TAG, "Alarm set on isha. " + model.getDateString() + ", " + model.getIshaString());
-                }
-                if (ishaDeactivated) {
-                    setAlarmManager(model.getIshaEpoch(), ISHA_ALARM, false);
-                    Log.d(TAG, "Alarm canceled on isha. " + model.getDateString() + ", " + model.getIshaString());
-                }
-
-                if (!mPrefHelper.getDndOnFridaysOnly() && getCurrentTimeInSeconds() > model.getIshaEpoch()) {
-                    setAlarmForRegularDay(lifecycleOwner, day.plusDays(ONE_DAY));
-                    Log.d(TAG, "setObserverOnTargetDay: observer set on the next day");
+                if (!mFajrAlarmActivated && !mDhuhrAlarmActivated && !mAsrAlarmActivated && !mMaghribAlarmActivated && !mIshaAlarmActivated
+                && !mPrefHelper.getDndOnFridaysOnly()) {
+                    Log.d(TAG, "launching observer for the next day");
+                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
+                    mNextDayAlarmActivated =true;
+                } if (mNextDayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
+                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
                 }
 
             }
         });
 
+
+    }
+
+    private boolean doTiming(Long epoch, boolean active, int requestCode, boolean dispatcher) {
+        boolean notTooLateForTiming = getCurrentTimeInSeconds() <= epoch;
+        boolean isTimingActive = active;
+        boolean notFridayDnd = !mPrefHelper.getDndOnFridaysOnly();
+        boolean isTimingGood2Go = notTooLateForTiming && isTimingActive && notFridayDnd;
+        boolean timingToBeDeactivated = dispatcher && !notFridayDnd || dispatcher && !isTimingActive;
+
+        if (!dispatcher && isTimingGood2Go) {
+            setAlarmManager(epoch, requestCode, true);
+            dispatcher = true;
+            Log.d(TAG, "Alarm set on . " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch));
+        }
+        if (timingToBeDeactivated) {
+            setAlarmManager(epoch, requestCode, false);
+            dispatcher = false;
+            Log.d(TAG, "Alarm canceled on . " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch));
+        }
+        return dispatcher;
     }
 
     public void setAlarmForNextFriday(LifecycleOwner lifecycleOwner, LocalDate date) {
@@ -179,7 +130,8 @@ public class DndHelper {
                         mFridayAlarmActivated = true;
                         Log.d(TAG, "Alarm set for friday. " + fridayEntry.getDateString() + ", " + fridayEntry.getTimeString());
                     }
-                    if (!fridayEntry.getSilent() && mFridayAlarmActivated || mFridayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
+                    if (!fridayEntry.getSilent() && mFridayAlarmActivated
+                            || mFridayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
                         setAlarmManager(fridayEntry.getTimeEpoch(), FRIDAY_ALARM, false);
                         Log.d(TAG, "Alarm canceled for friday. " + fridayEntry.getDateString() + ", " + fridayEntry.getTimeString());
                     }
@@ -188,26 +140,26 @@ public class DndHelper {
         });
     }
 
-    public void setAlarmManager(Long triggerAtSeconds, int requestCode, boolean status) {
+    public boolean setAlarmManager(Long timing, int requestCode, boolean status) {
 
         Intent intent = new Intent(mContext, ForegroundService.class);
         intent.setAction(DND_ON);
         PendingIntent dndOnIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (status) {
-            mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(triggerAtSeconds * 1000, null), dndOnIntent);
-            Log.d(TAG, "AlarmManager activated on " + triggerAtSeconds * 1000);
+            mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(timing * 1000, null), dndOnIntent);
+            Log.d(TAG, "AlarmManager activated on " + timing * 1000);
+            return true;
         }
-        if (!status) {
-            mAlarmManager.cancel(dndOnIntent);
-            Log.d(TAG, "AlarmManager canceled on " + triggerAtSeconds * 1000);
-        }
+        mAlarmManager.cancel(dndOnIntent);
+        Log.d(TAG, "AlarmManager canceled on " + timing * 1000);
+        return true;
     }
 
     public String getNextAlarmTime() {
         if (mAlarmManager.getNextAlarmClock() != null) {
             Date date = new Date(mAlarmManager.getNextAlarmClock().getTriggerTime());
-            DateFormat onlyTimeFormat = new SimpleDateFormat("hh:mm a");
+            DateFormat onlyTimeFormat = new SimpleDateFormat("HH:mm a");
             if (date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
                 return "Today at " + onlyTimeFormat.format(date);
             }
@@ -237,4 +189,5 @@ public class DndHelper {
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         Log.d(TAG, "setRingerMode: UNSILENT");
     }
+
 }

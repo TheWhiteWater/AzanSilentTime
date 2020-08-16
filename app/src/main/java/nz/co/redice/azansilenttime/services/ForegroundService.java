@@ -1,8 +1,6 @@
 package nz.co.redice.azansilenttime.services;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -17,8 +15,9 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -80,8 +79,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-        Log.d(TAG, "onStartCommand: DND status = " + mPrefHelper.getDndOnFridaysOnly());
-        mDndHelper.setAlarmForRegularDay(this, LocalDate.now());
+        mDndHelper.setObserverForRegularDay(this, LocalDate.now());
         mDndHelper.setAlarmForNextFriday(this, LocalDate.now());
     }
 
@@ -93,7 +91,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(@NotNull Intent intent) {
         super.onBind(intent);
         Log.d(TAG, "onBind: Service bound");
         stopForeground(true);
@@ -116,21 +114,6 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
         if (!mChangingConfiguration)
             startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.createForegroundNotification(this));
         return true;
-    }
-
-
-    public boolean serviceIsRunningInForeground(Context context) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(
-                Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(
-                Integer.MAX_VALUE)) {
-            if (getClass().getName().equals(service.service.getClassName())) {
-                if (service.foreground) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @NonNull

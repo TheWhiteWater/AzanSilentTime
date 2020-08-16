@@ -28,9 +28,7 @@
         </activity>
 
         <service
-            android:name="nz.co.redice.azansilenttime.services.ForegroundService"
-            android:enabled="true"
-            android:exported="true" />
+            android:name="nz.co.redice.azansilenttime.services.ForegroundService"/>
 
 
     </application>

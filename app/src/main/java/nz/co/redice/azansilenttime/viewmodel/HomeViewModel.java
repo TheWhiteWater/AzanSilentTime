@@ -47,11 +47,6 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-    }
-
     public LiveData<Integer> getRegularDatabaseSize() {
         return mRepository.getRegularTableSize();
     }

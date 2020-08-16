@@ -9,7 +9,11 @@ import android.text.format.DateFormat;
 
 import androidx.fragment.app.DialogFragment;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
+
+import nz.co.redice.azansilenttime.R;
 
 public class TimePickerFragment extends DialogFragment {
 
@@ -21,6 +25,7 @@ public class TimePickerFragment extends DialogFragment {
         mListener = listener;
         mContext = context;
     }
+    @NotNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current time as the default values for the picker
@@ -29,7 +34,7 @@ public class TimePickerFragment extends DialogFragment {
         int minute = c.get(Calendar.MINUTE);
 
         // Create a new instance of TimePickerDialog and return it
-        return new TimePickerDialog(mContext, AlertDialog.THEME_HOLO_LIGHT, mListener, hour, minute,DateFormat.is24HourFormat(mContext));
+        return new TimePickerDialog(mContext, R.style.HoloDialogTheme, mListener, hour, minute,DateFormat.is24HourFormat(mContext));
     }
 
 

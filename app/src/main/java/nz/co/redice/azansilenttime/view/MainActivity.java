@@ -16,7 +16,7 @@ import nz.co.redice.azansilenttime.utils.PrefHelper;
 import nz.co.redice.azansilenttime.utils.ServiceHelper;
 
 @AndroidEntryPoint
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
@@ -59,12 +59,11 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public void onBackPressed() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        if (navController.getCurrentDestination().getLabel().equals("HomeFragment") ||
-                navController.getCurrentDestination().getLabel().equals("LocationFragment")) {
-            // do nothing
-        } else {
+        if (!navController.getCurrentDestination().getLabel().equals("HomeFragment") &&
+                !navController.getCurrentDestination().getLabel().equals("LocationFragment")) {
             super.onBackPressed();
         }
+
     }
 
 

@@ -18,6 +18,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -42,7 +44,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mViewBinding = FragmentLocationBinding.inflate(inflater, container, false);
         View view = mViewBinding.getRoot();
@@ -89,7 +91,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         if (shouldProvideRationale) {
             Log.i("App", "Displaying permission rationale to provide additional context.");
             Snackbar.make(
-                    mViewBinding.autoLocationLayout,
+                    mViewBinding.locationLayout,
                     "Location permission is needed for core functionality",
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.ok, view -> {
