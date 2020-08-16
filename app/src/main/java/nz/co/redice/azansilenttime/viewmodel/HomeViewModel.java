@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -62,11 +63,9 @@ public class HomeViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void populateFridayTable() {
-
-        // minus 1 day needs because current day can be friday and the calcNextFriday always returns NEXT friday
         LocalDate targetDay = LocalDate.now().minusDays(1);
         // TODO: 15.08.2020 link to current year
-        LocalDate endOfTheYear = LocalDate.of(2020, 12, 31);
+        LocalDate endOfTheYear = LocalDate.of(Calendar.getInstance().get(Calendar.YEAR), 12, 31);
 
         while (targetDay.isBefore(endOfTheYear)) {
             targetDay = calcNextFriday(targetDay);
@@ -84,7 +83,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public LiveData<FridayEntry> getNextFridayEntry(LocalDate selectedDate) {
-        Long nextFriday = calcNextFriday(selectedDate).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        Long nextFriday = calcNextFriday(selectedDate.minusDays(1)).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         return mRepository.getFridayEntry(nextFriday);
     }
 
@@ -99,10 +98,9 @@ public class HomeViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void updateFridaysTable(int hourOfDay, int minute) {
-        // minus 1 day needs because current day can be friday and the calcNextFriday always returns NEXT friday
         LocalDate targetDay = LocalDate.now().minusDays(1);
         // TODO: 15.08.2020 link to current year
-        LocalDate endOfTheYear = LocalDate.of(2020, 12, 31);
+        LocalDate endOfTheYear = LocalDate.of(Calendar.getInstance().get(Calendar.YEAR), 12, 31);
 
         while (targetDay.isBefore(endOfTheYear)) {
             targetDay = calcNextFriday(targetDay);
@@ -111,9 +109,7 @@ public class HomeViewModel extends AndroidViewModel {
 
             Observable.just(new FridayEntry(date, true, time))
                     .subscribeOn(Schedulers.io())
-                    .subscribe(s -> {
-                        mRepository.updateFridayEntry(new FridayEntry(date, true, time));
-                    });
+                    .subscribe(s -> mRepository.updateFridayEntry(s));
         }
     }
 }

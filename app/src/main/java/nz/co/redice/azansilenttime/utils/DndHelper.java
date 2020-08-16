@@ -11,14 +11,18 @@ import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -43,6 +47,7 @@ public class DndHelper {
     private static final long ONE_DAY = 1;
     @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
+    private ArrayList<Long> mActiveAlarmlist = new ArrayList<>();
     private boolean mFajrAlarmActivated;
     private boolean mDhuhrAlarmActivated;
     private boolean mAsrAlarmActivated;
@@ -78,11 +83,12 @@ public class DndHelper {
                 mIshaAlarmActivated = doTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmActivated);
 
                 if (!mFajrAlarmActivated && !mDhuhrAlarmActivated && !mAsrAlarmActivated && !mMaghribAlarmActivated && !mIshaAlarmActivated
-                && !mPrefHelper.getDndOnFridaysOnly()) {
+                        && !mPrefHelper.getDndOnFridaysOnly()) {
                     Log.d(TAG, "launching observer for the next day");
                     setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
-                    mNextDayAlarmActivated =true;
-                } if (mNextDayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
+                    mNextDayAlarmActivated = true;
+                }
+                if (mNextDayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
                     setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
                 }
 
@@ -148,24 +154,33 @@ public class DndHelper {
 
         if (status) {
             mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(timing * 1000, null), dndOnIntent);
+            mActiveAlarmlist.add(timing * 1000);
             Log.d(TAG, "AlarmManager activated on " + timing * 1000);
             return true;
         }
+
         mAlarmManager.cancel(dndOnIntent);
+        mActiveAlarmlist.remove(timing * 1000);
         Log.d(TAG, "AlarmManager canceled on " + timing * 1000);
         return true;
     }
 
     public String getNextAlarmTime() {
-        if (mAlarmManager.getNextAlarmClock() != null) {
-            Date date = new Date(mAlarmManager.getNextAlarmClock().getTriggerTime());
-            DateFormat onlyTimeFormat = new SimpleDateFormat("HH:mm a");
-            if (date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
-                return "Today at " + onlyTimeFormat.format(date);
+        if (mActiveAlarmlist.size() > 0) {
+            Collections.sort(mActiveAlarmlist);
+            Date date = new Date(mActiveAlarmlist.get(0));
+
+            LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+            DateTimeFormatter onlyTimeFormat = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
+            DateTimeFormatter onlyDayFormat = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
+
+            if (localDateTime.getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
+                return "Today at " + onlyTimeFormat.format(localDateTime);
             }
-            DateFormat onlyDayFormat = new SimpleDateFormat("dd MMM");
-            Log.d(TAG, "getNextAlarmTime: " + onlyDayFormat.format(date) + " at " + onlyTimeFormat.format(date));
-            return "Next DND on " + onlyDayFormat.format(date) + " at " + onlyTimeFormat.format(date);
+            Log.d(TAG, "getNextAlarmTime: " + onlyDayFormat.format(localDateTime) + " at " + onlyTimeFormat.format(localDateTime));
+            Log.d(TAG, "getNextAlarmTime: value " + mActiveAlarmlist.get(0));
+            return "Next DND on " + onlyDayFormat.format(localDateTime) + " at " + onlyTimeFormat.format(localDateTime);
         } else
             return "DND hasn't set";
     }
