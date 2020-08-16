@@ -28,6 +28,7 @@
         android:layout_marginTop="28dp"
         android:text="Check your GPS and \nInternet connections \n and press Locate"
         android:textAlignment="center"
+        android:textColor="@color/textColor"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
