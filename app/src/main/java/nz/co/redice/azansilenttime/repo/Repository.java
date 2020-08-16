@@ -111,4 +111,8 @@ public class Repository {
         mDao.updateFridayEntry(fridayEntry);
     }
 
+    public void deleteFridayTable() {
+        mDao.deleteAllFridayTable();
+    }
+
 }

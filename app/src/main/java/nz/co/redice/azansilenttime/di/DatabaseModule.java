@@ -29,6 +29,7 @@ public class DatabaseModule {
 
 
     @Provides
+    @Singleton
     EventDao provideDao(AppDatabase database) {
         return  database.getDao();
     }

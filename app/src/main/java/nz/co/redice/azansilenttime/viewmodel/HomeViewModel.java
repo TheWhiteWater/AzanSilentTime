@@ -26,6 +26,7 @@ import nz.co.redice.azansilenttime.utils.PrefHelper;
 
 public class HomeViewModel extends AndroidViewModel {
 
+    private static final String TAG = "App HomeViewModel";
     private final SavedStateHandle savedStateHandle;
     public LiveData<FridayEntry> nextFriday;
     private Repository mRepository;
@@ -64,7 +65,6 @@ public class HomeViewModel extends AndroidViewModel {
     @SuppressLint("CheckResult")
     public void populateFridayTable() {
         LocalDate targetDay = LocalDate.now().minusDays(1);
-        // TODO: 15.08.2020 link to current year
         LocalDate endOfTheYear = LocalDate.of(Calendar.getInstance().get(Calendar.YEAR), 12, 31);
 
         while (targetDay.isBefore(endOfTheYear)) {
@@ -99,7 +99,6 @@ public class HomeViewModel extends AndroidViewModel {
     @SuppressLint("CheckResult")
     public void updateFridaysTable(int hourOfDay, int minute) {
         LocalDate targetDay = LocalDate.now().minusDays(1);
-        // TODO: 15.08.2020 link to current year
         LocalDate endOfTheYear = LocalDate.of(Calendar.getInstance().get(Calendar.YEAR), 12, 31);
 
         while (targetDay.isBefore(endOfTheYear)) {

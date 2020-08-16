@@ -47,4 +47,7 @@ public interface EventDao {
 
     @Query("DELETE FROM regular_table")
     public void deleteCalendar();
+
+    @Query("DELETE FROM friday_table")
+    public void deleteAllFridayTable();
 }

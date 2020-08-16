@@ -69,7 +69,7 @@ public class NotificationHelper {
                 .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
                 .setContentTitle("Content Title")
                 .setContentText(mDndHelper.getNextAlarmTime())
-                .setSmallIcon(R.drawable.ic_android)
+                .setSmallIcon(R.drawable.ic_black_24)
                 .build();
     }
 
