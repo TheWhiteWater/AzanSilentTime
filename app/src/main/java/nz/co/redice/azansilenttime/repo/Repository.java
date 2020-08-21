@@ -1,5 +1,6 @@
 package nz.co.redice.azansilenttime.repo;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -13,6 +14,7 @@ import java.util.Calendar;
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.local.EventDao;
@@ -107,8 +109,11 @@ public class Repository {
         return mDao.getSelectedFridayEntry(value);
     }
 
+    @SuppressLint("CheckResult")
     public void updateFridayEntry(FridayEntry fridayEntry) {
-        mDao.updateFridayEntry(fridayEntry);
+        Observable.just(fridayEntry)
+                .subscribeOn(Schedulers.io())
+                .subscribe(s -> mDao.updateFridayEntry(fridayEntry));
     }
 
     public void deleteFridayTable() {

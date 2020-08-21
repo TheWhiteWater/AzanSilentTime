@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LifecycleOwner;
 
@@ -77,20 +78,26 @@ public class DndHelper {
         mRepository.getRegularEntry(targetDayEpoch).observe(lifecycleOwner, model -> {
             if (model != null) {
 
-                if (getCurrentTimeInSeconds() <= model.getFajrEpoch())
+                if (getCurrentTimeInSeconds() <= model.getFajrEpoch()) {
+                    Log.d(TAG, "setObserverForRegularDay: current time: " + getCurrentTimeInSeconds() * 1000);
                     mFajrAlarmActivated = doTiming(model.getFajrEpoch(), model.getFajrSilent(), FAJR_ALARM, mFajrAlarmActivated);
+                }
 
-                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch())
+                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch()) {
                     mDhuhrAlarmActivated = doTiming(model.getDhuhrEpoch(), model.getDhuhrSilent(), DHUR_ALARM, mDhuhrAlarmActivated);
+                }
 
-                if (getCurrentTimeInSeconds() <= model.getAsrEpoch())
+                if (getCurrentTimeInSeconds() <= model.getAsrEpoch()) {
                     mAsrAlarmActivated = doTiming(model.getAsrEpoch(), model.getAsrSilent(), ASR_ALARM, mAsrAlarmActivated);
+                }
 
-                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch())
+                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch()) {
                     mMaghribAlarmActivated = doTiming(model.getMaghribEpoch(), model.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmActivated);
+                }
 
-                if (getCurrentTimeInSeconds() <= model.getIshaEpoch())
+                if (getCurrentTimeInSeconds() <= model.getIshaEpoch()) {
                     mIshaAlarmActivated = doTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmActivated);
+                }
 
                 if (!mFajrAlarmActivated && !mDhuhrAlarmActivated && !mAsrAlarmActivated && !mMaghribAlarmActivated && !mIshaAlarmActivated
                         && !mPrefHelper.getDndOnFridaysOnly()) {
@@ -127,12 +134,16 @@ public class DndHelper {
         if (!dispatcher && isTimingGood2Go) {
             setAlarmManager(epoch, requestCode, true);
             dispatcher = true;
-            Log.d(TAG, "Alarm set on. " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch));
+            //                   + Converters.getDateFromLong(epoch) + ", "
+            String message = String.format("Silent mode ON for %s", Converters.setTimeFromLong(epoch));
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
         }
         if (timingToBeDeactivated) {
             setAlarmManager(epoch, requestCode, false);
             dispatcher = false;
-            Log.d(TAG, "Alarm canceled on. " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch));
+            //                    + Converters.getDateFromLong(epoch) + ", "
+            String message = String.format("Silent mode OFF for %s", Converters.setTimeFromLong(epoch));
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
         }
         return dispatcher;
     }
@@ -155,13 +166,16 @@ public class DndHelper {
         if (!dispatcher && isTimingGood2Go || dispatcher && timingToBeDeactivated) {
             setAlarmManager(epoch, requestCode, true);
             dispatcher = true;
-            Log.d(TAG, "Alarm set on " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch));
+//            String message = "Alarm set on " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch);
+//            Toast.makeText(mContext, message , Toast.LENGTH_SHORT).show();
         }
         if (timingToBeDeactivated) {
             setAlarmManager(epoch, requestCode, false);
             dispatcher = false;
-            Log.d(TAG, "Alarm canceled on . " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch));
+//            String message = "Alarm canceled on . " + Converters.setDateFromLong(epoch) + ", " + Converters.setTimeFromLong(epoch);
+//            Toast.makeText(mContext, message , Toast.LENGTH_SHORT).show();
         }
+
         return dispatcher;
     }
 
@@ -186,7 +200,6 @@ public class DndHelper {
     }
 
     public boolean setAlarmManager(Long timing, int requestCode, boolean status) {
-
         Intent intent = new Intent(mContext, ForegroundService.class);
         intent.setAction(DND_ON);
         PendingIntent dndOnIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);

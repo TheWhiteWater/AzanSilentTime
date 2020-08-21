@@ -2,6 +2,7 @@ package nz.co.redice.azansilenttime.view;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -24,8 +25,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -35,19 +36,28 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.FragmentHomeBinding;
 import nz.co.redice.azansilenttime.repo.local.entity.EntryModel;
+import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.utils.PrefHelper;
 import nz.co.redice.azansilenttime.view.presentation.DatePickerFragment;
 import nz.co.redice.azansilenttime.view.presentation.TimePickerFragment;
 import nz.co.redice.azansilenttime.viewmodel.HomeViewModel;
 
 @AndroidEntryPoint
-public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = "App HomeFragment";
     @Inject PrefHelper mPrefHelper;
     private HomeViewModel mViewModel;
     private FragmentHomeBinding mViewBinding;
     private EntryModel mEntryModel;
+    private FridayEntry mFridayEntry;
+
+    private TransitionDrawable transitionFajr;
+    private TransitionDrawable transitionDhuhr;
+    private TransitionDrawable transitionMaghrib;
+    private TransitionDrawable transitionAsr;
+    private TransitionDrawable transitionIsha;
+    private TransitionDrawable transitionFriday;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,109 +100,63 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setViewListeners();
-        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-
-        mViewBinding.checkbox.setChecked(mPrefHelper.getDndOnFridaysOnly());
-
+        setLayoutWidgets();
 
         mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
             if (integer >= 365) {
-                displaySelectedEntry(LocalDate.from(ZonedDateTime.now(ZoneId.systemDefault())));
+                bindRegularEntry(LocalDate.from(LocalDateTime.now()));
             } else {
                 mViewModel.requestPrayerCalendar();
             }
         });
 
-            mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
-                if (integer > 0) {
-                    displayNextFridayEntry(LocalDate.now(ZoneId.systemDefault()));
-                } else {
-                    mViewModel.populateFridayTable();
-                }
-            });
-    }
-
-
-    private void setViewListeners() {
-        //setting date picker
-        mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
-        mViewBinding.fridayDateView.setOnClickListener(this::showDatePickerDialog);
-
-        mViewBinding.fridayTime.setOnClickListener(this::showTimePickerDialog);
-
-        mViewBinding.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-
-                if (b) {
-
-                    mPrefHelper.setDndOnFridaysOnly(true);
-
-                    mViewBinding.dateView.setVisibility(View.GONE);
-                    mViewBinding.fajrBtn.setVisibility(View.GONE);
-                    mViewBinding.fajrTime.setVisibility(View.GONE);
-                    mViewBinding.fajrName.setVisibility(View.GONE);
-
-                    mViewBinding.dhuhrBtn.setVisibility(View.GONE);
-                    mViewBinding.dhuhrTime.setVisibility(View.GONE);
-                    mViewBinding.dhuhrName.setVisibility(View.GONE);
-
-                    mViewBinding.asrBtn.setVisibility(View.GONE);
-                    mViewBinding.asrTime.setVisibility(View.GONE);
-                    mViewBinding.asrName.setVisibility(View.GONE);
-
-                    mViewBinding.maghribBtn.setVisibility(View.GONE);
-                    mViewBinding.maghribTime.setVisibility(View.GONE);
-                    mViewBinding.maghribName.setVisibility(View.GONE);
-
-                    mViewBinding.ishaBtn.setVisibility(View.GONE);
-                    mViewBinding.ishaTime.setVisibility(View.GONE);
-                    mViewBinding.ishaName.setVisibility(View.GONE);
-
-                    mViewBinding.fridayDateView.setVisibility(View.VISIBLE);
-                    mViewBinding.fridayName.setVisibility(View.VISIBLE);
-                    mViewBinding.fridayTime.setVisibility(View.VISIBLE);
-
-                } else {
-
-                    mPrefHelper.setDndOnFridaysOnly(false);
-
-                    mViewBinding.dateView.setVisibility(View.VISIBLE);
-
-                    mViewBinding.fajrBtn.setVisibility(View.VISIBLE);
-                    mViewBinding.fajrTime.setVisibility(View.VISIBLE);
-                    mViewBinding.fajrName.setVisibility(View.VISIBLE);
-
-                    mViewBinding.dhuhrBtn.setVisibility(View.VISIBLE);
-                    mViewBinding.dhuhrTime.setVisibility(View.VISIBLE);
-                    mViewBinding.dhuhrName.setVisibility(View.VISIBLE);
-
-                    mViewBinding.asrBtn.setVisibility(View.VISIBLE);
-                    mViewBinding.asrTime.setVisibility(View.VISIBLE);
-                    mViewBinding.asrName.setVisibility(View.VISIBLE);
-
-                    mViewBinding.maghribBtn.setVisibility(View.VISIBLE);
-                    mViewBinding.maghribTime.setVisibility(View.VISIBLE);
-                    mViewBinding.maghribName.setVisibility(View.VISIBLE);
-
-                    mViewBinding.ishaBtn.setVisibility(View.VISIBLE);
-                    mViewBinding.ishaTime.setVisibility(View.VISIBLE);
-                    mViewBinding.ishaName.setVisibility(View.VISIBLE);
-
-                    mViewBinding.fridayDateView.setVisibility(View.GONE);
-                    mViewBinding.fridayName.setVisibility(View.GONE);
-                    mViewBinding.fridayTime.setVisibility(View.GONE);
-                }
+        mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
+            if (integer > 0) {
+                bindFridayEntry(LocalDate.now());
+            } else {
+                mViewModel.populateFridayTable();
             }
         });
 
-        //setting mute buttons
-        mViewBinding.asrBtn.setOnClickListener(this::onClick);
-        mViewBinding.fajrBtn.setOnClickListener(this::onClick);
-        mViewBinding.ishaBtn.setOnClickListener(this::onClick);
-        mViewBinding.maghribBtn.setOnClickListener(this::onClick);
-        mViewBinding.dhuhrBtn.setOnClickListener(this::onClick);
+
+    }
+
+
+    private void setLayoutWidgets() {
+        Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
+
+
+        mViewBinding.fajrCard.setBackgroundResource(R.drawable.cardview_background);
+        mViewBinding.dhuhrCard.setBackgroundResource(R.drawable.cardview_background);
+        mViewBinding.asrCard.setBackgroundResource(R.drawable.cardview_background);
+        mViewBinding.maghribCard.setBackgroundResource(R.drawable.cardview_background);
+        mViewBinding.ishaCard.setBackgroundResource(R.drawable.cardview_background);
+        mViewBinding.fridayCard.setBackgroundResource(R.drawable.cardview_background);
+
+        transitionFajr = (TransitionDrawable) mViewBinding.fajrCard.getBackground();
+        transitionDhuhr = (TransitionDrawable) mViewBinding.dhuhrCard.getBackground();
+        transitionMaghrib = (TransitionDrawable) mViewBinding.maghribCard.getBackground();
+        transitionAsr = (TransitionDrawable) mViewBinding.asrCard.getBackground();
+        transitionIsha = (TransitionDrawable) mViewBinding.ishaCard.getBackground();
+        transitionFriday = (TransitionDrawable) mViewBinding.fridayCard.getBackground();
+
+        mViewBinding.fajrSwitch.setOnCheckedChangeListener(this);
+        mViewBinding.dhuhrSwitch.setOnCheckedChangeListener(this);
+        mViewBinding.maghribSwitch.setOnCheckedChangeListener(this);
+        mViewBinding.asrSwitch.setOnCheckedChangeListener(this);
+        mViewBinding.ishaSwitch.setOnCheckedChangeListener(this);
+        mViewBinding.fridaySwitch.setOnCheckedChangeListener(this);
+
+//        mViewBinding.checkbox.setChecked(mPrefHelper.getDndOnFridaysOnly());
+        mViewBinding.setPrefs(mPrefHelper);
+        mViewBinding.checkbox.setOnCheckedChangeListener(this);
+
+
+        //setting date picker
+        mViewBinding.dateCardView.setOnClickListener(this::showDatePickerDialog);
+
+        mViewBinding.fridayTime.setOnClickListener(this::showTimePickerDialog);
+
     }
 
     private void showTimePickerDialog(View view) {
@@ -211,16 +175,17 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         super.onDestroyView();
     }
 
-    private void displayNextFridayEntry(LocalDate selectedDate) {
+    private void bindFridayEntry(LocalDate selectedDate) {
         mViewModel.getNextFridayEntry(selectedDate).observe(getViewLifecycleOwner(),
                 fridayEntry -> {
                     if (fridayEntry != null) {
+                        mFridayEntry = fridayEntry;
                         mViewBinding.setFriday(fridayEntry);
                     }
                 });
     }
 
-    private void displaySelectedEntry(LocalDate date) {
+    private void bindRegularEntry(LocalDate date) {
 
         mViewModel.getSelectedEntry(date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()).observe(getViewLifecycleOwner(), selected -> {
             if (selected != null) {
@@ -231,42 +196,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
 
         });
-    }
-
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.dhuhr_btn:
-                if (mEntryModel != null) {
-                    mEntryModel.setDhuhrSilent(!mEntryModel.getDhuhrSilent());
-                    mViewModel.updateRegularEntry(mEntryModel);
-                }
-                break;
-            case R.id.asr_btn:
-                if (mEntryModel != null) {
-                    mEntryModel.setAsrSilent(!mEntryModel.getAsrSilent());
-                    mViewModel.updateRegularEntry(mEntryModel);
-                }
-                break;
-            case R.id.fajr_btn:
-                if (mEntryModel != null) {
-                    mEntryModel.setFajrSilent(!mEntryModel.getFajrSilent());
-                    mViewModel.updateRegularEntry(mEntryModel);
-                }
-                break;
-            case R.id.maghrib_btn:
-                if (mEntryModel != null) {
-                    mEntryModel.setMaghribSilent(!mEntryModel.getMaghribSilent());
-                    mViewModel.updateRegularEntry(mEntryModel);
-                }
-                break;
-            case R.id.isha_btn:
-            default:
-                if (mEntryModel != null) {
-                    mEntryModel.setIshaSilent(!mEntryModel.getIshaSilent());
-                    mViewModel.updateRegularEntry(mEntryModel);
-                }
-                break;
-        }
     }
 
     @Override
@@ -280,12 +209,68 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
 
         if (!mPrefHelper.getDndOnFridaysOnly()) {
-            displaySelectedEntry(selectedDate);
+            bindRegularEntry(selectedDate);
         } else {
             Log.d("App", "onDateSet:  picked date = " + selectedDate);
-            displayNextFridayEntry(selectedDate);
-
+            bindFridayEntry(selectedDate);
         }
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+        switch (compoundButton.getId()) {
+            case R.id.fajr_switch:
+                if (mEntryModel != null) {
+                    mEntryModel.setFajrSilent(isChecked);
+                    launchTransition(transitionFajr, isChecked);
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.dhuhr_switch:
+                if (mEntryModel != null) {
+                    mEntryModel.setDhuhrSilent(isChecked);
+                    launchTransition(transitionDhuhr, isChecked);
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.maghrib_switch:
+                if (mEntryModel != null) {
+                    mEntryModel.setMaghribSilent(isChecked);
+                    mViewModel.updateRegularEntry(mEntryModel);
+                    launchTransition(transitionMaghrib, isChecked);
+                }
+                break;
+            case R.id.asr_switch:
+                if (mEntryModel != null) {
+                    mEntryModel.setAsrSilent(isChecked);
+                    launchTransition(transitionAsr, isChecked);
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.isha_switch:
+                if (mEntryModel != null) {
+                    mEntryModel.setIshaSilent(isChecked);
+                    launchTransition(transitionIsha, isChecked);
+                    mViewModel.updateRegularEntry(mEntryModel);
+                }
+                break;
+            case R.id.friday_switch:
+                mFridayEntry.setSilent(isChecked);
+                launchTransition(transitionFriday, isChecked);
+                mViewModel.updateFridayEntry(mFridayEntry);
+                break;
+            case R.id.checkbox:
+                mPrefHelper.setDndForFridaysOnly(isChecked);
+                mViewBinding.invalidateAll();
+                break;
+        }
+
+    }
+
+    private void launchTransition(TransitionDrawable transition, boolean isChecked) {
+        if (isChecked)
+            transition.startTransition(400);
+        else
+            transition.reverseTransition(400);
+    }
 }

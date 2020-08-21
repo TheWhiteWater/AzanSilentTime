@@ -67,7 +67,7 @@ public class PrefHelper {
         return mSharedPreferences.getBoolean(DND_FRIDAYS_ONLY, false);
     }
 
-    public void setDndOnFridaysOnly(boolean b) {
+    public void setDndForFridaysOnly(boolean b) {
         mEditor.putBoolean(DND_FRIDAYS_ONLY, b).apply();
     }
 

@@ -43,7 +43,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Inject LocationHelper mLocationHelper;
     @Inject Repository mRepository;
     @Inject ServiceHelper mServiceHelper;
-    private boolean isPrefsHasChanged;
+    private boolean isDatabaseUpdateRequired;
 
 
     @Override
@@ -53,7 +53,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (isPrefsHasChanged) {
+                if (isDatabaseUpdateRequired) {
                     mRepository.deletePrayerCalendar();
                     mRepository.requestPrayerCalendar();
                 }
@@ -78,7 +78,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     }
 
 
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -88,22 +87,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             locationPreference.setOnPreferenceClickListener(this);
         }
 
-        DropDownPreference mutePeriodPreference = findPreference(MUTE_PERIOD);
+        Preference mutePeriodPreference = findPreference(MUTE_PERIOD);
         if (mutePeriodPreference != null) {
             mutePeriodPreference.setOnPreferenceChangeListener(this);
         }
 
-        DropDownPreference calculationMethodPreference = findPreference(CALCULATION_METHOD);
+        Preference calculationMethodPreference = findPreference(CALCULATION_METHOD);
         if (calculationMethodPreference != null) {
             calculationMethodPreference.setOnPreferenceChangeListener(this);
         }
 
-        DropDownPreference calculationSchoolPreference = findPreference(SCHOOL);
+        Preference calculationSchoolPreference = findPreference(SCHOOL);
         if (calculationSchoolPreference != null) {
             calculationSchoolPreference.setOnPreferenceChangeListener(this);
         }
 
-        DropDownPreference midnightModePreference = findPreference(MIDNIGHT_MODE);
+        Preference midnightModePreference = findPreference(MIDNIGHT_MODE);
         if (midnightModePreference != null) {
             midnightModePreference.setOnPreferenceChangeListener(this);
         }
@@ -116,24 +115,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         switch (preference.getKey()) {
             case MUTE_PERIOD:
                 mPrefHelper.setDndPeriod((String) newValue);
-                isPrefsHasChanged = true;
+                isDatabaseUpdateRequired = false;
                 Log.d(TAG, "onCreatePreferences: DndPeriod " + mPrefHelper.getDndPeriod());
                 break;
             case CALCULATION_METHOD:
                 mPrefHelper.setCalculationMethod((String) newValue);
-                isPrefsHasChanged = true;
+                isDatabaseUpdateRequired = true;
 
                 Log.d(TAG, "onCreatePreferences: CalculationMethod " + mPrefHelper.getCalculationMethod());
                 break;
             case SCHOOL:
                 mPrefHelper.setCalculationSchool((String) newValue);
-                isPrefsHasChanged = true;
+                isDatabaseUpdateRequired = true;
 
                 Log.d(TAG, "onCreatePreferences: CalculationSchool " + mPrefHelper.getCalculationSchool());
                 break;
             case MIDNIGHT_MODE:
                 mPrefHelper.setMidnightMode((String) newValue);
-                isPrefsHasChanged = true;
+                isDatabaseUpdateRequired = true;
 
                 Log.d(TAG, "onCreatePreferences: MidnightMode " + mPrefHelper.getMidnightMode());
                 break;
@@ -161,7 +160,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                                 mPrefHelper.setLongitude((float) locationResult.getLastLocation().getLongitude());
                                 mPrefHelper.setLatitude((float) locationResult.getLastLocation().getLatitude());
                                 mLocationHelper.removeLocationUpdates(this);
-                                isPrefsHasChanged = true;
+                                isDatabaseUpdateRequired = true;
                                 Log.d(TAG, "onLocationResult: address: " + locationText);
                             }
                         } else {

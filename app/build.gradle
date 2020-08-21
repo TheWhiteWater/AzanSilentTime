@@ -114,4 +114,8 @@ dependencies {
 
     //Fused Location Provider
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    //RxBinding
+    implementation 'com.jakewharton.rxbinding4:rxbinding-material:4.0.0'
+
 }

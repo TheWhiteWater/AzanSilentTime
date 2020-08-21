@@ -127,28 +127,32 @@ public class EntryModel {
         this.ishaEpoch = ishaEpoch;
     }
 
-    public String getFajrString() {
+    public String getFajrTimeText() {
         return Converters.setTimeFromLong(fajrEpoch);
     }
 
-    public String getDhuhrString() {
+    public String getDhuhrTimeText() {
         return Converters.setTimeFromLong(dhuhrEpoch);
     }
 
-    public String getAsrString() {
+    public String getAsrTimeText() {
         return Converters.setTimeFromLong(asrEpoch);
     }
 
-    public String getMaghribString() {
+    public String getMaghribTimeText() {
         return Converters.setTimeFromLong(maghribEpoch);
     }
 
-    public String getIshaString() {
+    public String getIshaTimeText() {
         return Converters.setTimeFromLong(ishaEpoch);
     }
 
-    public String getDateString() {
-        return Converters.setDateFromLong(date);
+    public String getDateText() {
+        return Converters.getDateFromLong(date);
+    }
+
+    public String getDayOfTheWeekString() {
+        return Converters.setDayOfTheWeekFromLong(date);
     }
 
 }

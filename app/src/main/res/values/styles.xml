@@ -1,46 +1,87 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorPrimaryDark">@color/primary</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:windowContentTransitions">true</item>
+
     </style>
 
-    <style name="HoloDialogTheme" parent="android:style/Theme.Holo.Light.Dialog">
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorControlNormal">@color/primary_dark</item>
+    <style name="AzanAppTheme" parent="AppTheme">
+        <item name="fontFamily">@font/texgyreadventor_regular</item>
+        <item name="preferenceTheme">@style/PreferencesScreenTheme</item>
+    </style>
+
+    <style name="SwitchTheme" parent="ThemeOverlay.MaterialComponents.Light">
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">@color/white_text</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/accent</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">#FF5722</item>
+    </style>
+
+    <style name="PreferencesScreenTheme" parent="PreferenceThemeOverlay">
+        <item name="android:textSize">14sp</item>
+        <item name="preferenceCategoryTitleTextAppearance">@style/PrefTitle</item>
+    </style>
+
+    <style name="listItemSize">
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_marginStart">4dp</item>
     </style>
 
 
-    <style name="time_title">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">start</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:layout_marginTop">18dp</item>
-    </style>
-
-    <style name="prayer_btn">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_marginEnd">12dp</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="prayer_time">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:gravity">center</item>
-    </style>
-
-    <style name="date_view_style">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">16sp</item>
+    <style name="PrefTitle">
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="AzanAppTheme.RoundedCard">
+        <item name="android:textColor">@color/white_text</item>
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">6dp</item>
+    </style>
+
+
+    <style name="AzanAppTheme.RoundedCard.TimeTitle">
+        <item name="android:gravity">start</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="AzanAppTheme.RoundedCard.TimeValue">
+        <item name="android:textSize">24sp</item>
+        <item name="android:gravity">center</item>
+        <item name="fontFamily">@font/texgyreadventor_bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="AzanAppTheme.RoundedCard.Date">
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/texgyreadventor_bold</item>
+    </style>
+
+
+
+    <style name="HoloDialogTheme" parent="android:style/Theme.Holo.Light.Dialog">
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
+    <style name="cardview_constraint_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/cardview_marginStart</item>
+        <item name="android:layout_marginEnd">@dimen/cardview_marginEnd</item>
+        <item name="android:layout_marginTop">@dimen/cardview_marginTop</item>
+        <item name="android:layout_marginBottom">@dimen/cardview_marginBottom</item>
+    </style>
 </resources>

@@ -57,7 +57,7 @@ public class HomeViewModel extends AndroidViewModel {
         mRepository.requestPrayerCalendar();
     }
 
-    public LiveData<EntryModel> updateRegularEntry(EntryModel model) {
+    public synchronized LiveData<EntryModel> updateRegularEntry(EntryModel model) {
         mRepository.updateRegularEntry(model);
         return mRepository.getRegularEntry(model.getDate());
     }
@@ -105,10 +105,12 @@ public class HomeViewModel extends AndroidViewModel {
             targetDay = calcNextFriday(targetDay);
             Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             Long time = targetDay.atTime(LocalTime.of(hourOfDay, minute)).atZone(ZoneId.systemDefault()).toEpochSecond();
-
-            Observable.just(new FridayEntry(date, true, time))
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(s -> mRepository.updateFridayEntry(s));
+            mRepository.updateFridayEntry(new FridayEntry(date, true, time));
         }
+    }
+
+    @SuppressLint("CheckResult")
+    public void updateFridayEntry(FridayEntry fridayEntry) {
+        mRepository.updateFridayEntry(fridayEntry);
     }
 }

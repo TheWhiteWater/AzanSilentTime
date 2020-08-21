@@ -18,8 +18,6 @@ import nz.co.redice.azansilenttime.utils.ServiceHelper;
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
-    @Inject PrefHelper mPrefHelper;
-    @Inject Repository mRepository;
     @Inject ServiceHelper mServiceHelper;
     private ActivityMainBinding mBinding;
 

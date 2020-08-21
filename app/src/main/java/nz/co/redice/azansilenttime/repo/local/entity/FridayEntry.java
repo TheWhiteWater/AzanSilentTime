@@ -13,8 +13,6 @@ public class FridayEntry {
     private Long date;
     private Boolean isSilent = true;
     private Long timeEpoch;
-    private String TimeString;
-    private String DateString;
     private String blank;
 
     public FridayEntry() {
@@ -24,8 +22,6 @@ public class FridayEntry {
     public FridayEntry(Long date) {
         this.date = date;
         this.isSilent = true;
-        this.TimeString = Converters.setTimeFromLong(timeEpoch);
-        this.DateString = Converters.setDateFromLong(date);
         this.blank = "Select";
     }
 
@@ -34,8 +30,6 @@ public class FridayEntry {
         this.date = date;
         this.isSilent = isFridaySilent;
         this.timeEpoch = timeEpoch;
-        this.TimeString = Converters.setTimeFromLong(timeEpoch);
-        this.DateString = Converters.setDateFromLong(date);
     }
 
 
@@ -63,21 +57,20 @@ public class FridayEntry {
         this.timeEpoch = timeEpoch;
     }
 
-    public String getTimeString() {
-        return TimeString;
+    public String getTimeText() {
+        return Converters.setTimeFromLong(timeEpoch);
     }
 
-    public void setTimeString(String fridayTimeString) {
-        this.TimeString = fridayTimeString;
-    }
 
     public String getDateString() {
-        return DateString;
+        return Converters.getDateFromLong(date);
     }
 
-    public void setDateString(String fridayDateString) {
-        this.DateString = fridayDateString;
+    public String getDayOfTheWeekString() {
+        return Converters.setDayOfTheWeekFromLong(date);
     }
+
+
 
     public String getBlank() {
         return blank;
