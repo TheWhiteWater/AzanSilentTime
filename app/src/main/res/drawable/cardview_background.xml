@@ -3,7 +3,6 @@
 
     <item android:drawable="@drawable/card_color_false"/>
 
-    <item android:drawable="@drawable/card_color_true"/>
-
+    <item android:drawable="@drawable/card_color_true" />
 
 </transition>

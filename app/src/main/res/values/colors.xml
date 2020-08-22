@@ -11,6 +11,7 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
+    <color name="faded_cardview">#E0E0E3</color>
 
     <color name="white_text">#FFFFFF</color>
 </resources>

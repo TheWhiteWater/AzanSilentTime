@@ -77,28 +77,16 @@ public class DndHelper {
         Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         mRepository.getRegularEntry(targetDayEpoch).observe(lifecycleOwner, model -> {
             if (model != null) {
-
-                if (getCurrentTimeInSeconds() <= model.getFajrEpoch()) {
-                    Log.d(TAG, "setObserverForRegularDay: current time: " + getCurrentTimeInSeconds() * 1000);
+                if (getCurrentTimeInSeconds() <= model.getFajrEpoch())
                     mFajrAlarmActivated = doTiming(model.getFajrEpoch(), model.getFajrSilent(), FAJR_ALARM, mFajrAlarmActivated);
-                }
-
-                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch()) {
+                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch())
                     mDhuhrAlarmActivated = doTiming(model.getDhuhrEpoch(), model.getDhuhrSilent(), DHUR_ALARM, mDhuhrAlarmActivated);
-                }
-
-                if (getCurrentTimeInSeconds() <= model.getAsrEpoch()) {
+                if (getCurrentTimeInSeconds() <= model.getAsrEpoch())
                     mAsrAlarmActivated = doTiming(model.getAsrEpoch(), model.getAsrSilent(), ASR_ALARM, mAsrAlarmActivated);
-                }
-
-                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch()) {
+                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch())
                     mMaghribAlarmActivated = doTiming(model.getMaghribEpoch(), model.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmActivated);
-                }
-
-                if (getCurrentTimeInSeconds() <= model.getIshaEpoch()) {
+                if (getCurrentTimeInSeconds() <= model.getIshaEpoch())
                     mIshaAlarmActivated = doTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmActivated);
-                }
-
                 if (!mFajrAlarmActivated && !mDhuhrAlarmActivated && !mAsrAlarmActivated && !mMaghribAlarmActivated && !mIshaAlarmActivated
                         && !mPrefHelper.getDndOnFridaysOnly()) {
                     Log.d(TAG, "launching observer for the next day");
