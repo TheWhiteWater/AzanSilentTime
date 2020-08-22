@@ -8,6 +8,7 @@ import androidx.hilt.Assisted;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 
 import java.time.DayOfWeek;
@@ -29,6 +30,8 @@ public class HomeViewModel extends AndroidViewModel {
     private static final String TAG = "App HomeViewModel";
     private final SavedStateHandle savedStateHandle;
     public LiveData<FridayEntry> nextFriday;
+    private MutableLiveData<EntryModel> _entryModel = new MutableLiveData<>();
+    private LiveData<EntryModel> mEntryModel;
     private Repository mRepository;
     private PrefHelper mPrefHelper;
 
@@ -44,12 +47,27 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    public LiveData<EntryModel> getSelectedEntry(Long date) {
-        return mRepository.getRegularEntry(date);
+    public LiveData<EntryModel> getEntryModel() {
+        if (mEntryModel == null) {
+            getSelectedEntry(LocalDate.now());
+        }
+        return mEntryModel;
     }
 
+    public void setEntryModel(LiveData<EntryModel> entryModel) {
+        mEntryModel = entryModel;
+    }
 
-    public LiveData<Integer> getRegularDatabaseSize() {
+    public void getSelectedEntry(LocalDate date) {
+        Long target = LocalDate.from(date).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        setEntryModel(mRepository.getRegularEntry(target));
+    }
+
+    public LiveData<Integer> getLiveDataBaseCount() {
+        return mRepository.getLiveDataBaseCount();
+    }
+
+    public int getRegularDatabaseSize() {
         return mRepository.getRegularTableSize();
     }
 
@@ -57,9 +75,9 @@ public class HomeViewModel extends AndroidViewModel {
         mRepository.requestPrayerCalendar();
     }
 
-    public synchronized LiveData<EntryModel> updateRegularEntry(EntryModel model) {
+    public void updateRegularEntry(EntryModel model) {
         mRepository.updateRegularEntry(model);
-        return mRepository.getRegularEntry(model.getDate());
+        setEntryModel(mRepository.getRegularEntry(model.getDate()));
     }
 
     @SuppressLint("CheckResult")
