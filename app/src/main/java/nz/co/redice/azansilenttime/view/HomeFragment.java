@@ -21,12 +21,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -51,9 +50,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private FragmentHomeBinding mViewBinding;
     private EntryModel mEntryModel;
     private FridayEntry mFridayEntry;
-
-    private LocalDate targetDate;
-
 
     private TransitionDrawable transitionFajr;
     private TransitionDrawable transitionDhuhr;
@@ -103,17 +99,10 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         setLayoutWidgets();
 
-        targetDate = LocalDate.from(LocalDateTime.now());
-        mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
-            if (integer >= 365) {
-                bindRegularEntry(targetDate);
-            } else {
-                mViewModel.requestPrayerCalendar();
-            }
-        });
-
+        bindRegularEntry();
 
         mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
             if (integer > 0) {
@@ -175,18 +164,25 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 });
     }
 
-    private void bindRegularEntry(LocalDate date) {
-        mViewModel.getSelectedEntry(date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond()).observe(getViewLifecycleOwner(), selected -> {
-            if (selected != null) {
-                Log.d(TAG, "bindRegularEntry: " + selected.getDateText());
-                mEntryModel = selected;
-                registerSwitchListeners(false);
-                setSwitchesStates(mEntryModel);
-                mViewBinding.setEntry(mEntryModel);
-                mViewBinding.invalidateAll();
-                registerSwitchListeners(true);
-            }
+    private void bindRegularEntry() {
+        mViewModel.getLiveDataBaseCount().observe(getViewLifecycleOwner(), integer -> {
+            if (integer >= 365) {
 
+                mViewModel.getEntryModel().observe(getViewLifecycleOwner(), entryModel -> {
+                    if (entryModel != null) {
+                        Log.d(TAG, "bindRegularEntry: " + entryModel.getDateText());
+                        registerSwitchListeners(false);
+                        mEntryModel = entryModel;
+                        setSwitchesStates(mEntryModel);
+                        mViewBinding.setEntry(mEntryModel);
+                        mViewBinding.invalidateAll();
+                        registerSwitchListeners(true);
+                    }
+
+
+                });
+
+            }
         });
     }
 
@@ -210,9 +206,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
         if (!mPrefHelper.getDndOnFridaysOnly()) {
             Log.d(TAG, "onDateSet: " + selectedDate);
-            targetDate = selectedDate;
-//            mViewBinding.setEntry(null);
-            bindRegularEntry(selectedDate);
+            mViewModel.getSelectedEntry(selectedDate);
+            bindRegularEntry();
+            mViewBinding.invalidateAll();
         } else {
             Log.d("App", "onDateSet:  picked date = " + selectedDate);
             bindFridayEntry(selectedDate);
@@ -224,36 +220,36 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         switch (compoundButton.getId()) {
             case R.id.fajr_switch:
                 if (mEntryModel != null) {
-                    mEntryModel.setFajrSilent(isChecked);
+                    mEntryModel.setFajrSilent(!mEntryModel.getFajrSilent());
                     mViewModel.updateRegularEntry(mEntryModel);
                 }
                 break;
             case R.id.dhuhr_switch:
                 if (mEntryModel != null) {
-                    mEntryModel.setDhuhrSilent(isChecked);
+                    mEntryModel.setDhuhrSilent(!mEntryModel.getDhuhrSilent());
                     mViewModel.updateRegularEntry(mEntryModel);
                 }
                 break;
             case R.id.maghrib_switch:
                 if (mEntryModel != null) {
-                    mEntryModel.setMaghribSilent(isChecked);
+                    mEntryModel.setMaghribSilent(!mEntryModel.getMaghribSilent());
                     mViewModel.updateRegularEntry(mEntryModel);
                 }
                 break;
             case R.id.asr_switch:
                 if (mEntryModel != null) {
-                    mEntryModel.setAsrSilent(isChecked);
+                    mEntryModel.setAsrSilent(!mEntryModel.getAsrSilent());
                     mViewModel.updateRegularEntry(mEntryModel);
                 }
                 break;
             case R.id.isha_switch:
                 if (mEntryModel != null) {
-                    mEntryModel.setIshaSilent(isChecked);
+                    mEntryModel.setIshaSilent(!mEntryModel.getIshaSilent());
                     mViewModel.updateRegularEntry(mEntryModel);
                 }
                 break;
             case R.id.friday_switch:
-                mFridayEntry.setSilent(isChecked);
+                mFridayEntry.setSilent(!mFridayEntry.getSilent());
                 mViewModel.updateFridayEntry(mFridayEntry);
                 break;
             case R.id.checkbox:
@@ -264,7 +260,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     }
 
-//    private synchronized void launchTransition(TransitionDrawable transition, boolean isChecked) {
+//    private void launchTransition(TransitionDrawable transition, boolean isChecked) {
 //        if (isChecked)
 //            transition.startTransition(400);
 //        else
