@@ -9,7 +9,7 @@
 
         <variable
             name="entry"
-            type="nz.co.redice.azansilenttime.repo.local.entity.EntryModel" />
+            type="nz.co.redice.azansilenttime.repo.local.entity.RegularEntry" />
 
         <variable
             name="friday"
@@ -240,7 +240,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/maghrib_name"
                     tools:text="20:20 AM" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
+                <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/maghrib_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -287,7 +287,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/isha_name"
                     tools:text="20:20 AM" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
+                <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/isha_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

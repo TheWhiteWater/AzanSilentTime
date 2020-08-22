@@ -26,7 +26,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 @Singleton
 public class LocationHelper {
     private static final String TAG = "App LocationHelper";
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 500;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     @Inject PermissionHelper mPermissionHelper;
     @Inject PrefHelper mPrefHelper;

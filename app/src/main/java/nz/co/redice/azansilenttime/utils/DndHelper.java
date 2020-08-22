@@ -73,36 +73,36 @@ public class DndHelper {
     }
 
 
-    public void setObserverForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
-        Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-        mRepository.getRegularEntry(targetDayEpoch).observe(lifecycleOwner, model -> {
-            if (model != null) {
-                if (getCurrentTimeInSeconds() <= model.getFajrEpoch())
-                    mFajrAlarmActivated = doTiming(model.getFajrEpoch(), model.getFajrSilent(), FAJR_ALARM, mFajrAlarmActivated);
-                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch())
-                    mDhuhrAlarmActivated = doTiming(model.getDhuhrEpoch(), model.getDhuhrSilent(), DHUR_ALARM, mDhuhrAlarmActivated);
-                if (getCurrentTimeInSeconds() <= model.getAsrEpoch())
-                    mAsrAlarmActivated = doTiming(model.getAsrEpoch(), model.getAsrSilent(), ASR_ALARM, mAsrAlarmActivated);
-                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch())
-                    mMaghribAlarmActivated = doTiming(model.getMaghribEpoch(), model.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmActivated);
-                if (getCurrentTimeInSeconds() <= model.getIshaEpoch())
-                    mIshaAlarmActivated = doTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmActivated);
-                if (!mFajrAlarmActivated && !mDhuhrAlarmActivated && !mAsrAlarmActivated && !mMaghribAlarmActivated && !mIshaAlarmActivated
-                        && !mPrefHelper.getDndOnFridaysOnly()) {
-                    Log.d(TAG, "launching observer for the next day");
-                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
-                    mNextDayAlarmActivated = true;
-                }
-                if (mNextDayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
-                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
-                    mNextDayAlarmActivated = false;
-                }
-
-            }
-        });
-
-
-    }
+//    public void setObserverForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
+//        Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+//        mRepository.getRegularEntry(targetDayEpoch).observe(lifecycleOwner, model -> {
+//            if (model != null) {
+//                if (getCurrentTimeInSeconds() <= model.getFajrEpoch())
+//                    mFajrAlarmActivated = doTiming(model.getFajrEpoch(), model.getFajrSilent(), FAJR_ALARM, mFajrAlarmActivated);
+//                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch())
+//                    mDhuhrAlarmActivated = doTiming(model.getDhuhrEpoch(), model.getDhuhrSilent(), DHUR_ALARM, mDhuhrAlarmActivated);
+//                if (getCurrentTimeInSeconds() <= model.getAsrEpoch())
+//                    mAsrAlarmActivated = doTiming(model.getAsrEpoch(), model.getAsrSilent(), ASR_ALARM, mAsrAlarmActivated);
+//                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch())
+//                    mMaghribAlarmActivated = doTiming(model.getMaghribEpoch(), model.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmActivated);
+//                if (getCurrentTimeInSeconds() <= model.getIshaEpoch())
+//                    mIshaAlarmActivated = doTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmActivated);
+//                if (!mFajrAlarmActivated && !mDhuhrAlarmActivated && !mAsrAlarmActivated && !mMaghribAlarmActivated && !mIshaAlarmActivated
+//                        && !mPrefHelper.getDndOnFridaysOnly()) {
+//                    Log.d(TAG, "launching observer for the next day");
+//                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
+//                    mNextDayAlarmActivated = true;
+//                }
+//                if (mNextDayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
+//                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
+//                    mNextDayAlarmActivated = false;
+//                }
+//
+//            }
+//        });
+//
+//
+//    }
 
     private boolean doTiming(Long epoch, boolean active, int requestCode, boolean dispatcher) {
         boolean notTooLateForTiming = getCurrentTimeInSeconds() <= epoch;
@@ -176,11 +176,11 @@ public class DndHelper {
                 mFridayAlarmActivated = doFriday(fridayEntry.getTimeEpoch(), fridayEntry.getSilent(), FRIDAY_ALARM, mFridayAlarmActivated);
 
                 if (!mFridayAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
-                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
+//                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
                     mNextFridayAlarmActivated = true;
                 }
                 if (mNextFridayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
-                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
+//                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
                     mNextFridayAlarmActivated = false;
                 }
             }

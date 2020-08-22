@@ -8,7 +8,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import io.reactivex.Completable;
-import nz.co.redice.azansilenttime.repo.local.entity.EntryModel;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 
 import static androidx.room.OnConflictStrategy.REPLACE;
@@ -16,12 +16,11 @@ import static androidx.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface EventDao {
-
     @Insert(onConflict = REPLACE)
-    void insertEntry(EntryModel entryModel);
+    void insertEntry(RegularEntry regularEntry);
 
     @Update(onConflict = REPLACE)
-    Completable updateEntry(EntryModel entryModel);
+    Completable updateEntry(RegularEntry regularEntry);
 
     @Insert(onConflict = REPLACE)
     void insertFridayEntry(FridayEntry fridayEntry);
@@ -34,10 +33,10 @@ public interface EventDao {
 
 
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
-    LiveData<EntryModel> getSelectedEntry(Long selectedDate);
+    LiveData<RegularEntry> getSelectedEntry(Long selectedDate);
 
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
-    EntryModel getSelectedEntrySynchronously(Long selectedDate);
+    RegularEntry getSelectedEntrySynchronously(Long selectedDate);
 
     @Query("SELECT COUNT(date) FROM regular_table")
     LiveData<Integer> getRowCount();

@@ -7,9 +7,8 @@ import androidx.lifecycle.LiveData;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
@@ -18,8 +17,8 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.local.EventDao;
-import nz.co.redice.azansilenttime.repo.local.entity.EntryModel;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.repo.remote.AzanService;
 import nz.co.redice.azansilenttime.repo.remote.models.ApiResponse;
 import nz.co.redice.azansilenttime.repo.remote.models.Day;
@@ -58,8 +57,8 @@ public class Repository {
                 if (response.isSuccessful() && response.body() != null) {
                     for (Day day : response.body().data.getAnnualList()) {
                         Completable.fromAction(() -> {
-                            EntryModel newEntryModel = day.toEntry();
-                            mDao.insertEntry(newEntryModel);
+                            RegularEntry newRegularEntry = day.toEntry();
+                            mDao.insertEntry(newRegularEntry);
                         })
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
@@ -76,15 +75,13 @@ public class Repository {
     }
 
     public void deletePrayerCalendar() {
-        Completable.fromAction(() -> mDao.deleteCalendar())
+        Completable.fromAction(mDao::deleteCalendar)
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
 
-    public LiveData<EntryModel> getRegularEntry(Long value) {
-        LocalDate.now().atStartOfDay(ZoneId.systemDefault());
-        Log.d(TAG, "getRegularEntry: ");
-        return mDao.getSelectedEntry(value);
+    public RegularEntry getRegularEntry(Long value) {
+        return mDao.getSelectedEntrySynchronously(value);
     }
 
     public LiveData<Integer> getRegularTableSize() {
@@ -95,9 +92,10 @@ public class Repository {
         return mDao.getFridaysCount();
     }
 
-    public void updateRegularEntry(EntryModel model) {
+    public void updateRegularEntry(RegularEntry model) {
         mDao.updateEntry(model)
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 
@@ -120,4 +118,7 @@ public class Repository {
         mDao.deleteAllFridayTable();
     }
 
+    public LiveData<Integer> getLiveDataBaseCount() {
+        return mDao.getRowCount();
+    }
 }

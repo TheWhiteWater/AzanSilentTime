@@ -79,8 +79,8 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-        mDndHelper.setObserverForRegularDay(this, LocalDate.now());
-        mDndHelper.setObserverForNextFriday(this, LocalDate.now());
+//        mDndHelper.setObserverForRegularDay(this, LocalDate.now());
+//        mDndHelper.setObserverForNextFriday(this, LocalDate.now());
     }
 
     @Override

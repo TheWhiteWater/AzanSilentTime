@@ -8,7 +8,7 @@ import nz.co.redice.azansilenttime.view.presentation.Converters;
 
 
 @Entity(tableName = "regular_table")
-public class EntryModel {
+public class RegularEntry {
 
     @PrimaryKey
     private Long date;
@@ -25,11 +25,11 @@ public class EntryModel {
     private Long maghribEpoch;
     private Long ishaEpoch;
 
-    public EntryModel() {
+    public RegularEntry() {
     }
 
     @Ignore
-    public EntryModel(Long date, Long fajrEpoch, Long dhuhrEpoch, Long asrEpoch, Long maghribEpoch, Long ishaEpoch) {
+    public RegularEntry(Long date, Long fajrEpoch, Long dhuhrEpoch, Long asrEpoch, Long maghribEpoch, Long ishaEpoch) {
         this.date = date;
         this.fajrEpoch = fajrEpoch;
         this.dhuhrEpoch = dhuhrEpoch;

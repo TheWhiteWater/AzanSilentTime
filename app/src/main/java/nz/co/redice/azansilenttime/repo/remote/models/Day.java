@@ -3,7 +3,7 @@ package nz.co.redice.azansilenttime.repo.remote.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import nz.co.redice.azansilenttime.repo.local.entity.EntryModel;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.view.presentation.Converters;
 
 public class Day {
@@ -19,8 +19,8 @@ public class Day {
     public Meta meta;
 
 
-    public EntryModel toEntry() {
-        return new EntryModel(
+    public RegularEntry toEntry() {
+        return new RegularEntry(
                 Converters.getLocalDateIntoLong(date.gregorian.date),
                 Converters.getLocalTimeIntoLong(date.gregorian.date, timings.fajr),
                 Converters.getLocalTimeIntoLong(date.gregorian.date, timings.dhuhr),
