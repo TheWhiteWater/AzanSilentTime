@@ -52,6 +52,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private EntryModel mEntryModel;
     private FridayEntry mFridayEntry;
 
+    private LocalDate targetDate;
+
+
     private TransitionDrawable transitionFajr;
     private TransitionDrawable transitionDhuhr;
     private TransitionDrawable transitionMaghrib;
@@ -102,9 +105,10 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         super.onViewCreated(view, savedInstanceState);
         setLayoutWidgets();
 
+        targetDate = LocalDate.from(LocalDateTime.now());
         mViewModel.getRegularDatabaseSize().observe(getViewLifecycleOwner(), integer -> {
             if (integer >= 365) {
-                bindRegularEntry(LocalDate.from(LocalDateTime.now()));
+                bindRegularEntry(targetDate);
             } else {
                 mViewModel.requestPrayerCalendar();
             }
@@ -128,7 +132,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         mViewBinding.setPrefs(mPrefHelper);
         mViewBinding.checkbox.setOnCheckedChangeListener(this);
-
 
         //setting date picker
         mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
@@ -178,8 +181,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 Log.d(TAG, "bindRegularEntry: " + selected.getDateText());
                 mEntryModel = selected;
                 registerSwitchListeners(false);
-                mViewBinding.setEntry(mEntryModel);
                 setSwitchesStates(mEntryModel);
+                mViewBinding.setEntry(mEntryModel);
+                mViewBinding.invalidateAll();
                 registerSwitchListeners(true);
             }
 
@@ -206,6 +210,8 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
         if (!mPrefHelper.getDndOnFridaysOnly()) {
             Log.d(TAG, "onDateSet: " + selectedDate);
+            targetDate = selectedDate;
+//            mViewBinding.setEntry(null);
             bindRegularEntry(selectedDate);
         } else {
             Log.d("App", "onDateSet:  picked date = " + selectedDate);
