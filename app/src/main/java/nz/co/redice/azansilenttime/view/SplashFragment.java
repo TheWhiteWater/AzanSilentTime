@@ -30,7 +30,7 @@ public class SplashFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Objects.requireNonNull(((AppCompatActivity)requireActivity()).getSupportActionBar()).hide();
+        (Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar())).hide();
     }
 
     @SuppressLint("CheckResult")

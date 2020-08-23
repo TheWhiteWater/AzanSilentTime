@@ -122,6 +122,8 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
             default:
                 mViewModel.saveLocationInPrefs();
                 mViewModel.removeLocationRequest();
+                mViewModel.requestPrayerCalendar();
+                mViewModel.populateFridayTable();
                 NavHostFragment.findNavController(this).navigate(R.id.fromLocationToHome);
                 break;
         }

@@ -8,13 +8,11 @@ import androidx.lifecycle.LiveData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.local.EventDao;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
@@ -29,8 +27,7 @@ import retrofit2.Response;
 
 public class Repository {
 
-    private static final String TAG = "Repo";
-    private static final int MUSLIM_WORLD_LEAGUE_METHOD = 3;
+    private static final String TAG = "App Repo";
     private final AzanService mAzanService;
     private final EventDao mDao;
     private PrefHelper mPrefHelper;
@@ -52,17 +49,14 @@ public class Repository {
                 Calendar.getInstance().get(Calendar.YEAR),
                 true
         ).enqueue(new Callback<ApiResponse>() {
+            @SuppressLint("CheckResult")
             @Override
             public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     for (Day day : response.body().data.getAnnualList()) {
-                        Completable.fromAction(() -> {
-                            RegularEntry newRegularEntry = day.toEntry();
-                            mDao.insertEntry(newRegularEntry);
-                        })
-                                .observeOn(AndroidSchedulers.mainThread())
+                        Observable.just(day)
                                 .subscribeOn(Schedulers.io())
-                                .subscribe();
+                                .subscribe(s-> mDao.insertEntry(s.toEntry()));
                     }
                 }
             }
@@ -81,26 +75,27 @@ public class Repository {
     }
 
     public RegularEntry getRegularEntry(Long value) {
-        return mDao.getSelectedEntrySynchronously(value);
+        return mDao.getSelectedRegularEntry(value);
     }
 
-    public LiveData<Integer> getRegularTableSize() {
-        return mDao.getRowCount();
+    public Observable<RegularEntry> getObservableEntryByDate(Long value) {
+        return mDao.getSelectedObservable(value);
     }
 
-    public LiveData<Integer> getFridayTableSize() {
-        return mDao.getFridaysCount();
+    public LiveData<RegularEntry> getLiveDataEntryByDate(Long value) {
+        return mDao.getSelectedLiveData(value);
     }
 
     public void updateRegularEntry(RegularEntry model) {
         mDao.updateEntry(model)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.computation())
                 .subscribe();
+        Log.d(TAG, "updateRegularEntry: updated");
     }
 
-    public void insertFridayEntry(FridayEntry fridayEntry) {
-        mDao.insertFridayEntry(fridayEntry);
+
+    public LiveData<Integer> getRegularBaseEntryCount() {
+        return  mDao.getRegularsRowCount();
     }
 
     public LiveData<FridayEntry> getFridayEntry(Long value) {
@@ -118,7 +113,8 @@ public class Repository {
         mDao.deleteAllFridayTable();
     }
 
-    public LiveData<Integer> getLiveDataBaseCount() {
-        return mDao.getRowCount();
+
+    public void insertFridayEntry(FridayEntry fridayEntry) {
+        mDao.insertFridayEntry(fridayEntry);
     }
 }

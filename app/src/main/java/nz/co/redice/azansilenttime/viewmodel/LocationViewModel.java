@@ -16,6 +16,16 @@ import androidx.lifecycle.SavedStateHandle;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
+
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+import nz.co.redice.azansilenttime.repo.Repository;
+import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
 import nz.co.redice.azansilenttime.utils.PrefHelper;
 
@@ -25,6 +35,7 @@ public class LocationViewModel extends AndroidViewModel {
     private final SavedStateHandle savedStateHandle;
     private LocationHelper mLocationHelper;
     private PrefHelper mPrefHelper;
+    private Repository mRepository;
 
     private Location mLocation;
     private LocationCallback mLocationCallback;
@@ -36,11 +47,13 @@ public class LocationViewModel extends AndroidViewModel {
     @SuppressLint("MissingPermission")
     @ViewModelInject
     public LocationViewModel(@NonNull Application application, LocationHelper locationHelper,
+                             Repository repository,
                              @Assisted SavedStateHandle savedStateHandle, PrefHelper prefHelper) {
         super(application);
         this.savedStateHandle = savedStateHandle;
         mLocationHelper = locationHelper;
         mPrefHelper = prefHelper;
+        mRepository = repository;
 
 
 
@@ -82,5 +95,32 @@ public class LocationViewModel extends AndroidViewModel {
 
     public void removeLocationRequest() {
         mLocationHelper.removeLocationUpdates(mLocationCallback);
+    }
+
+    public void requestPrayerCalendar() {
+        mRepository.requestPrayerCalendar();
+    }
+
+    @SuppressLint("CheckResult")
+    public void populateFridayTable() {
+        LocalDate targetDay = LocalDate.now().minusDays(1);
+        LocalDate endOfTheYear = LocalDate.of(Calendar.getInstance().get(Calendar.YEAR), 12, 31);
+
+        while (targetDay.isBefore(endOfTheYear)) {
+            targetDay = calcNextFriday(targetDay);
+
+            Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+            Long time = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+
+            Observable.just(new FridayEntry(date, true, time))
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(s -> mRepository.insertFridayEntry(s));
+
+        }
+
+    }
+
+        private LocalDate calcNextFriday(LocalDate day) {
+        return day.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
     }
 }

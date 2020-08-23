@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +48,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private FragmentHomeBinding mViewBinding;
     private RegularEntry mRegularEntry;
     private FridayEntry mFridayEntry;
+    private boolean isScreenLoaded = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +85,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         View view = mViewBinding.getRoot();
         mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).show();
+
         return view;
     }
 
@@ -92,38 +95,28 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         setLayoutWidgets();
 
-        mViewModel.selectNewObservableLiveEntry(LocalDate.now());
+        mViewModel.selectNewEntry(LocalDate.now());
 
+        setLiveDataObserver();
 
-        mViewModel.getObservableLiveEntry().observe(getViewLifecycleOwner(), entry -> {
+    }
 
+    private void setLiveDataObserver() {
+        mViewModel.getObservable().observe(getViewLifecycleOwner(), entry -> {
             if (entry != null) {
                 registerSwitchListeners(false);
                 setSwitchesStates(entry);
+                mRegularEntry = entry;
                 mViewBinding.setEntry(entry);
-                mViewBinding.invalidateAll();
+                Toast.makeText(getContext(), "new entry", Toast.LENGTH_SHORT).show();
                 registerSwitchListeners(true);
             }
-
-
         });
-
-
-//        mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
-//            if (integer > 0) {
-//                bindFridayEntry(LocalDate.now());
-//            } else {
-//                mViewModel.populateFridayTable();
-//            }
-//        });
-
-
     }
 
 
     private void setLayoutWidgets() {
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-
         mViewBinding.setPrefs(mPrefHelper);
         mViewBinding.checkbox.setOnCheckedChangeListener(this);
 
@@ -159,34 +152,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         super.onDestroyView();
     }
 
-//    private void bindFridayEntry(LocalDate selectedDate) {
-//        mViewModel.getNextFridayEntry(selectedDate).observe(getViewLifecycleOwner(),
-//                fridayEntry -> {
-//                    if (fridayEntry != null) {
-//                        mFridayEntry = fridayEntry;
-//                        mViewBinding.setFriday(fridayEntry);
-//                    }
-//                });
-//    }
-
-//    private void bindRegularEntry() {
-//
-//        mViewModel.getEntryModel().observe(getViewLifecycleOwner(), entryModel -> {
-//            if (entryModel != null) {
-//                Log.d(TAG, "bindRegularEntry: " + entryModel.getDateText());
-//                registerSwitchListeners(false);
-//                setSwitchesStates(entryModel);
-//                mViewBinding.setEntry(entryModel);
-//                mViewBinding.invalidateAll();
-//                registerSwitchListeners(true);
-//            } else {
-//                mViewModel.requestPrayerCalendar();
-//            }
-//
-//        });
-//
-//    }
-
 
     public void setSwitchesStates(RegularEntry regularEntry) {
         mViewBinding.fajrSwitch.setChecked(regularEntry.getFajrSilent());
@@ -206,8 +171,8 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
         if (!mPrefHelper.getDndOnFridaysOnly()) {
-            mViewModel.selectNewObservableLiveEntry(selectedDate);
-            mViewBinding.invalidateAll();
+            mViewModel.selectNewEntry(selectedDate);
+
         }
 //        else {
 //            Log.d("App", "onDateSet:  picked date = " + selectedDate);
@@ -217,40 +182,43 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+
+
         switch (compoundButton.getId()) {
             case R.id.fajr_switch:
-                if (mRegularEntry != null) {
-                    mRegularEntry.setFajrSilent(!mRegularEntry.getFajrSilent());
-//                    mViewModel.updateRegularEntry(mRegularEntry);
-                }
+                mRegularEntry.setFajrSilent(!mRegularEntry.getFajrSilent());
+                mViewModel.updateEntry(mRegularEntry);
+                mViewBinding.invalidateAll();
                 break;
             case R.id.dhuhr_switch:
-                if (mRegularEntry != null) {
-                    mRegularEntry.setDhuhrSilent(!mRegularEntry.getDhuhrSilent());
-//                    mViewModel.updateRegularEntry(mRegularEntry);
-                }
+                mRegularEntry.setDhuhrSilent(!mRegularEntry.getDhuhrSilent());
+                mViewModel.updateEntry(mRegularEntry);
+                mViewBinding.invalidateAll();
+
                 break;
             case R.id.maghrib_switch:
-                if (mRegularEntry != null) {
-                    mRegularEntry.setMaghribSilent(!mRegularEntry.getMaghribSilent());
-//                    mViewModel.updateRegularEntry(mRegularEntry);
-                }
+                mRegularEntry.setMaghribSilent(!mRegularEntry.getMaghribSilent());
+                mViewModel.updateEntry(mRegularEntry);
+                mViewBinding.invalidateAll();
+
                 break;
             case R.id.asr_switch:
-                if (mRegularEntry != null) {
-                    mRegularEntry.setAsrSilent(!mRegularEntry.getAsrSilent());
-//                    mViewModel.updateRegularEntry(mRegularEntry);
-                }
+                mRegularEntry.setAsrSilent(!mRegularEntry.getAsrSilent());
+                mViewModel.updateEntry(mRegularEntry);
+                mViewBinding.invalidateAll();
+
                 break;
             case R.id.isha_switch:
-                if (mRegularEntry != null) {
-                    mRegularEntry.setIshaSilent(!mRegularEntry.getIshaSilent());
-//                    mViewModel.updateRegularEntry(mRegularEntry);
-                }
+                mRegularEntry.setIshaSilent(!mRegularEntry.getIshaSilent());
+                mViewModel.updateEntry(mRegularEntry);
+                mViewBinding.invalidateAll();
+
                 break;
             case R.id.friday_switch:
                 mFridayEntry.setSilent(!mFridayEntry.getSilent());
 //                mViewModel.updateFridayEntry(mFridayEntry);
+                mViewBinding.invalidateAll();
+
                 break;
             case R.id.checkbox:
                 mPrefHelper.setDndForFridaysOnly(isChecked);
@@ -259,5 +227,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
 
     }
+
 
 }

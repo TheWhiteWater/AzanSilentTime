@@ -8,6 +8,9 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 
@@ -19,7 +22,7 @@ public interface EventDao {
     @Insert(onConflict = REPLACE)
     void insertEntry(RegularEntry regularEntry);
 
-    @Update(onConflict = REPLACE)
+    @Update (onConflict = REPLACE)
     Completable updateEntry(RegularEntry regularEntry);
 
     @Insert(onConflict = REPLACE)
@@ -33,16 +36,19 @@ public interface EventDao {
 
 
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
-    LiveData<RegularEntry> getSelectedEntry(Long selectedDate);
+    Observable<RegularEntry> getSelectedObservable(Long selectedDate);
 
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
-    RegularEntry getSelectedEntrySynchronously(Long selectedDate);
+    LiveData<RegularEntry> getSelectedLiveData(Long selectedDate);
+
+    @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
+    RegularEntry getSelectedRegularEntry(Long selectedDate);
 
     @Query("SELECT COUNT(date) FROM regular_table")
-    LiveData<Integer> getRowCount();
+    LiveData<Integer> getRegularsRowCount();
 
     @Query("SELECT COUNT(date) FROM friday_table")
-    LiveData<Integer> getFridaysCount();
+    LiveData<Integer> getFridaysRowCount();
 
     @Query("DELETE FROM regular_table")
     public void deleteCalendar();

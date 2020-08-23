@@ -95,8 +95,8 @@ public class PrefHelper {
     }
 
     public void setDndPeriod(String value) {
-        String[] values = mContext.getResources().getStringArray(R.array.dnd_period_values);
-        mEditor.putInt(DND_PERIOD, getPrefValue(values, value)).apply();
+        String[] array = mContext.getResources().getStringArray(R.array.dnd_period_values);
+        mEditor.putInt(DND_PERIOD, getPrefValue(array, value)).apply();
     }
 
     public int getCalculationSchool() {

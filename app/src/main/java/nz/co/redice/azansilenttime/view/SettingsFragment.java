@@ -1,6 +1,7 @@
 package nz.co.redice.azansilenttime.view;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         NavHostFragment.findNavController(this).navigate(R.id.fromSettingsToHome);
     }
 
+    private int getPrefValue(String[] array, String value) {
+        int index = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (value.equals(array[i]))
+                index = i;
+        }
+        return Integer.parseInt(array[index]);
+    }
+
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -89,21 +99,48 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         Preference mutePeriodPreference = findPreference(MUTE_PERIOD);
         if (mutePeriodPreference != null) {
+            mutePeriodPreference.setSummaryProvider(new Preference.SummaryProvider() {
+                @Override
+                public CharSequence provideSummary(Preference preference) {
+                    return mPrefHelper.getDndPeriod() + " min";
+                }
+            });
             mutePeriodPreference.setOnPreferenceChangeListener(this);
         }
 
         Preference calculationMethodPreference = findPreference(CALCULATION_METHOD);
         if (calculationMethodPreference != null) {
+            calculationMethodPreference.setSummaryProvider(new Preference.SummaryProvider() {
+                @Override
+                public CharSequence provideSummary(Preference preference) {
+                    String[] values = getResources().getStringArray(R.array.calculation_methods_entries);
+                    return values[mPrefHelper.getCalculationMethod()];
+                }
+            });
             calculationMethodPreference.setOnPreferenceChangeListener(this);
         }
 
         Preference calculationSchoolPreference = findPreference(SCHOOL);
         if (calculationSchoolPreference != null) {
+            calculationSchoolPreference.setSummaryProvider(new Preference.SummaryProvider() {
+                @Override
+                public CharSequence provideSummary(Preference preference) {
+                    String[] values = getResources().getStringArray(R.array.school_entries);
+                    return values[mPrefHelper.getCalculationSchool()];
+                }
+            });
             calculationSchoolPreference.setOnPreferenceChangeListener(this);
         }
 
         Preference midnightModePreference = findPreference(MIDNIGHT_MODE);
         if (midnightModePreference != null) {
+            midnightModePreference.setSummaryProvider(new Preference.SummaryProvider() {
+                @Override
+                public CharSequence provideSummary(Preference preference) {
+                    String[] values = getResources().getStringArray(R.array.midnight_mode_entries);
+                    return values[mPrefHelper.getMidnightMode()];
+                }
+            });
             midnightModePreference.setOnPreferenceChangeListener(this);
         }
 
