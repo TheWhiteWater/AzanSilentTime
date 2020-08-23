@@ -15,12 +15,11 @@ import androidx.lifecycle.SavedStateHandle;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.utils.PrefHelper;
-import nz.co.redice.azansilenttime.view.HomeFragment;
 
 public class HomeViewModel extends AndroidViewModel {
 
@@ -55,7 +54,7 @@ public class HomeViewModel extends AndroidViewModel {
     public void selectNewEntry(LocalDate date) {
         Log.d(TAG, "selectNewEntry: selecting entry from database ...");
         Long target = LocalDate.from(date).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-        mRepository.getObservableEntryByDate(target)
+        Observable.fromCallable(() -> mRepository.getRegularEntry(target))
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         s -> setObservable(s),
