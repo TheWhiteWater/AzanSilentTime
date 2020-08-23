@@ -19,9 +19,10 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
+import nz.co.redice.azansilenttime.utils.OnNetRequestCompleted;
 import nz.co.redice.azansilenttime.utils.PrefHelper;
 
-public class HomeViewModel extends AndroidViewModel {
+public class HomeViewModel extends AndroidViewModel implements OnNetRequestCompleted {
 
     private static final String TAG = "App HomeViewModel";
     private final SavedStateHandle savedStateHandle;
@@ -73,4 +74,8 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
+    @Override
+    public void onRequestCompleted() {
+        selectNewEntry(LocalDate.now());
+    }
 }
