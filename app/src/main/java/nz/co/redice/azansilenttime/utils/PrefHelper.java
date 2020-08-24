@@ -1,5 +1,6 @@
 package nz.co.redice.azansilenttime.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -24,10 +25,13 @@ public class PrefHelper {
     private static final String CALCULATION_METHOD = "calculation_method";
     private static final String CALCULATION_SCHOOL = "calculation_school";
     private static final String MIDNIGHT_MODE = "midnight_mode";
+    private static final String DATABASE_UPDATE_STATUS = "database_update_status";
+
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private Context mContext;
 
+    @SuppressLint("CommitPrefEdits")
     @Inject
     public PrefHelper(@ApplicationContext Context context) {
         mContext = context;
@@ -76,8 +80,16 @@ public class PrefHelper {
     }
 
     public void setLocationText(String addressText) {
-        mEditor.putString(LOCATION_TEXT, addressText);
+        mEditor.putString(LOCATION_TEXT, addressText).apply();
 
+    }
+
+    public Boolean isDatabaseNeedsUpdate() {
+        return mSharedPreferences.getBoolean(DATABASE_UPDATE_STATUS, false);
+    }
+
+    public void setDatabaseNeedsUpdate(Boolean status) {
+        mEditor.putBoolean(DATABASE_UPDATE_STATUS, status).apply();
     }
 
 

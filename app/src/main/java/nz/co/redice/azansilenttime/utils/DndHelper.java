@@ -167,25 +167,25 @@ public class DndHelper {
         return dispatcher;
     }
 
-    public void setObserverForNextFriday(LifecycleOwner lifecycleOwner, LocalDate date) {
-        LocalDate targetDay = date.minusDays(1).with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
-        Long targetEpoch = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-
-        mRepository.getFridayEntry(targetEpoch).observe(lifecycleOwner, fridayEntry -> {
-            if (fridayEntry != null) {
-                mFridayAlarmActivated = doFriday(fridayEntry.getTimeEpoch(), fridayEntry.getSilent(), FRIDAY_ALARM, mFridayAlarmActivated);
-
-                if (!mFridayAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
-//                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
-                    mNextFridayAlarmActivated = true;
-                }
-                if (mNextFridayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
-//                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
-                    mNextFridayAlarmActivated = false;
-                }
-            }
-        });
-    }
+//    public void setObserverForNextFriday(LifecycleOwner lifecycleOwner, LocalDate date) {
+//        LocalDate targetDay = date.minusDays(1).with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+//        Long targetEpoch = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+//
+//        mRepository.getFridayEntry(targetEpoch).observe(lifecycleOwner, fridayEntry -> {
+//            if (fridayEntry != null) {
+//                mFridayAlarmActivated = doFriday(fridayEntry.getTimeEpoch(), fridayEntry.getSilent(), FRIDAY_ALARM, mFridayAlarmActivated);
+//
+//                if (!mFridayAlarmActivated && mPrefHelper.getDndOnFridaysOnly()) {
+////                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
+//                    mNextFridayAlarmActivated = true;
+//                }
+//                if (mNextFridayAlarmActivated && !mPrefHelper.getDndOnFridaysOnly()) {
+////                    setObserverForRegularDay(lifecycleOwner, targetDay.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)));
+//                    mNextFridayAlarmActivated = false;
+//                }
+//            }
+//        });
+//    }
 
     public boolean setAlarmManager(Long timing, int requestCode, boolean status) {
         Intent intent = new Intent(mContext, ForegroundService.class);

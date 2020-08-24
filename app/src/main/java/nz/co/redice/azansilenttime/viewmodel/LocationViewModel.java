@@ -97,30 +97,5 @@ public class LocationViewModel extends AndroidViewModel {
         mLocationHelper.removeLocationUpdates(mLocationCallback);
     }
 
-    public void requestPrayerCalendar() {
-        mRepository.requestPrayerCalendar();
-    }
 
-    @SuppressLint("CheckResult")
-    public void populateFridayTable() {
-        LocalDate targetDay = LocalDate.now().minusDays(1);
-        LocalDate endOfTheYear = LocalDate.of(Calendar.getInstance().get(Calendar.YEAR), 12, 31);
-
-        while (targetDay.isBefore(endOfTheYear)) {
-            targetDay = calcNextFriday(targetDay);
-
-            Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-            Long time = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-
-            Observable.just(new FridayEntry(date, true, time))
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(s -> mRepository.insertFridayEntry(s));
-
-        }
-
-    }
-
-        private LocalDate calcNextFriday(LocalDate day) {
-        return day.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
-    }
 }

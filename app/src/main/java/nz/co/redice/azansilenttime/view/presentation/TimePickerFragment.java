@@ -1,6 +1,5 @@
 package nz.co.redice.azansilenttime.view.presentation;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;

@@ -60,7 +60,6 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -295,7 +294,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/friday_card"
             style="@style/AzanAppTheme.RoundedCard"
-            app:cardBackgroundColor="@{entry.fajrSilent ? @color/cardview : @color/faded_cardview}"
+            app:cardBackgroundColor="@{friday.Silent ? @color/cardview : @color/faded_cardview}"
             android:visibility="@{prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"

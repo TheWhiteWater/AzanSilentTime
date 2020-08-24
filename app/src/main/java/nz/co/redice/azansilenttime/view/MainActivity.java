@@ -6,13 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.ActivityMainBinding;
-import nz.co.redice.azansilenttime.repo.Repository;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
 import nz.co.redice.azansilenttime.utils.ServiceHelper;
 
 @AndroidEntryPoint
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        if (!navController.getCurrentDestination().getLabel().equals("HomeFragment") &&
+        if (!Objects.requireNonNull(navController.getCurrentDestination()).getLabel().equals("HomeFragment") &&
                 !navController.getCurrentDestination().getLabel().equals("LocationFragment")) {
             super.onBackPressed();
         }

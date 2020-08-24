@@ -17,8 +17,6 @@ import androidx.lifecycle.LifecycleRegistry;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDate;
-
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
