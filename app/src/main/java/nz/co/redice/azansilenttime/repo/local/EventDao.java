@@ -17,6 +17,10 @@ import static androidx.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface EventDao {
+
+    @Query("SELECT COUNT(date) FROM regular_table")
+    LiveData <Integer> getRegularTableRowCount();
+
     @Insert(onConflict = REPLACE)
     void insertEntry(RegularEntry regularEntry);
 
@@ -35,11 +39,12 @@ public interface EventDao {
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
     RegularEntry getSelectedRegularEntry(Long selectedDate);
 
+    @Query("DELETE FROM regular_table")
+    void deleteCalendar();
+
     @Query("SELECT COUNT(date) FROM friday_table")
     LiveData <Integer> getFridaysRowCount();
 
-    @Query("DELETE FROM regular_table")
-    void deleteCalendar();
 
     @Query("DELETE FROM friday_table")
     void deleteAllFridayTable();

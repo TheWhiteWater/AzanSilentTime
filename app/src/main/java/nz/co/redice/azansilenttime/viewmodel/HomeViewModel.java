@@ -58,7 +58,7 @@ public class HomeViewModel extends AndroidViewModel {
 
     public void checkDatabase() {
         if (mPrefHelper.isDatabaseNeedsUpdate())
-            requestPrayerCalendar();
+            updatePrayerCalendar();
     }
 
     public LiveData<RegularEntry> getRegularObservable() {
@@ -80,6 +80,9 @@ public class HomeViewModel extends AndroidViewModel {
         mFridayEntry.postValue(fridayEntry);
     }
 
+    public LiveData<Integer> getRegularBaseSize() {
+        return mRepository.getRegularBaseSize();
+    }
 
     @SuppressLint("CheckResult")
     public void selectNewEntry(LocalDate date) {
@@ -119,7 +122,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    public void requestPrayerCalendar() {
+    public void updatePrayerCalendar() {
         mRepository.getAzanService().requestStandardAnnualTimeTable(
                 mPrefHelper.getLatitude(),
                 mPrefHelper.getLongitude(),
@@ -138,10 +141,9 @@ public class HomeViewModel extends AndroidViewModel {
                                 .subscribeOn(Schedulers.io())
                                 .subscribe(s -> mRepository.insertRegularEntry(day.toEntry()));
                     }
+                    selectNewEntry(LocalDate.now());
+                    mPrefHelper.setDatabaseNeedsUpdate(false);
                 }
-                selectNewEntry(LocalDate.now());
-                Log.d(TAG, "onResponse: ");
-                mPrefHelper.setDatabaseNeedsUpdate(false);
             }
 
             @Override

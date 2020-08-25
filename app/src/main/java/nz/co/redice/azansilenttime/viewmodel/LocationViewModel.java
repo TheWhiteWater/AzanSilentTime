@@ -98,4 +98,7 @@ public class LocationViewModel extends AndroidViewModel {
     }
 
 
+    public void requestInitialDataBase() {
+        mRepository.requestPrayerCalendar();
+    }
 }

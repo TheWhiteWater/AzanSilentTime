@@ -42,7 +42,6 @@
             app:layout_constraintVertical_bias="0.0">
 
 
-
             <TextView
                 android:id="@+id/date_view"
                 style="@style/AzanAppTheme.RoundedCard.Date"
@@ -55,28 +54,31 @@
 
         </LinearLayout>
 
-        <ProgressBar
+        <androidx.core.widget.ContentLoadingProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:elevation="10dp"
+            android:indeterminate="true"
+            android:visibility="@{entry==null ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="@+id/guideline_left"
+            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fajr_card"
             style="@style/AzanAppTheme.RoundedCard"
+            android:visibility="@{prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.fajrSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/dhuhr_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
             app:layout_constraintTop_toBottomOf="@+id/guideline_top">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/cardview_constraint_style">
+            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
 
                 <TextView
                     android:id="@+id/fajr_name"
@@ -97,8 +99,8 @@
                     android:id="@+id/fajr_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/SwitchTheme"
                     android:checked="@{entry.fajrSilent}"
+                    android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -120,8 +122,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
             app:layout_constraintTop_toBottomOf="@+id/fajr_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/cardview_constraint_style">
+            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
 
                 <TextView
                     android:id="@+id/dhuhr_name"
@@ -142,8 +143,8 @@
                     android:id="@+id/dhuhr_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/SwitchTheme"
                     android:checked="@{entry.dhuhrSilent}"
+                    android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -165,8 +166,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
             app:layout_constraintTop_toBottomOf="@+id/dhuhr_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/cardview_constraint_style">
+            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
 
                 <TextView
                     android:id="@+id/asr_name"
@@ -187,8 +187,8 @@
                     android:id="@+id/asr_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/SwitchTheme"
                     android:checked="@{entry.asrSilent}"
+                    android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -210,8 +210,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
             app:layout_constraintTop_toBottomOf="@+id/asr_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/cardview_constraint_style">
+            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
 
                 <TextView
                     android:id="@+id/maghrib_name"
@@ -232,8 +231,8 @@
                     android:id="@+id/maghrib_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/SwitchTheme"
                     android:checked="@{entry.maghribSilent}"
+                    android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -248,15 +247,14 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/isha_card"
             style="@style/AzanAppTheme.RoundedCard"
-            app:cardBackgroundColor="@{entry.ishaSilent ? @color/cardview : @color/faded_cardview}"
             android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{entry.ishaSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
             app:layout_constraintTop_toBottomOf="@+id/maghrib_card">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/cardview_constraint_style">
+            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
 
                 <TextView
                     android:id="@+id/isha_name"
@@ -277,8 +275,8 @@
                     android:id="@+id/isha_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/SwitchTheme"
                     android:checked="@{entry.ishaSilent}"
+                    android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -294,8 +292,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/friday_card"
             style="@style/AzanAppTheme.RoundedCard"
-            app:cardBackgroundColor="@{friday.Silent ? @color/cardview : @color/faded_cardview}"
             android:visibility="@{prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{friday.Silent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -322,8 +320,8 @@
                     android:id="@+id/friday_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:theme="@style/SwitchTheme"
                     android:checked="@{friday.silent}"
+                    android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -339,9 +337,9 @@
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="@{prefs.dndOnFridaysOnly}"
             android:text="The Friday Prayer only"
             android:textSize="14sp"
-            android:checked="@{prefs.dndOnFridaysOnly}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

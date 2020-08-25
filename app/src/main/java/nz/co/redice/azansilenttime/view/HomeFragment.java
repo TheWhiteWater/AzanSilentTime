@@ -101,11 +101,16 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         setLayoutWidgets();
 
-        if (!mPrefHelper.isDatabaseNeedsUpdate()) {
-            mViewModel.selectNewEntry(LocalDate.now());
-        } else {
-            mViewModel.requestPrayerCalendar();
+        if (mPrefHelper.isDatabaseNeedsUpdate()) {
+            mViewModel.updatePrayerCalendar();
         }
+
+
+        mViewModel.getRegularBaseSize().observe(getViewLifecycleOwner(), integer -> {
+            if (integer > 0) {
+                mViewModel.selectNewEntry(LocalDate.now());
+            }
+        });
 
 
         mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
@@ -269,5 +274,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
 }
