@@ -76,6 +76,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         mViewModel.lastKnownPosition.observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
+                mViewBinding.progressBar.hide();
                 mViewBinding.locationTv.setText(s);
             }
         });
@@ -117,6 +118,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.auto_locate_btn:
                 getAdminArea();
+                mViewBinding.progressBar.show();
                 break;
             case R.id.save_location_btn:
             default:

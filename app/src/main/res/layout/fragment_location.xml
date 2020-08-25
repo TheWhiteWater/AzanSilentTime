@@ -61,7 +61,7 @@
         android:layout_height="150dp"
         android:elevation="10dp"
         android:indeterminate="true"
-        android:visibility="@{entry==null ? View.VISIBLE : View.GONE}"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
