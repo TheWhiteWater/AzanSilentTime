@@ -118,8 +118,7 @@ public class DndHelper {
         boolean notTooLateForTiming = getCurrentTimeInSeconds() <= timing;
         boolean notFridayDnd = !mPrefHelper.getDndForFridaysOnly();
         boolean isTimingGood2Go = notTooLateForTiming && isTimingOn && notFridayDnd;
-        boolean timingToBeCanceled = alarmStatus.isAlarmActive() && !notFridayDnd || alarmStatus.isAlarmActive() && !isTimingOn
-                || alarmStatus.isAlarmActive() && timing < alarmStatus.getAlarmTiming();
+        boolean timingToBeCanceled = alarmStatus.isAlarmActive() && !notFridayDnd || alarmStatus.isAlarmActive() && !isTimingOn;
 
         Log.d(TAG, "doTiming: ===========");
         Log.d(TAG, "doTiming: epoch " + Converters.getDateFromLong(timing) + ", " + Converters.setTimeFromLong(timing));
@@ -130,17 +129,23 @@ public class DndHelper {
         Log.d(TAG, "doTiming: timingToBeDeactivated " + timingToBeCanceled);
 
 
-        if (timingToBeCanceled) {
+        if (isTimingGood2Go && alarmStatus.getAlarmTiming() > timing) {
             setAlarmManager(alarmStatus.getAlarmTiming(), prayerId, false);
             alarmStatus.setAlarmActive(false);
-            String message = String.format("Silent mode OFF for %s", Converters.setTimeFromLong(timing));
-            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+            mNextDayAlarmActivated = false;
         }
+
         if (isTimingGood2Go) {
             setAlarmManager(timing, prayerId, true);
             alarmStatus.setAlarmActive(true);
             alarmStatus.setAlarmTiming(timing);
             String message = String.format("Silent mode ON for %s", Converters.setTimeFromLong(timing));
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+        }
+        if (timingToBeCanceled) {
+            setAlarmManager(alarmStatus.getAlarmTiming(), prayerId, false);
+            alarmStatus.setAlarmActive(false);
+            String message = String.format("Silent mode OFF for %s", Converters.setTimeFromLong(timing));
             Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
         }
     }
