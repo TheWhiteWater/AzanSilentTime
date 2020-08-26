@@ -45,7 +45,7 @@
             <TextView
                 android:id="@+id/date_view"
                 style="@style/AzanAppTheme.RoundedCard.Date"
-                android:text="@{prefs.dndOnFridaysOnly ? friday.dateString  : entry.dateText}"
+                android:text="@{prefs.dndForFridaysOnly ? friday.dateString  : entry.dateText}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -71,7 +71,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fajr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.fajrSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/dhuhr_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -115,7 +115,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/dhuhr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.dhuhrSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/asr_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -159,7 +159,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/asr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.asrSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/maghrib_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -203,7 +203,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/maghrib_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.maghribSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/isha_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -247,7 +247,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/isha_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.ishaSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -292,7 +292,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/friday_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{friday.Silent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -337,7 +337,7 @@
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="@{prefs.dndOnFridaysOnly}"
+            android:checked="@{prefs.dndForFridaysOnly}"
             android:text="The Friday Prayer only"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -17,6 +17,8 @@ import androidx.lifecycle.LifecycleRegistry;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -77,7 +79,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-//        mDndHelper.setObserverForRegularDay(this, LocalDate.now());
+        mDndHelper.setObserverForRegularDay(this, LocalDate.now());
 //        mDndHelper.setObserverForNextFriday(this, LocalDate.now());
     }
 

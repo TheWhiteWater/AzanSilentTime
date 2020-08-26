@@ -12,8 +12,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,12 +24,8 @@ import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
-import nz.co.redice.azansilenttime.repo.remote.models.ApiResponse;
 import nz.co.redice.azansilenttime.repo.remote.models.Day;
 import nz.co.redice.azansilenttime.utils.PrefHelper;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeViewModel extends AndroidViewModel {
 
@@ -56,11 +50,6 @@ public class HomeViewModel extends AndroidViewModel {
 
     }
 
-    public void checkDatabase() {
-        if (mPrefHelper.isRegularTableShouldBePopulated())
-            populateRegularTable();
-    }
-
     public LiveData<RegularEntry> getRegularObservable() {
         return mRegularEntry;
     }
@@ -80,13 +69,8 @@ public class HomeViewModel extends AndroidViewModel {
         mFridayEntry.postValue(fridayEntry);
     }
 
-    public LiveData<Integer> getRegularBaseSize() {
-        return mRepository.getRegularBaseSize();
-    }
-
     @SuppressLint("CheckResult")
     public void selectNewRegularEntry(LocalDate date) {
-        Log.d(TAG, "selectNewEntry: selecting entry from database ...");
         Long target = LocalDate.from(date).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         Observable.fromCallable(() -> mRepository.getRegularEntry(target))
                 .subscribeOn(Schedulers.io())
@@ -96,7 +80,6 @@ public class HomeViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void selectNewFridayEntry(LocalDate date) {
-        Log.d(TAG, "selectNewFridayEntry: selecting entry from database ...");
         Long nextFriday = calcNextFriday(date.minusDays(1)).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         Observable.fromCallable(() -> mRepository.getFridayEntry(nextFriday))
                 .subscribeOn(Schedulers.io())
@@ -107,7 +90,6 @@ public class HomeViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void selectNewFridayEntry(Long value) {
-        Log.d(TAG, "selectNewFridayEntry: selecting entry from database ...");
         Observable.fromCallable(() -> mRepository.getFridayEntry(value))
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::setFridayObservable, throwable -> {
@@ -117,40 +99,30 @@ public class HomeViewModel extends AndroidViewModel {
 
 
     public void updateEntry(RegularEntry entry) {
-        Log.d(TAG, "updateRegularEntry: ");
         mRepository.updateRegularEntry(entry);
     }
 
 
+    @SuppressLint("CheckResult")
     public void populateRegularTable() {
-        mRepository.getAzanService().requestStandardAnnualTimeTable(
+        mRepository.getAzanService().requestRegularCalendar(
                 mPrefHelper.getLatitude(),
                 mPrefHelper.getLongitude(),
                 mPrefHelper.getCalculationMethod(),
                 mPrefHelper.getCalculationSchool(),
                 mPrefHelper.getMidnightMode(),
                 Calendar.getInstance().get(Calendar.YEAR),
-                true
-        ).enqueue(new Callback<ApiResponse>() {
-            @SuppressLint("CheckResult")
-            @Override
-            public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    for (Day day : response.body().data.getAnnualList()) {
-                        Observable.just(day)
-                                .subscribeOn(Schedulers.io())
-                                .subscribe(s -> mRepository.insertRegularEntry(day.toEntry()));
-                    }
+                true)
+                .subscribeOn(Schedulers.io())
+                .toObservable()
+                .flatMap(s -> Observable.fromIterable(s.data.getAnnualList()))
+                .map(Day::toEntry)
+                .doOnComplete(() -> {
                     selectNewRegularEntry(LocalDate.now());
                     mPrefHelper.setRegularTableShouldBePopulated(false);
-                }
-            }
+                })
+                .subscribe(s ->mRepository.insertRegularEntry(s));
 
-            @Override
-            public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
-                Log.d(TAG, "onFailure: standard request" + t.getMessage());
-            }
-        });
     }
 
 
@@ -192,10 +164,6 @@ public class HomeViewModel extends AndroidViewModel {
     @SuppressLint("CheckResult")
     public void updateFridayEntry(FridayEntry fridayEntry) {
         mRepository.updateFridayEntry(fridayEntry);
-    }
-
-    public LiveData<Integer> getFridayTableCount() {
-        return mRepository.getFridayTableRowCount();
     }
 
 }

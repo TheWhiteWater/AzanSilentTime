@@ -97,8 +97,4 @@ public class LocationViewModel extends AndroidViewModel {
         mLocationHelper.removeLocationUpdates(mLocationCallback);
     }
 
-
-    public void requestInitialDataBase() {
-        mRepository.requestPrayerCalendar();
-    }
 }
