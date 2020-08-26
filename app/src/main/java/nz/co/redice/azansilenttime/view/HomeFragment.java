@@ -101,26 +101,19 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         setLayoutWidgets();
 
-        if (mPrefHelper.isDatabaseNeedsUpdate()) {
-            mViewModel.updatePrayerCalendar();
+        if (mPrefHelper.isRegularTableShouldBePopulated()) {
+            mViewModel.populateRegularTable();
+        } else {
+            mViewModel.selectNewRegularEntry(LocalDate.now());
         }
 
 
-        mViewModel.getRegularBaseSize().observe(getViewLifecycleOwner(), integer -> {
-            if (integer > 0) {
-                mViewModel.selectNewEntry(LocalDate.now());
-            }
-        });
+        if (mPrefHelper.isFridayTableShouldBePopulated()) {
+            mViewModel.populateFridayTable();
+        } else {
+            mViewModel.selectNewFridayEntry(LocalDate.now());
+        }
 
-
-        mViewModel.getFridayTableCount().observe(getViewLifecycleOwner(), integer -> {
-            Log.d(TAG, "onChanged: friday table count " + integer);
-            if (integer == 0) {
-                mViewModel.populateFridayTable();
-            }
-        });
-
-        mViewModel.selectNewFridayEntry(LocalDate.now());
 
         bindRegularEntry();
         bindFridayEntry();
@@ -130,7 +123,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private void bindRegularEntry() {
         mViewModel.getRegularObservable().observe(getViewLifecycleOwner(), entry -> {
             if (entry != null) {
-                Log.d(TAG, "setLiveDataObserver: ");
+                Log.d(TAG, "setLiveDataObserver: setting livedata");
                 registerSwitchListeners(false);
                 setRegularSwitches(entry);
                 mRegularEntry = entry;
@@ -219,7 +212,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
         if (!mPrefHelper.getDndOnFridaysOnly()) {
-            mViewModel.selectNewEntry(selectedDate);
+            mViewModel.selectNewRegularEntry(selectedDate);
         } else {
             Log.d("App", "onDateSet:  picked date = " + selectedDate);
             mViewModel.selectNewFridayEntry(selectedDate);
@@ -277,6 +270,8 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
+        mViewBinding.unbind();
+        mViewModel.getRegularObservable().removeObservers(getViewLifecycleOwner());
+        mViewModel.getFridayEntry().removeObservers(getViewLifecycleOwner());
     }
 }

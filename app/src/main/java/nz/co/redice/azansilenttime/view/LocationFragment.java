@@ -124,7 +124,8 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
             default:
                 mViewModel.saveLocationInPrefs();
                 mViewModel.removeLocationRequest();
-                mPrefHelper.setDatabaseNeedsUpdate(true);
+                mPrefHelper.setRegularTableShouldBePopulated(true);
+                mPrefHelper.setFridayTableShouldBePopulated(true);
                 NavHostFragment.findNavController(this).navigate(R.id.fromLocationToHome);
                 break;
         }
@@ -134,5 +135,9 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         mViewModel.getAdminArea();
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mViewModel.lastKnownPosition.removeObservers(getViewLifecycleOwner());
+    }
 }

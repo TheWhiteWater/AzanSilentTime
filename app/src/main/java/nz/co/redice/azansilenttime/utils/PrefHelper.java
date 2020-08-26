@@ -8,24 +8,24 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
-import nz.co.redice.azansilenttime.R;
 
 import static android.content.Context.MODE_PRIVATE;
 
 @Singleton
 public class PrefHelper {
 
+    public static final String DND_FRIDAYS_ONLY = "dnd_fridays_only";
     private static final String MY_PREFS = "my prefs";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
     private static final String LOCATION_STATUS = "location_status";
-    public static final String DND_FRIDAYS_ONLY = "dnd_fridays_only";
     private static final String LOCATION_TEXT = "location_text";
     private static final String DND_PERIOD = "dnd_period";
     private static final String CALCULATION_METHOD = "calculation_method";
     private static final String CALCULATION_SCHOOL = "calculation_school";
     private static final String MIDNIGHT_MODE = "midnight_mode";
-    private static final String DATABASE_UPDATE_STATUS = "database_update_status";
+    private static final String REGULAR_TABLE_UPDATE_STATUS = "regular_table_update_status";
+    private static final String FRIDAY_TABLE_UPDATE_STATUS = "friday_table_update_status";
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
@@ -84,31 +84,29 @@ public class PrefHelper {
 
     }
 
-    public Boolean isDatabaseNeedsUpdate() {
-        return mSharedPreferences.getBoolean(DATABASE_UPDATE_STATUS, false);
+    public Boolean isRegularTableShouldBePopulated() {
+        return mSharedPreferences.getBoolean(REGULAR_TABLE_UPDATE_STATUS, false);
     }
 
-    public void setDatabaseNeedsUpdate(Boolean status) {
-        mEditor.putBoolean(DATABASE_UPDATE_STATUS, status).apply();
+    public void setRegularTableShouldBePopulated(Boolean status) {
+        mEditor.putBoolean(REGULAR_TABLE_UPDATE_STATUS, status).apply();
     }
 
-
-    private int getPrefValue(String[] array, String value) {
-        int index = 0;
-        for (int i = 0; i < array.length; i++) {
-            if (value.equals(array[i]))
-                index = i;
-        }
-        return Integer.parseInt(array[index]);
+    public Boolean isFridayTableShouldBePopulated() {
+        return mSharedPreferences.getBoolean(FRIDAY_TABLE_UPDATE_STATUS, false);
     }
+
+    public void setFridayTableShouldBePopulated(Boolean status) {
+        mEditor.putBoolean(FRIDAY_TABLE_UPDATE_STATUS, status).apply();
+    }
+
 
     public int getDndPeriod() {
         return mSharedPreferences.getInt(DND_PERIOD, 10);
     }
 
     public void setDndPeriod(String value) {
-        String[] array = mContext.getResources().getStringArray(R.array.dnd_period_values);
-        mEditor.putInt(DND_PERIOD, getPrefValue(array, value)).apply();
+        mEditor.putInt(DND_PERIOD, Integer.parseInt(value)).apply();
     }
 
     public int getCalculationSchool() {
@@ -116,25 +114,25 @@ public class PrefHelper {
     }
 
     public void setCalculationSchool(String value) {
-        String[] values = mContext.getResources().getStringArray(R.array.school_values);
-        mEditor.putInt(CALCULATION_SCHOOL, getPrefValue(values, value)).apply();
+        mEditor.putInt(CALCULATION_SCHOOL, Integer.parseInt(value)).apply();
     }
+
 
     public int getCalculationMethod() {
         return mSharedPreferences.getInt(CALCULATION_METHOD, 4);
     }
 
     public void setCalculationMethod(String value) {
-        String[] values = mContext.getResources().getStringArray(R.array.calculation_method_values);
-        mEditor.putInt(CALCULATION_METHOD, getPrefValue(values, value)).apply();
+        mEditor.putInt(CALCULATION_METHOD, Integer.parseInt(value)).apply();
     }
+
+
 
     public int getMidnightMode() {
         return mSharedPreferences.getInt(MIDNIGHT_MODE, 0);
     }
 
     public void setMidnightMode(String value) {
-        String[] values = mContext.getResources().getStringArray(R.array.midnight_mode_values);
-        mEditor.putInt(MIDNIGHT_MODE, getPrefValue(values, value)).apply();
+        mEditor.putInt(MIDNIGHT_MODE, Integer.parseInt(value)).apply();
     }
 }

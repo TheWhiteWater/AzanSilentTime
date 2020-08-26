@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             public void handleOnBackPressed() {
                 if (isDatabaseUpdateRequired) {
                     mRepository.deletePrayerCalendar();
-                    mPrefHelper.setDatabaseNeedsUpdate(true);
+                    mPrefHelper.setRegularTableShouldBePopulated(true);
                 }
                 getBackToHomeScreen();
             }
@@ -87,19 +87,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         Preference mutePeriodPreference = findPreference(MUTE_PERIOD);
         if (mutePeriodPreference != null) {
-            mutePeriodPreference.setSummaryProvider(preference -> mPrefHelper.getDndPeriod() + " min");
+            mutePeriodPreference.setSummaryProvider(preference -> {
+                int prefValue = mPrefHelper.getDndPeriod();
+                return prefValue == 60 ? "1 hour" : prefValue + " min";
+            });
             mutePeriodPreference.setOnPreferenceChangeListener(this);
         }
 
         Preference calculationMethodPreference = findPreference(CALCULATION_METHOD);
         if (calculationMethodPreference != null) {
             calculationMethodPreference.setSummaryProvider(preference -> {
-                // TODO: 24.08.2020 summary correction through method or smth one item is missing
                 String[] values = getResources().getStringArray(R.array.calculation_methods_entries);
-                return values[mPrefHelper.getCalculationMethod()];
+                return values[getCorrectedCalculationMethod(mPrefHelper.getCalculationMethod())];
             });
             calculationMethodPreference.setOnPreferenceChangeListener(this);
         }
+
 
         Preference calculationSchoolPreference = findPreference(SCHOOL);
         if (calculationSchoolPreference != null) {
@@ -122,31 +125,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     }
 
+    private int getCorrectedCalculationMethod(int intValue) {
+        return intValue <= 5 ? intValue : --intValue;
+    }
+
+
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case MUTE_PERIOD:
                 mPrefHelper.setDndPeriod((String) newValue);
                 isDatabaseUpdateRequired = false;
-                Log.d(TAG, "onCreatePreferences: DndPeriod " + mPrefHelper.getDndPeriod());
                 break;
             case CALCULATION_METHOD:
+                Log.d(TAG, "onPreferenceChange: value from xml " + newValue);
                 mPrefHelper.setCalculationMethod((String) newValue);
                 isDatabaseUpdateRequired = true;
-
-                Log.d(TAG, "onCreatePreferences: CalculationMethod " + mPrefHelper.getCalculationMethod());
                 break;
             case SCHOOL:
                 mPrefHelper.setCalculationSchool((String) newValue);
                 isDatabaseUpdateRequired = true;
 
-                Log.d(TAG, "onCreatePreferences: CalculationSchool " + mPrefHelper.getCalculationSchool());
                 break;
             case MIDNIGHT_MODE:
                 mPrefHelper.setMidnightMode((String) newValue);
                 isDatabaseUpdateRequired = true;
-
-                Log.d(TAG, "onCreatePreferences: MidnightMode " + mPrefHelper.getMidnightMode());
                 break;
         }
 

@@ -71,7 +71,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fajr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!prefs.dndOnFridaysOnly ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{entry.fajrSilent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/dhuhr_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"

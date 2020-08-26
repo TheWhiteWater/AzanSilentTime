@@ -57,8 +57,8 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void checkDatabase() {
-        if (mPrefHelper.isDatabaseNeedsUpdate())
-            updatePrayerCalendar();
+        if (mPrefHelper.isRegularTableShouldBePopulated())
+            populateRegularTable();
     }
 
     public LiveData<RegularEntry> getRegularObservable() {
@@ -85,7 +85,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     @SuppressLint("CheckResult")
-    public void selectNewEntry(LocalDate date) {
+    public void selectNewRegularEntry(LocalDate date) {
         Log.d(TAG, "selectNewEntry: selecting entry from database ...");
         Long target = LocalDate.from(date).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         Observable.fromCallable(() -> mRepository.getRegularEntry(target))
@@ -122,7 +122,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    public void updatePrayerCalendar() {
+    public void populateRegularTable() {
         mRepository.getAzanService().requestStandardAnnualTimeTable(
                 mPrefHelper.getLatitude(),
                 mPrefHelper.getLongitude(),
@@ -141,8 +141,8 @@ public class HomeViewModel extends AndroidViewModel {
                                 .subscribeOn(Schedulers.io())
                                 .subscribe(s -> mRepository.insertRegularEntry(day.toEntry()));
                     }
-                    selectNewEntry(LocalDate.now());
-                    mPrefHelper.setDatabaseNeedsUpdate(false);
+                    selectNewRegularEntry(LocalDate.now());
+                    mPrefHelper.setRegularTableShouldBePopulated(false);
                 }
             }
 
@@ -168,6 +168,8 @@ public class HomeViewModel extends AndroidViewModel {
             Log.d(TAG, "populateFridayTable: " + fridayEntry.getDateString());
             mRepository.insertFridayEntry(fridayEntry);
         }
+        mPrefHelper.setFridayTableShouldBePopulated(false);
+        selectNewFridayEntry(LocalDate.now());
     }
 
     private LocalDate calcNextFriday(LocalDate day) {
