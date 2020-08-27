@@ -1,6 +1,7 @@
 package nz.co.redice.azansilenttime.services;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.Observable;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.utils.DndHelper;
 import nz.co.redice.azansilenttime.utils.NotificationHelper;
@@ -42,6 +44,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
     @Inject DndHelper mDndHelper;
     @Inject NotificationHelper mNotificationHelper;
     private LifecycleRegistry lifecycleRegistry;
+    private NotificationManager mNotificationManager;
 
     private boolean mChangingConfiguration = false;
 
@@ -50,26 +53,34 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.createForegroundNotification(this));
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
 
         lifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
 
         mPrefHelper.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-            if (intent.getAction() != null)
-                switch (intent.getAction()) {
-                    case QUIT_APP:
-                        stopSelf();
-                        break;
-                    case DND_ON:
-                        mDndHelper.turnDndOn();
-                        break;
-                    case DND_OFF:
-                        mDndHelper.turnDndOff();
-                        break;
-                }
+        if (intent.getAction() != null)
+            switch (intent.getAction()) {
+                case QUIT_APP:
+                    stopSelf();
+                    break;
+                case DND_ON:
+                    mDndHelper.turnDndOn();
+                    break;
+                case DND_OFF:
+                    mDndHelper.turnDndOff();
+                    break;
+            }
 
         startObservingAlarmTimings();
+
+
+        mDndHelper.mNextAlarmTime.subscribe(s -> {
+            mNotificationHelper.mNotificationBuilder.setContentText(s);
+            mNotificationManager.notify(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
+        });
 
 
         Log.d(TAG, "onStartCommand: service started");
@@ -112,7 +123,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind: ");
         if (!mChangingConfiguration)
-            startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.createForegroundNotification(this));
+            startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
         return true;
     }
 
@@ -126,6 +137,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
     public void onDestroy() {
         super.onDestroy();
         lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
+
     }
 
     @Override
@@ -153,5 +165,6 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
             return ForegroundService.this;
         }
     }
+
 
 }

@@ -171,7 +171,10 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     @Override
     public void onDestroyView() {
+        mViewBinding.unbind();
         mViewBinding = null;
+        mViewModel.getRegularObservable().removeObservers(getViewLifecycleOwner());
+        mViewModel.getFridayEntry().removeObservers(getViewLifecycleOwner());
         super.onDestroyView();
     }
 
@@ -247,11 +250,5 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mViewBinding.unbind();
-        mViewModel.getRegularObservable().removeObservers(getViewLifecycleOwner());
-        mViewModel.getFridayEntry().removeObservers(getViewLifecycleOwner());
-    }
+
 }

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import io.reactivex.subjects.BehaviorSubject;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.services.ForegroundService;
 import nz.co.redice.azansilenttime.view.presentation.Converters;
@@ -43,6 +44,7 @@ public class DndHelper {
     private static final int ISHA_ALARM = 5;
     private static final int FRIDAY_ALARM = 7;
     private static final long ONE_DAY = 1;
+    public BehaviorSubject<String> mNextAlarmTime;
     @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
     private ArrayList<Long> mActivatedAlarmList = new ArrayList<>();
@@ -52,8 +54,6 @@ public class DndHelper {
     private MaghribAlarmStatus mMaghribAlarmStatus;
     private AsrAlarmStatus mAsrAlarmStatus;
     private FridayAlarmStatus mFridayAlarmStatus;
-
-
     private boolean mNextDayAlarmActivated;
     private boolean mNextFridayAlarmActivated;
 
@@ -73,6 +73,8 @@ public class DndHelper {
         mIshaAlarmStatus = new IshaAlarmStatus();
         mMaghribAlarmStatus = new MaghribAlarmStatus();
         mFridayAlarmStatus = new FridayAlarmStatus();
+
+        mNextAlarmTime = BehaviorSubject.create();
     }
 
     private long getCurrentTimeInSeconds() {
@@ -82,31 +84,32 @@ public class DndHelper {
 
     public void setObserverForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
         Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-        mRepository.getSelectedRegularLiveData(targetDayEpoch).observe(lifecycleOwner, model -> {
-            if (model != null) {
-                if (getCurrentTimeInSeconds() <= model.getFajrEpoch())
-                    processRegularTiming(model.getFajrEpoch(), model.getFajrSilent(), FAJR_ALARM, mFajrAlarmStatus);
-                if (getCurrentTimeInSeconds() <= model.getDhuhrEpoch())
-                    processRegularTiming(model.getDhuhrEpoch(), model.getDhuhrSilent(), DHUR_ALARM, mDhurAlarmStatus);
-                if (getCurrentTimeInSeconds() <= model.getAsrEpoch())
-                    processRegularTiming(model.getAsrEpoch(), model.getAsrSilent(), ASR_ALARM, mAsrAlarmStatus);
-                if (getCurrentTimeInSeconds() <= model.getMaghribEpoch())
-                    processRegularTiming(model.getMaghribEpoch(), model.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmStatus);
-                if (getCurrentTimeInSeconds() <= model.getIshaEpoch())
-                    processRegularTiming(model.getIshaEpoch(), model.getIshaSilent(), ISHA_ALARM, mIshaAlarmStatus);
+        mRepository.getSelectedRegularLiveData(targetDayEpoch).observe(lifecycleOwner, entry -> {
+            if (entry != null) {
+                if (getCurrentTimeInSeconds() <= entry.getFajrEpoch())
+                    processRegularTiming(entry.getFajrEpoch(), entry.getFajrSilent(), FAJR_ALARM, mFajrAlarmStatus);
+                if (getCurrentTimeInSeconds() <= entry.getDhuhrEpoch())
+                    processRegularTiming(entry.getDhuhrEpoch(), entry.getDhuhrSilent(), DHUR_ALARM, mDhurAlarmStatus);
+                if (getCurrentTimeInSeconds() <= entry.getAsrEpoch())
+                    processRegularTiming(entry.getAsrEpoch(), entry.getAsrSilent(), ASR_ALARM, mAsrAlarmStatus);
+                if (getCurrentTimeInSeconds() <= entry.getMaghribEpoch())
+                    processRegularTiming(entry.getMaghribEpoch(), entry.getMaghribSilent(), MAGHRIB_ALARM, mMaghribAlarmStatus);
+                if (getCurrentTimeInSeconds() <= entry.getIshaEpoch())
+                    processRegularTiming(entry.getIshaEpoch(), entry.getIshaSilent(), ISHA_ALARM, mIshaAlarmStatus);
 
 
-                if (!mFajrAlarmStatus.isAlarmActive() && !mDhurAlarmStatus.isAlarmActive() && !mAsrAlarmStatus.isAlarmActive() &&
-                        !mMaghribAlarmStatus.isAlarmActive() && !mIshaAlarmStatus.isAlarmActive()
-                        && !mPrefHelper.getDndForFridaysOnly() && !mNextDayAlarmActivated) {
-                    Log.d(TAG, "launching observer for the next day");
-                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
-                    mNextDayAlarmActivated = true;
-                }
-                if (mNextDayAlarmActivated && !mPrefHelper.getDndForFridaysOnly()) {
-                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
-                    mNextDayAlarmActivated = false;
-                }
+//                if (!mFajrAlarmStatus.isAlarmActive() && !mDhurAlarmStatus.isAlarmActive() && !mAsrAlarmStatus.isAlarmActive() &&
+//                        !mMaghribAlarmStatus.isAlarmActive() && !mIshaAlarmStatus.isAlarmActive()
+//                        && !mPrefHelper.getDndForFridaysOnly() && !mNextDayAlarmActivated) {
+//                    Log.d(TAG, "launching observer for the next day");
+//                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
+//                    mNextDayAlarmActivated = true;
+//                }
+//                if (mNextDayAlarmActivated && !mPrefHelper.getDndForFridaysOnly()) {
+//                    setObserverForRegularDay(lifecycleOwner, LocalDate.now().plusDays(ONE_DAY));
+//                    mNextDayAlarmActivated = false;
+//                }
+
 
             }
         });
@@ -115,27 +118,21 @@ public class DndHelper {
     }
 
     private void processRegularTiming(Long timing, boolean isTimingOn, int prayerId, AlarmStatus alarmStatus) {
-        boolean notTooLateForTiming = getCurrentTimeInSeconds() <= timing;
-        boolean notFridayDnd = !mPrefHelper.getDndForFridaysOnly();
-        boolean isTimingGood2Go = notTooLateForTiming && isTimingOn && notFridayDnd;
-        boolean timingToBeCanceled = alarmStatus.isAlarmActive() && !notFridayDnd || alarmStatus.isAlarmActive() && !isTimingOn;
+        boolean timingIsOutdated = getCurrentTimeInSeconds() >= timing;
+        boolean fridaysOnlyActive = mPrefHelper.getDndForFridaysOnly();
+        boolean timingIsGood2Go = !timingIsOutdated && isTimingOn && !fridaysOnlyActive;
+        boolean timingToBeCanceled = alarmStatus.isAlarmActive() && fridaysOnlyActive || alarmStatus.isAlarmActive() && !isTimingOn;
 
         Log.d(TAG, "doTiming: ===========");
-        Log.d(TAG, "doTiming: epoch " + Converters.getDateFromLong(timing) + ", " + Converters.setTimeFromLong(timing));
-        Log.d(TAG, "doTiming: notTooLateForTiming " + notTooLateForTiming);
+        Log.d(TAG, "doTiming: timing " + Converters.getDateFromLong(timing) + ", " + Converters.setTimeFromLong(timing));
+        Log.d(TAG, "doTiming: notTooLateForTiming " + timingIsOutdated);
         Log.d(TAG, "doTiming: isTimingActive " + isTimingOn);
-        Log.d(TAG, "doTiming: notFridayDnd " + notFridayDnd);
-        Log.d(TAG, "doTiming: isTimingGood2Go " + isTimingGood2Go);
-        Log.d(TAG, "doTiming: timingToBeDeactivated " + timingToBeCanceled);
+        Log.d(TAG, "doTiming: notFridayDnd " + fridaysOnlyActive);
+        Log.d(TAG, "doTiming: isTimingGood2Go " + timingIsGood2Go);
+        Log.d(TAG, "doTiming: timingToBeCanceled " + timingToBeCanceled);
 
 
-        if (isTimingGood2Go && alarmStatus.getAlarmTiming() > timing) {
-            setAlarmManager(alarmStatus.getAlarmTiming(), prayerId, false);
-            alarmStatus.setAlarmActive(false);
-            mNextDayAlarmActivated = false;
-        }
-
-        if (isTimingGood2Go) {
+        if (timingIsGood2Go) {
             setAlarmManager(timing, prayerId, true);
             alarmStatus.setAlarmActive(true);
             alarmStatus.setAlarmTiming(timing);
@@ -208,34 +205,37 @@ public class DndHelper {
 
         if (toBeActivated) {
             mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(timing * 1000, null), dndOnIntent);
-            mActivatedAlarmList.add(timing * 1000);
+            if (!mActivatedAlarmList.contains(timing * 1000))
+                mActivatedAlarmList.add(timing * 1000);
             Log.d(TAG, "AlarmManager activated on " + timing * 1000);
         } else {
             mAlarmManager.cancel(dndOnIntent);
             mActivatedAlarmList.remove(timing * 1000);
             Log.d(TAG, "AlarmManager canceled on " + timing * 1000);
         }
-
+        setNextAlarmTime();
     }
 
-    public String getNextAlarmTime() {
+    public void setNextAlarmTime() {
+        Collections.sort(mActivatedAlarmList);
         if (mActivatedAlarmList.size() > 0) {
-            Collections.sort(mActivatedAlarmList);
             Date date = new Date(mActivatedAlarmList.get(0));
 
             LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
-            DateTimeFormatter onlyTimeFormat = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
-            DateTimeFormatter onlyDayFormat = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
+            DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
 
             if (localDateTime.getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
-                return "Next DND today at " + onlyTimeFormat.format(localDateTime);
+                mNextAlarmTime.onNext("Next DND today at " + timeFormatter.format(localDateTime));
             }
-            Log.d(TAG, "getNextAlarmTime: " + onlyDayFormat.format(localDateTime) + " at " + onlyTimeFormat.format(localDateTime));
+            Log.d(TAG, "setNextAlarmTime: list size " + mActivatedAlarmList.size());
+            Log.d(TAG, "getNextAlarmTime: " + dayFormatter.format(localDateTime) + " at " + timeFormatter.format(localDateTime));
             Log.d(TAG, "getNextAlarmTime: value " + mActivatedAlarmList.get(0));
-            return "Next DND on " + onlyDayFormat.format(localDateTime) + " at " + onlyTimeFormat.format(localDateTime);
-        } else
-            return "DND hasn't set";
+            mNextAlarmTime.onNext("Next DND on " + dayFormatter.format(localDateTime) + " at " + timeFormatter.format(localDateTime));
+        }
+        else
+            mNextAlarmTime.onNext("Next day selection");
     }
 
 

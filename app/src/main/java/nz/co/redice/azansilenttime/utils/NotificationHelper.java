@@ -1,7 +1,6 @@
 package nz.co.redice.azansilenttime.utils;
 
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,6 +27,11 @@ public class NotificationHelper {
     private static final String FOREGROUND_CHANNEL_ID = "channelId";
     @Inject DndHelper mDndHelper;
 
+    private PendingIntent activityPendingIntent;
+    private PendingIntent servicePendingIntent;
+    public NotificationCompat.Builder mNotificationBuilder;
+
+
     private Context mContext;
 
     @Inject
@@ -44,33 +48,28 @@ public class NotificationHelper {
             manager.createNotificationChannel(foregroundNotificationChannel);
 
         }
-    }
 
-    public Notification createForegroundNotification(Context context) {
+
         Intent turnOffIntent = new Intent(mContext, ForegroundService.class);
-
-        // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
-//        turnOffIntent.putExtra(QUIT_APP, true);
         turnOffIntent.setAction(QUIT_APP);
 
 
         // The PendingIntent that leads to a call to onStartCommand() in this service.
-        PendingIntent servicePendingIntent = PendingIntent.getService(mContext, 0, turnOffIntent,
+        servicePendingIntent = PendingIntent.getService(mContext, 0, turnOffIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         Intent activityLaunchingIntent = new Intent(context, MainActivity.class);
 
         //last flag tells what to do when pending updated / re-send
-        PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0, activityLaunchingIntent, 0);
+        activityPendingIntent = PendingIntent.getActivity(context, 0, activityLaunchingIntent, 0);
 
-        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
+        mNotificationBuilder = new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .addAction(R.drawable.ic_settings, "Home", activityPendingIntent)
                 .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
                 .setContentTitle("Content Title")
-                .setContentText(mDndHelper.getNextAlarmTime())
-                .setSmallIcon(R.drawable.ic_black_24)
-                .build();
+                .setContentText("Not set yet")
+                .setSmallIcon(R.drawable.ic_black_24);
     }
 
 
