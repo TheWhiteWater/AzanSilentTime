@@ -111,7 +111,7 @@ public class DndHelper {
             setAlarmManager(timing, prayerId, true);
             alarmStatus.setAlarmActive(true);
             alarmStatus.setAlarmTiming(timing);
-            Log.d(TAG, "processRegularTiming: isSilentFlagOn ");
+            Log.d(TAG, "processRegularTiming: isSilentFlagOn " + isSilentFlagOn);
         }
 
         if (timingToBeCanceled) {
