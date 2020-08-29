@@ -9,10 +9,12 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.util.Log;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -25,6 +27,7 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import io.reactivex.subjects.BehaviorSubject;
 import nz.co.redice.azansilenttime.repo.Repository;
+import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.services.ForegroundService;
 import nz.co.redice.azansilenttime.view.presentation.Converters;
@@ -35,12 +38,13 @@ public class DndHelper {
     public static final String DND_ON = "dnd_on";
     public static final String DND_OFF = "dnd_off";
     private static final String TAG = "App DndHelper";
-    private static final int ALARM = 7777;
+    private static final int REGULAR_ALARM = 123;
+    private static final int FRIDAY_ALARM = 321;
     private static final long ONE_DAY = 1;
     public BehaviorSubject<String> mNextAlarmTime;
     @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
-    @Inject AlarmStatus mCurrentAlarmStatus;
+    @Inject AlarmStatus mCurrentAlarmCash;
     private ArrayList<Long> mActivatedAlarmList = new ArrayList<>();
     private ArrayList<SubEntry> mTimings;
 
@@ -70,15 +74,15 @@ public class DndHelper {
 
         mRepository.selectTwoDaysForAlarmSetting(startDayEpoch, endDayEpoch)
                 .subscribe(x -> {
-                    mTimings.clear();
-                    for (RegularEntry s : x) {
-                        mTimings.add(new SubEntry(s.getFajrEpoch(), s.getFajrSilent()));
-                        mTimings.add(new SubEntry(s.getDhuhrEpoch(), s.getDhuhrSilent()));
-                        mTimings.add(new SubEntry(s.getAsrEpoch(), s.getAsrSilent()));
-                        mTimings.add(new SubEntry(s.getMaghribEpoch(), s.getMaghribSilent()));
-                        mTimings.add(new SubEntry(s.getIshaEpoch(), s.getIshaSilent()));
-                    }
-                    processRegularTiming(mTimings);
+                        mTimings.clear();
+                        for (RegularEntry s : x) {
+                            mTimings.add(new SubEntry(s.getFajrEpoch(), s.getFajrSilent()));
+                            mTimings.add(new SubEntry(s.getDhuhrEpoch(), s.getDhuhrSilent()));
+                            mTimings.add(new SubEntry(s.getAsrEpoch(), s.getAsrSilent()));
+                            mTimings.add(new SubEntry(s.getMaghribEpoch(), s.getMaghribSilent()));
+                            mTimings.add(new SubEntry(s.getIshaEpoch(), s.getIshaSilent()));
+                        }
+                        processRegularTiming(mTimings);
                 });
 
     }
@@ -92,30 +96,92 @@ public class DndHelper {
         SubEntry earliestSubEntry = null;
         if (newList.size() > 0) {
             earliestSubEntry = newList.get(0);
-            Log.d(TAG, "processRegularTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing) + " " + Converters.getDateFromLong(earliestSubEntry.timing)
-                    + " activeStatus " + earliestSubEntry.activeStatus);
+            Log.d(TAG, "processRegularTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing)
+                    + " " + Converters.getDateFromLong(earliestSubEntry.timing));
         }
 
 
         boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
 
         if (!isFridaysOnlyActive && earliestSubEntry != null) {
-            if (mCurrentAlarmStatus.isAlarmActive()) {
-                if (mCurrentAlarmStatus.getAlarmTiming() == earliestSubEntry.timing) {
+            if (mCurrentAlarmCash.isAlarmActive()) {
+                if (mCurrentAlarmCash.getAlarmTiming() == earliestSubEntry.timing) {
                     return;
                 }
 
-                if (mCurrentAlarmStatus.getAlarmTiming() != earliestSubEntry.timing) {
-                    setAlarmManager(mCurrentAlarmStatus.getAlarmTiming(), ALARM, false);
-                    mCurrentAlarmStatus.setAlarmActive(false);
+                if (mCurrentAlarmCash.getAlarmTiming() != earliestSubEntry.timing) {
+                    setAlarmManager(mCurrentAlarmCash.getAlarmTiming(), REGULAR_ALARM, false);
+                    mCurrentAlarmCash.setAlarmActive(false);
                 }
             }
 
-            setAlarmManager(earliestSubEntry.timing, ALARM, true);
-            mCurrentAlarmStatus.setAlarmActive(true);
-            mCurrentAlarmStatus.setAlarmTiming(earliestSubEntry.timing);
+            setAlarmManager(earliestSubEntry.timing, REGULAR_ALARM, true);
+            mCurrentAlarmCash.setAlarmActive(true);
+            mCurrentAlarmCash.setAlarmTiming(earliestSubEntry.timing);
+        }
+        if (isFridaysOnlyActive && mCurrentAlarmCash.isAlarmActive()) {
+            setAlarmManager(mCurrentAlarmCash.getAlarmTiming(), REGULAR_ALARM, false);
+            mCurrentAlarmCash.setAlarmActive(false);
         }
     }
+
+
+    @SuppressLint("CheckResult")
+    public void setObserverForNextFriday(LocalDate day) {
+
+        LocalDate startFriday = calcNextFriday(day.minusDays(ONE_DAY));
+        LocalDate endFriday = calcNextFriday(startFriday);
+        Long startDayEpoch = startFriday.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        Long endDayEpoch = endFriday.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+
+        mRepository.selectTwoFridaysForAlarmSetting(startDayEpoch, endDayEpoch)
+                .subscribe(x -> {
+                        mTimings.clear();
+                        for (FridayEntry s : x) {
+                            mTimings.add(new SubEntry(s.getTimeEpoch(), s.getSilent()));
+                        }
+                        processFridayTiming(mTimings);
+                });
+    }
+
+    private void processFridayTiming(ArrayList<SubEntry> timings) {
+        Collections.sort(timings);
+        ArrayList<SubEntry> newList = mTimings.stream().sorted(SubEntry::compareTo)
+                .filter(subEntry -> (subEntry.timing > getCurrentTimeInSeconds()) && subEntry.activeStatus)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        SubEntry earliestSubEntry = null;
+        if (newList.size() > 0) {
+            earliestSubEntry = newList.get(0);
+            Log.d(TAG, "processFRIDAYTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing)
+                    + " " + Converters.getDateFromLong(earliestSubEntry.timing));
+        }
+
+
+        boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
+
+        if (isFridaysOnlyActive && earliestSubEntry != null) {
+            if (mCurrentAlarmCash.isAlarmActive()) {
+                if (mCurrentAlarmCash.getAlarmTiming() == earliestSubEntry.timing) {
+                    return;
+                }
+
+                if (mCurrentAlarmCash.getAlarmTiming() != earliestSubEntry.timing) {
+                    setAlarmManager(mCurrentAlarmCash.getAlarmTiming(), FRIDAY_ALARM, false);
+                    mCurrentAlarmCash.setAlarmActive(false);
+                }
+            }
+
+            setAlarmManager(earliestSubEntry.timing, FRIDAY_ALARM, true);
+            mCurrentAlarmCash.setAlarmActive(true);
+            mCurrentAlarmCash.setAlarmTiming(earliestSubEntry.timing);
+        }
+        if (!isFridaysOnlyActive && mCurrentAlarmCash.isAlarmActive()) {
+            setAlarmManager(mCurrentAlarmCash.getAlarmTiming(), FRIDAY_ALARM, false);
+            mCurrentAlarmCash.setAlarmActive(false);
+        }
+    }
+
 
     public void setAlarmManager(Long timing, int requestCode, boolean toBeActivated) {
         Intent intent = new Intent(mContext, ForegroundService.class);
@@ -140,20 +206,21 @@ public class DndHelper {
         if (mActivatedAlarmList.size() > 0) {
             Date date = new Date(mActivatedAlarmList.get(0));
 
-            LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mPrefHelper.getDndPeriod());
 
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
             DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
 
-            if (localDateTime.getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
-                mNextAlarmTime.onNext("Next Do Not Disturb today at " + timeFormatter.format(localDateTime));
-            }
-            mNextAlarmTime.onNext("Next Do Not Disturb on " + dayFormatter.format(localDateTime) + " at " + timeFormatter.format(localDateTime));
-        } else
-            mNextAlarmTime.onNext("Next day");
+            if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
+                mNextAlarmTime.onNext("today between " + timeFormatter.format(startMuteTime)
+                        + " - " + timeFormatter.format(endMuteTime));
+            else
+                mNextAlarmTime.onNext(dayFormatter.format(startMuteTime) + " between "
+                        + timeFormatter.format(startMuteTime) + " - " + timeFormatter.format(endMuteTime));
+        }
     }
 
-    @SuppressLint("CheckResult")
     public void turnDndOn() {
         Log.d(TAG, "turnDndOn: ");
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
@@ -170,6 +237,10 @@ public class DndHelper {
     public void turnDndOff() {
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         Log.d(TAG, "setRingerMode: UNSILENT");
+    }
+
+    private LocalDate calcNextFriday(LocalDate day) {
+        return day.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
     }
 
     class SubEntry implements Comparable<SubEntry> {

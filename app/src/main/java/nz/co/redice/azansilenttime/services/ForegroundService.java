@@ -12,19 +12,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LifecycleRegistry;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.Observable;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.utils.DndHelper;
 import nz.co.redice.azansilenttime.utils.NotificationHelper;
@@ -88,8 +83,10 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-        mDndHelper.setObserverForRegularDay(LocalDate.now());
-//        mDndHelper.setObserverForNextFriday(this, LocalDate.now());
+        if (!mPrefHelper.isDndForFridaysOnly())
+            mDndHelper.setObserverForRegularDay(LocalDate.now());
+        else
+            mDndHelper.setObserverForNextFriday(LocalDate.now());
     }
 
     @Override
@@ -124,7 +121,6 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
             startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
         return true;
     }
-
 
 
     @Override

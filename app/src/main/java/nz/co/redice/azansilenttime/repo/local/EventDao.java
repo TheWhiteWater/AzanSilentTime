@@ -53,6 +53,10 @@ public interface EventDao {
     Observable<List<RegularEntry>> getTwoDaysForAlarmSetting(Long startDate, Long endDate);
 
 
+    @Query("SELECT * FROM friday_table WHERE date BETWEEN :startDate AND :endDate" )
+    Observable<List<FridayEntry>> getTwoFridaysForAlarmSetting(Long startDate, Long endDate);
+
+
 
 
 

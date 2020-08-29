@@ -85,4 +85,8 @@ public class Repository {
         return mDao.getTwoDaysForAlarmSetting(startDate, endDate);
     }
 
+    public Observable<List<FridayEntry>> selectTwoFridaysForAlarmSetting(Long startDate, Long endDate) {
+        return mDao.getTwoFridaysForAlarmSetting(startDate, endDate);
+    }
+
 }

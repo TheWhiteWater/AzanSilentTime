@@ -67,7 +67,7 @@ public class NotificationHelper {
         mNotificationBuilder = new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .addAction(R.drawable.ic_settings, "Home", activityPendingIntent)
                 .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
-                .setContentTitle("Content Title")
+                .setContentTitle("Next Mute period:")
                 .setContentText("Not set yet")
                 .setSmallIcon(R.drawable.ic_black_24);
     }
