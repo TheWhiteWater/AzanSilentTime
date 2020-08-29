@@ -36,15 +36,14 @@ public class DndHelper {
     public static final String DND_ON = "dnd_on";
     public static final String DND_OFF = "dnd_off";
     private static final String TAG = "App DndHelper";
-    private static final int AZAN_ALARM = 7777;
+    private static final int ALARM = 7777;
     private static final long ONE_DAY = 1;
     public BehaviorSubject<String> mNextAlarmTime;
     @Inject PrefHelper mPrefHelper;
     @Inject Repository mRepository;
+    @Inject AlarmStatus mCurrentAlarmStatus;
     private ArrayList<Long> mActivatedAlarmList = new ArrayList<>();
-    private AzanAlarmStatus mAzanAlarmStatus;
-    private boolean mNextDayAlarmActivated;
-    private boolean mNextFridayAlarmActivated;
+    private ArrayList<SubEntry> mTimings;
 
     private Context mContext;
     private AlarmManager mAlarmManager;
@@ -56,8 +55,6 @@ public class DndHelper {
         mContext = context;
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-        mAzanAlarmStatus = new AzanAlarmStatus();
-
         mNextAlarmTime = BehaviorSubject.create();
     }
 
@@ -68,61 +65,76 @@ public class DndHelper {
 
     public void setObserverForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
         Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        mTimings = new ArrayList<>();
+
         mRepository.getSelectedRegularLiveData(targetDayEpoch).observe(lifecycleOwner, entry -> {
             if (entry != null) {
+                mTimings.add(new SubEntry(entry.getFajrEpoch(), entry.getFajrSilent()));
+                mTimings.add(new SubEntry(entry.getDhuhrEpoch(), entry.getDhuhrSilent()));
+                mTimings.add(new SubEntry(entry.getAsrEpoch(), entry.getAsrSilent()));
+                mTimings.add(new SubEntry(entry.getMaghribEpoch(), entry.getMaghribSilent()));
+                mTimings.add(new SubEntry(entry.getIshaEpoch(), entry.getIshaSilent()));
+                processRegularTiming(mTimings);
 
-                if (getCurrentTimeInSeconds() <= entry.getFajrEpoch())
-                    processRegularTiming(entry.getFajrEpoch(), entry.getFajrSilent(), AZAN_ALARM, mAzanAlarmStatus);
-                if (getCurrentTimeInSeconds() <= entry.getDhuhrEpoch())
-                    processRegularTiming(entry.getDhuhrEpoch(), entry.getDhuhrSilent(), AZAN_ALARM, mAzanAlarmStatus);
-                if (getCurrentTimeInSeconds() <= entry.getAsrEpoch())
-                    processRegularTiming(entry.getAsrEpoch(), entry.getAsrSilent(), AZAN_ALARM, mAzanAlarmStatus);
-                if (getCurrentTimeInSeconds() <= entry.getMaghribEpoch())
-                    processRegularTiming(entry.getMaghribEpoch(), entry.getMaghribSilent(), AZAN_ALARM, mAzanAlarmStatus);
-                if (getCurrentTimeInSeconds() <= entry.getIshaEpoch())
-                    processRegularTiming(entry.getIshaEpoch(), entry.getIshaSilent(), AZAN_ALARM, mAzanAlarmStatus);
-
-
-                if (!mAzanAlarmStatus.isAlarmActive() && !mNextDayAlarmActivated) {
-                    Log.d(TAG, "launching observer for the next day");
-                    mNextDayAlarmActivated = true;
+                if (!mCurrentAlarmStatus.isAlarmActive()) {
                     setObserverForRegularDay(lifecycleOwner, day.plusDays(ONE_DAY));
                 }
 
             }
         });
 
-
     }
 
-    private void processRegularTiming(Long timing, boolean isSilentFlagOn, int prayerId, AzanAlarmStatus alarmStatus) {
-        boolean timingIsOutdated = getCurrentTimeInSeconds() >= timing || alarmStatus.isAlarmActive() && timing < alarmStatus.getAlarmTiming();
-        boolean fridaysOnlyActive = mPrefHelper.getDndForFridaysOnly();
-        boolean timingIsGood2Go = !timingIsOutdated && isSilentFlagOn && !fridaysOnlyActive && !alarmStatus.isAlarmActive();
-        boolean timingToBeCanceled = alarmStatus.isAlarmActive() &&
-                (
-                        fridaysOnlyActive
-                                || timing < alarmStatus.getAlarmTiming()
-                                || !isSilentFlagOn
-                );
-        Log.d(TAG, "processRegularTiming: isSilentFlagOn before " + isSilentFlagOn);
+    private void processRegularTiming(ArrayList<SubEntry> timings) {
+        Collections.sort(timings);
 
-        if (timingIsGood2Go) {
-            setAlarmManager(timing, prayerId, true);
-            alarmStatus.setAlarmActive(true);
-            alarmStatus.setAlarmTiming(timing);
-            Log.d(TAG, "processRegularTiming: isSilentFlagOn " + isSilentFlagOn);
+        for (int i = 0; i < timings.size(); i++) {
+
+            if (
+//                    !timings.get(i).activeStatus ||
+                            timings.get(i).timing < getCurrentTimeInSeconds())
+                Log.d(TAG, "processRegularTiming: removing " + Converters.setTimeFromLong(timings.get(i).timing));
+                timings.remove(i);
         }
 
-        if (timingToBeCanceled) {
-            setAlarmManager(alarmStatus.getAlarmTiming(), prayerId, false);
-            alarmStatus.setAlarmActive(false);
-            Log.d(TAG, "processRegularTiming: isSilentFlagOn after " + isSilentFlagOn);
+//        for (SubEntry s: timings) {
+//            if (!s.activeStatus || s.timing < getCurrentTimeInSeconds())
+//                timings.remove(s);
+//        }
+
+//        mTimings = timings;
+
+
+        if (timings.size() > 0) {
+            SubEntry earliestSubEntry = timings.get(0);
+            Log.d(TAG, "processRegularTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing) + " " + Converters.getDateFromLong(earliestSubEntry.timing)
+                    + " activeStatus " + earliestSubEntry.activeStatus);
+        } else {
+            Log.d(TAG, "processRegularTiming: Opsy the array seems  empty");
         }
-        Log.d(TAG, "processRegularTiming: isSilentFlagOn after " + isSilentFlagOn);
+
+
+//        boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
+//
+//        if (!isFridaysOnlyActive && earliestSubEntry.activeStatus) {
+//            if (mCurrentAlarmStatus.isAlarmActive()) {
+//                if (mCurrentAlarmStatus.getAlarmTiming() == earliestSubEntry.timing) {
+//                    return;
+//                }
+//
+//                if (mCurrentAlarmStatus.getAlarmTiming() != earliestSubEntry.timing) {
+//                    setAlarmManager(mCurrentAlarmStatus.getAlarmTiming(), ALARM, false);
+//                    mCurrentAlarmStatus.setAlarmActive(false);
+//                }
+//            }
+//
+//            setAlarmManager(earliestSubEntry.timing, ALARM, true);
+//            mCurrentAlarmStatus.setAlarmActive(true);
+//            mCurrentAlarmStatus.setAlarmTiming(earliestSubEntry.timing);
+//        }
+
+        mCurrentAlarmStatus.setAlarmActive(true);
     }
-
-
 
     public void setAlarmManager(Long timing, int requestCode, boolean toBeActivated) {
         Intent intent = new Intent(mContext, ForegroundService.class);
@@ -139,10 +151,10 @@ public class DndHelper {
             mActivatedAlarmList.remove(timing * 1000);
             Log.d(TAG, "AlarmManager canceled on " + timing * 1000 + ": " + Converters.getDateFromLong(timing) + ", " + Converters.setTimeFromLong(timing));
         }
-        setNextAlarmTime();
+        updateNotificationContext();
     }
 
-    public void setNextAlarmTime() {
+    public void updateNotificationContext() {
         Collections.sort(mActivatedAlarmList);
         if (mActivatedAlarmList.size() > 0) {
             Date date = new Date(mActivatedAlarmList.get(0));
@@ -159,7 +171,6 @@ public class DndHelper {
         } else
             mNextAlarmTime.onNext("Next day");
     }
-
 
     @SuppressLint("CheckResult")
     public void turnDndOn() {
@@ -180,26 +191,43 @@ public class DndHelper {
         Log.d(TAG, "setRingerMode: UNSILENT");
     }
 
+    class SubEntry implements Comparable<SubEntry> {
+        final Long timing;
+        final Boolean activeStatus;
 
-
-    static class AzanAlarmStatus  {
-        private boolean alarmActive;
-        private long alarmTiming;
-
-        public boolean isAlarmActive() {
-            return alarmActive;
+        public SubEntry(Long timing, Boolean activeStatus) {
+            this.timing = timing;
+            this.activeStatus = activeStatus;
         }
 
-        public void setAlarmActive(boolean alarmActive) {
-            this.alarmActive = alarmActive;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            SubEntry subEntry = (SubEntry) o;
+
+            if (!timing.equals(subEntry.timing)) return false;
+            return activeStatus.equals(subEntry.activeStatus);
         }
 
-        public long getAlarmTiming() {
-            return alarmTiming;
+        @Override
+        public int hashCode() {
+            int result = timing.hashCode();
+            result = 31 * result + activeStatus.hashCode();
+            return result;
         }
 
-        public void setAlarmTiming(long alarmTiming) {
-            this.alarmTiming = alarmTiming;
+        @Override
+        public int compareTo(SubEntry subEntry) {
+            if (this.timing > subEntry.timing) {
+                return 1;
+            }
+            if (this.timing < subEntry.timing) {
+                return 0;
+            } else {
+                return -1;
+            }
         }
     }
 

@@ -67,7 +67,7 @@ public class PrefHelper {
         mEditor.putBoolean(LOCATION_STATUS, status).apply();
     }
 
-    public boolean getDndForFridaysOnly() {
+    public boolean isDndForFridaysOnly() {
         return mSharedPreferences.getBoolean(DND_FRIDAYS_ONLY, false);
     }
 

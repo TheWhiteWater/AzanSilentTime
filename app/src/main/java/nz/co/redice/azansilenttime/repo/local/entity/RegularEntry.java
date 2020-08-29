@@ -13,11 +13,11 @@ public class RegularEntry {
     @PrimaryKey
     private Long date;
 
-    private Boolean isFajrSilent = true;
-    private Boolean isDhuhrSilent = true;
-    private Boolean isAsrSilent = true;
-    private Boolean isMaghribSilent = true;
-    private Boolean isIshaSilent = true;
+    private boolean isFajrSilent = true;
+    private boolean isDhuhrSilent = true;
+    private boolean isAsrSilent = true;
+    private boolean isMaghribSilent = true;
+    private boolean isIshaSilent = true;
 
     private Long fajrEpoch;
     private Long dhuhrEpoch;

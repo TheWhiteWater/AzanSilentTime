@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
-        if (!mPrefHelper.getDndForFridaysOnly())
+        if (!mPrefHelper.isDndForFridaysOnly())
             mViewModel.selectNewRegularEntry(selectedDate);
         else
             mViewModel.selectNewFridayEntry(selectedDate);
