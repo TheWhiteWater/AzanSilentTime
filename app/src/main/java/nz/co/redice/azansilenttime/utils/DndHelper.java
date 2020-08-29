@@ -9,17 +9,15 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.util.Log;
 
-import androidx.lifecycle.LifecycleOwner;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,6 +25,7 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import io.reactivex.subjects.BehaviorSubject;
 import nz.co.redice.azansilenttime.repo.Repository;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.services.ForegroundService;
 import nz.co.redice.azansilenttime.view.presentation.Converters;
 
@@ -56,67 +55,52 @@ public class DndHelper {
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mNextAlarmTime = BehaviorSubject.create();
+        mTimings = new ArrayList<>();
     }
 
     private long getCurrentTimeInSeconds() {
-        return Calendar.getInstance().getTime().getTime() / 1000;
+        return System.currentTimeMillis() / 1000;
     }
 
 
-    public void setObserverForRegularDay(LifecycleOwner lifecycleOwner, LocalDate day) {
-        Long targetDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-        mTimings = new ArrayList<>();
+    @SuppressLint("CheckResult")
+    public void setObserverForRegularDay(LocalDate day) {
+        Long startDayEpoch = day.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        Long endDayEpoch = day.plusDays(ONE_DAY).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
 
-        mRepository.getSelectedRegularLiveData(targetDayEpoch).observe(lifecycleOwner, entry -> {
-            if (entry != null) {
-                mTimings.add(new SubEntry(entry.getFajrEpoch(), entry.getFajrSilent()));
-                mTimings.add(new SubEntry(entry.getDhuhrEpoch(), entry.getDhuhrSilent()));
-                mTimings.add(new SubEntry(entry.getAsrEpoch(), entry.getAsrSilent()));
-                mTimings.add(new SubEntry(entry.getMaghribEpoch(), entry.getMaghribSilent()));
-                mTimings.add(new SubEntry(entry.getIshaEpoch(), entry.getIshaSilent()));
-                processRegularTiming(mTimings);
-
-                if (!mCurrentAlarmStatus.isAlarmActive()) {
-                    setObserverForRegularDay(lifecycleOwner, day.plusDays(ONE_DAY));
-                }
-
-            }
-        });
+        mRepository.selectTwoDaysForAlarmSetting(startDayEpoch, endDayEpoch)
+                .subscribe(x -> {
+                    mTimings.clear();
+                    for (RegularEntry s : x) {
+                        mTimings.add(new SubEntry(s.getFajrEpoch(), s.getFajrSilent()));
+                        mTimings.add(new SubEntry(s.getDhuhrEpoch(), s.getDhuhrSilent()));
+                        mTimings.add(new SubEntry(s.getAsrEpoch(), s.getAsrSilent()));
+                        mTimings.add(new SubEntry(s.getMaghribEpoch(), s.getMaghribSilent()));
+                        mTimings.add(new SubEntry(s.getIshaEpoch(), s.getIshaSilent()));
+                    }
+                    processRegularTiming(mTimings);
+                });
 
     }
 
     private void processRegularTiming(ArrayList<SubEntry> timings) {
         Collections.sort(timings);
+        ArrayList<SubEntry> newList = mTimings.stream().sorted(SubEntry::compareTo)
+                .filter(subEntry -> (subEntry.timing > getCurrentTimeInSeconds()) && subEntry.activeStatus)
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        for (int i = 0; i < timings.size(); i++) {
-
-            if (
-//                    !timings.get(i).activeStatus ||
-                            timings.get(i).timing < getCurrentTimeInSeconds())
-                Log.d(TAG, "processRegularTiming: removing " + Converters.setTimeFromLong(timings.get(i).timing));
-                timings.remove(i);
-        }
-
-//        for (SubEntry s: timings) {
-//            if (!s.activeStatus || s.timing < getCurrentTimeInSeconds())
-//                timings.remove(s);
-//        }
-
-//        mTimings = timings;
-
-
-        if (timings.size() > 0) {
-            SubEntry earliestSubEntry = timings.get(0);
+        SubEntry earliestSubEntry = null;
+        if (newList.size() > 0) {
+            earliestSubEntry = newList.get(0);
             Log.d(TAG, "processRegularTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing) + " " + Converters.getDateFromLong(earliestSubEntry.timing)
                     + " activeStatus " + earliestSubEntry.activeStatus);
-        } else {
-            Log.d(TAG, "processRegularTiming: Opsy the array seems  empty");
         }
 
 
-//        boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
-//
-//        if (!isFridaysOnlyActive && earliestSubEntry.activeStatus) {
+        boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
+
+        if (!isFridaysOnlyActive && earliestSubEntry != null) {
+//                && earliestSubEntry.activeStatus) {
 //            if (mCurrentAlarmStatus.isAlarmActive()) {
 //                if (mCurrentAlarmStatus.getAlarmTiming() == earliestSubEntry.timing) {
 //                    return;
@@ -127,13 +111,11 @@ public class DndHelper {
 //                    mCurrentAlarmStatus.setAlarmActive(false);
 //                }
 //            }
-//
-//            setAlarmManager(earliestSubEntry.timing, ALARM, true);
-//            mCurrentAlarmStatus.setAlarmActive(true);
-//            mCurrentAlarmStatus.setAlarmTiming(earliestSubEntry.timing);
-//        }
 
-        mCurrentAlarmStatus.setAlarmActive(true);
+            setAlarmManager(earliestSubEntry.timing, ALARM, true);
+            mCurrentAlarmStatus.setAlarmActive(true);
+            mCurrentAlarmStatus.setAlarmTiming(earliestSubEntry.timing);
+        }
     }
 
     public void setAlarmManager(Long timing, int requestCode, boolean toBeActivated) {
@@ -222,11 +204,10 @@ public class DndHelper {
         public int compareTo(SubEntry subEntry) {
             if (this.timing > subEntry.timing) {
                 return 1;
-            }
-            if (this.timing < subEntry.timing) {
-                return 0;
-            } else {
+            } else if (this.timing < subEntry.timing) {
                 return -1;
+            } else {
+                return 0;
             }
         }
     }
