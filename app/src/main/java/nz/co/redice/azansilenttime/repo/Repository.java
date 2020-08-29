@@ -1,9 +1,10 @@
 package nz.co.redice.azansilenttime.repo;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -14,7 +15,6 @@ import nz.co.redice.azansilenttime.repo.local.EventDao;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.repo.remote.AzanService;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
 
 public class Repository {
 
@@ -79,6 +79,10 @@ public class Repository {
 
     public LiveData<FridayEntry> getSelectedFridayLiveData(Long value) {
         return mDao.getSelectedFridayLiveData(value);
+    }
+
+    public Observable<List<RegularEntry>> selectTwoDaysForAlarmSetting(Long startDate, Long endDate) {
+        return mDao.getTwoDaysForAlarmSetting(startDate, endDate);
     }
 
 }

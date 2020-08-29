@@ -100,17 +100,16 @@ public class DndHelper {
         boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
 
         if (!isFridaysOnlyActive && earliestSubEntry != null) {
-//                && earliestSubEntry.activeStatus) {
-//            if (mCurrentAlarmStatus.isAlarmActive()) {
-//                if (mCurrentAlarmStatus.getAlarmTiming() == earliestSubEntry.timing) {
-//                    return;
-//                }
-//
-//                if (mCurrentAlarmStatus.getAlarmTiming() != earliestSubEntry.timing) {
-//                    setAlarmManager(mCurrentAlarmStatus.getAlarmTiming(), ALARM, false);
-//                    mCurrentAlarmStatus.setAlarmActive(false);
-//                }
-//            }
+            if (mCurrentAlarmStatus.isAlarmActive()) {
+                if (mCurrentAlarmStatus.getAlarmTiming() == earliestSubEntry.timing) {
+                    return;
+                }
+
+                if (mCurrentAlarmStatus.getAlarmTiming() != earliestSubEntry.timing) {
+                    setAlarmManager(mCurrentAlarmStatus.getAlarmTiming(), ALARM, false);
+                    mCurrentAlarmStatus.setAlarmActive(false);
+                }
+            }
 
             setAlarmManager(earliestSubEntry.timing, ALARM, true);
             mCurrentAlarmStatus.setAlarmActive(true);

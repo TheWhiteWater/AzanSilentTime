@@ -1,13 +1,17 @@
 package nz.co.redice.azansilenttime.repo.local;
 
 
+import androidx.databinding.ObservableList;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.util.List;
+
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
@@ -44,5 +48,12 @@ public interface EventDao {
 
     @Query("DELETE FROM regular_table")
     void deleteCalendar();
+
+    @Query("SELECT * FROM regular_table WHERE date BETWEEN :startDate AND :endDate" )
+    Observable<List<RegularEntry>> getTwoDaysForAlarmSetting(Long startDate, Long endDate);
+
+
+
+
 
 }

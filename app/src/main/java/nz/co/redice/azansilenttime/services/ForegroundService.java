@@ -35,7 +35,7 @@ import static nz.co.redice.azansilenttime.utils.DndHelper.DND_ON;
 import static nz.co.redice.azansilenttime.utils.NotificationHelper.QUIT_APP;
 
 @AndroidEntryPoint
-public class ForegroundService extends JobIntentService implements LifecycleOwner, SharedPreferences.OnSharedPreferenceChangeListener {
+public class ForegroundService extends JobIntentService implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "App Service";
 
@@ -44,7 +44,6 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
     @Inject PrefHelper mPrefHelper;
     @Inject DndHelper mDndHelper;
     @Inject NotificationHelper mNotificationHelper;
-    private LifecycleRegistry lifecycleRegistry;
     private NotificationManager mNotificationManager;
 
     private boolean mChangingConfiguration = false;
@@ -57,8 +56,6 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
-
-        lifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
 
         mPrefHelper.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
@@ -91,7 +88,7 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-        mDndHelper.setObserverForRegularDay(this, LocalDate.now());
+        mDndHelper.setObserverForRegularDay(LocalDate.now());
 //        mDndHelper.setObserverForNextFriday(this, LocalDate.now());
     }
 
@@ -128,29 +125,11 @@ public class ForegroundService extends JobIntentService implements LifecycleOwne
         return true;
     }
 
-    @NonNull
-    @Override
-    public Lifecycle getLifecycle() {
-        return lifecycleRegistry;
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
-
-    }
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
 
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        lifecycleRegistry = new LifecycleRegistry(this);
-        lifecycleRegistry.setCurrentState(Lifecycle.State.CREATED);
     }
 
     @Override
