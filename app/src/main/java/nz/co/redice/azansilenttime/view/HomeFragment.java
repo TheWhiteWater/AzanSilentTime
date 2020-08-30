@@ -94,12 +94,12 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         setLayoutWidgets();
 
-        if (mSharedPreferencesHelper.isRegularTableShouldBePopulated())
+        if (mSharedPreferencesHelper.isRegularTableToBePopulated())
             mViewModel.populateRegularTable();
         else
             mViewModel.selectNewRegularEntry(LocalDate.now());
 
-        if (mSharedPreferencesHelper.isFridayTableShouldBePopulated())
+        if (mSharedPreferencesHelper.isFridayTableToBePopulated())
             mViewModel.populateFridayTable();
         else
             mViewModel.selectNewFridayEntry(LocalDate.now());

@@ -119,7 +119,7 @@ public class HomeViewModel extends AndroidViewModel {
                 .map(Day::toEntry)
                 .doOnComplete(() -> {
                     selectNewRegularEntry(LocalDate.now());
-                    mSharedPreferencesHelper.setRegularTableShouldBePopulated(false);
+                    mSharedPreferencesHelper.setRegularTableToBePopulated(false);
                 })
                 .subscribe(s ->mRepository.insertRegularEntry(s));
 
@@ -139,7 +139,7 @@ public class HomeViewModel extends AndroidViewModel {
             Log.d(TAG, "populateFridayTable: " + fridayEntry.getDateString());
             mRepository.insertFridayEntry(fridayEntry);
         }
-        mSharedPreferencesHelper.setFridayTableShouldBePopulated(false);
+        mSharedPreferencesHelper.setFridayTableToBePopulated(false);
         selectNewFridayEntry(LocalDate.now());
     }
 

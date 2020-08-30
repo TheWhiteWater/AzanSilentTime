@@ -59,6 +59,8 @@ public class SharedPreferencesHelper {
         mEditor.putFloat(LATITUDE, longitude).apply();
     }
 
+
+
     public boolean getLocationStatus() {
         return mSharedPreferences.getBoolean(LOCATION_STATUS, false);
     }
@@ -66,6 +68,8 @@ public class SharedPreferencesHelper {
     public void setLocationStatus(Boolean status) {
         mEditor.putBoolean(LOCATION_STATUS, status).apply();
     }
+
+
 
     public boolean isDndForFridaysOnly() {
         return mSharedPreferences.getBoolean(DND_FRIDAYS_ONLY, false);
@@ -75,28 +79,29 @@ public class SharedPreferencesHelper {
         mEditor.putBoolean(DND_FRIDAYS_ONLY, b).apply();
     }
 
+
+
     public String getLocationText() {
         return mSharedPreferences.getString(LOCATION_TEXT, "XXX");
     }
 
     public void setLocationText(String addressText) {
         mEditor.putString(LOCATION_TEXT, addressText).apply();
-
     }
 
-    public Boolean isRegularTableShouldBePopulated() {
+    public Boolean isRegularTableToBePopulated() {
         return mSharedPreferences.getBoolean(REGULAR_TABLE_UPDATE_STATUS, false);
     }
 
-    public void setRegularTableShouldBePopulated(Boolean status) {
+    public void setRegularTableToBePopulated(Boolean status) {
         mEditor.putBoolean(REGULAR_TABLE_UPDATE_STATUS, status).apply();
     }
 
-    public Boolean isFridayTableShouldBePopulated() {
+    public Boolean isFridayTableToBePopulated() {
         return mSharedPreferences.getBoolean(FRIDAY_TABLE_UPDATE_STATUS, false);
     }
 
-    public void setFridayTableShouldBePopulated(Boolean status) {
+    public void setFridayTableToBePopulated(Boolean status) {
         mEditor.putBoolean(FRIDAY_TABLE_UPDATE_STATUS, status).apply();
     }
 

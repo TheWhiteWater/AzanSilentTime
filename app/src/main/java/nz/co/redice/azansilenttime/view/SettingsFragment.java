@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             public void handleOnBackPressed() {
                 if (isDatabaseUpdateRequired) {
                     mRepository.deletePrayerCalendar();
-                    mSharedPreferencesHelper.setRegularTableShouldBePopulated(true);
+                    mSharedPreferencesHelper.setRegularTableToBePopulated(true);
                 }
                 getBackToHomeScreen();
             }

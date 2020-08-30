@@ -124,8 +124,8 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
             default:
                 mViewModel.saveLocationInPrefs();
                 mViewModel.removeLocationRequest();
-                mSharedPreferencesHelper.setRegularTableShouldBePopulated(true);
-                mSharedPreferencesHelper.setFridayTableShouldBePopulated(true);
+                mSharedPreferencesHelper.setRegularTableToBePopulated(true);
+                mSharedPreferencesHelper.setFridayTableToBePopulated(true);
                 NavHostFragment.findNavController(this).navigate(R.id.fromLocationToHome);
                 break;
         }
