@@ -21,12 +21,12 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.repo.Repository;
-import nz.co.redice.azansilenttime.utils.DndHelper;
+import nz.co.redice.azansilenttime.utils.AlarmManagerHelper;
 import nz.co.redice.azansilenttime.utils.NotificationHelper;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
-import static nz.co.redice.azansilenttime.utils.DndHelper.DND_OFF;
-import static nz.co.redice.azansilenttime.utils.DndHelper.DND_ON;
+import static nz.co.redice.azansilenttime.utils.AlarmManagerHelper.DND_OFF;
+import static nz.co.redice.azansilenttime.utils.AlarmManagerHelper.DND_ON;
 import static nz.co.redice.azansilenttime.utils.NotificationHelper.QUIT_APP;
 
 @AndroidEntryPoint
@@ -37,7 +37,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
     private final IBinder mBinder = new LocalBinder();
     @Inject Repository mRepository;
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
-    @Inject DndHelper mDndHelper;
+    @Inject AlarmManagerHelper mAlarmManagerHelper;
     @Inject NotificationHelper mNotificationHelper;
     private NotificationManager mNotificationManager;
 
@@ -60,17 +60,17 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
                     stopSelf();
                     break;
                 case DND_ON:
-                    mDndHelper.turnDndOn();
+                    mAlarmManagerHelper.turnDndOn();
                     break;
                 case DND_OFF:
-                    mDndHelper.turnDndOff();
+                    mAlarmManagerHelper.turnDndOff();
                     break;
             }
 
         startObservingAlarmTimings();
 
 
-        mDndHelper.mNextAlarmTime.subscribe(s -> {
+        mAlarmManagerHelper.mNextAlarmTime.subscribe(s -> {
             mNotificationHelper.mNotificationBuilder.setContentText(s);
             mNotificationManager.notify(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
         });
@@ -84,9 +84,9 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
         if (!mSharedPreferencesHelper.isDndForFridaysOnly())
-            mDndHelper.setObserverForRegularDay(LocalDate.now());
+            mAlarmManagerHelper.setObserverForRegularDay(LocalDate.now());
         else
-            mDndHelper.setObserverForNextFriday(LocalDate.now());
+            mAlarmManagerHelper.setObserverForNextFriday(LocalDate.now());
     }
 
     @Override

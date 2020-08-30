@@ -18,7 +18,6 @@ public class ServiceHelper {
 
     private ForegroundService mService = null;
     private boolean isBound = false;
-    private Context mContext;
     private boolean mShouldUnbind;
 
 
@@ -38,7 +37,6 @@ public class ServiceHelper {
 
     @Inject
     public ServiceHelper(@ApplicationContext Context context) {
-        mContext = context;
     }
 
     public void startService(Context context) {

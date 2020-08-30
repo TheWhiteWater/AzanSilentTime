@@ -29,13 +29,11 @@ public class SharedPreferencesHelper {
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private Context mContext;
 
     @SuppressLint("CommitPrefEdits")
     @Inject
     public SharedPreferencesHelper(@ApplicationContext Context context) {
-        mContext = context;
-        mSharedPreferences = mContext.getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+        mSharedPreferences = context.getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
     }
 
@@ -59,8 +57,6 @@ public class SharedPreferencesHelper {
         mEditor.putFloat(LATITUDE, longitude).apply();
     }
 
-
-
     public boolean getLocationStatus() {
         return mSharedPreferences.getBoolean(LOCATION_STATUS, false);
     }
@@ -69,8 +65,6 @@ public class SharedPreferencesHelper {
         mEditor.putBoolean(LOCATION_STATUS, status).apply();
     }
 
-
-
     public boolean isDndForFridaysOnly() {
         return mSharedPreferences.getBoolean(DND_FRIDAYS_ONLY, false);
     }
@@ -78,8 +72,6 @@ public class SharedPreferencesHelper {
     public void setDndForFridaysOnly(boolean b) {
         mEditor.putBoolean(DND_FRIDAYS_ONLY, b).apply();
     }
-
-
 
     public String getLocationText() {
         return mSharedPreferences.getString(LOCATION_TEXT, "XXX");
@@ -122,7 +114,6 @@ public class SharedPreferencesHelper {
         mEditor.putInt(CALCULATION_SCHOOL, Integer.parseInt(value)).apply();
     }
 
-
     public int getCalculationMethod() {
         return mSharedPreferences.getInt(CALCULATION_METHOD, 4);
     }
@@ -130,8 +121,6 @@ public class SharedPreferencesHelper {
     public void setCalculationMethod(String value) {
         mEditor.putInt(CALCULATION_METHOD, Integer.parseInt(value)).apply();
     }
-
-
 
     public int getMidnightMode() {
         return mSharedPreferences.getInt(MIDNIGHT_MODE, 0);

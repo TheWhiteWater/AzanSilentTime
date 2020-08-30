@@ -25,7 +25,7 @@ public class NotificationHelper {
     // The identifier for the notification displayed for the foreground service.
     public static final int NOTIFICATION_ID = 12345678;
     private static final String FOREGROUND_CHANNEL_ID = "channelId";
-    @Inject DndHelper mDndHelper;
+    @Inject AlarmManagerHelper mAlarmManagerHelper;
 
     private PendingIntent activityPendingIntent;
     private PendingIntent servicePendingIntent;

@@ -34,7 +34,7 @@ import nz.co.redice.azansilenttime.services.ForegroundService;
 import nz.co.redice.azansilenttime.view.presentation.Converters;
 
 @Singleton
-public class DndHelper {
+public class AlarmManagerHelper {
 
     public static final String DND_ON = "dnd_on";
     public static final String DND_OFF = "dnd_off";
@@ -55,7 +55,7 @@ public class DndHelper {
 
 
     @Inject
-    public DndHelper(@ApplicationContext Context context) {
+    public AlarmManagerHelper(@ApplicationContext Context context) {
         mContext = context;
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
@@ -198,7 +198,6 @@ public class DndHelper {
             mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(timing * 1000, null), dndOnIntent);
             if (!mActivatedAlarmList.contains(timing * 1000))
                 mActivatedAlarmList.add(timing * 1000);
-
             Log.d(TAG, "AlarmManager activated on " + timing * 1000 + ": " + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
         } else {
             mAlarmManager.cancel(dndOnIntent);
