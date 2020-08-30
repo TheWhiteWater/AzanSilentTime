@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
@@ -42,7 +43,7 @@ public class DndHelper {
     private static final int FRIDAY_ALARM = 321;
     private static final long ONE_DAY = 1;
     public BehaviorSubject<String> mNextAlarmTime;
-    @Inject PrefHelper mPrefHelper;
+    @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     @Inject Repository mRepository;
     @Inject AlarmStatus mCurrentAlarmCash;
     private ArrayList<Long> mActivatedAlarmList = new ArrayList<>();
@@ -74,15 +75,18 @@ public class DndHelper {
 
         mRepository.selectTwoDaysForAlarmSetting(startDayEpoch, endDayEpoch)
                 .subscribe(x -> {
-                        mTimings.clear();
-                        for (RegularEntry s : x) {
-                            mTimings.add(new SubEntry(s.getFajrEpoch(), s.getFajrSilent()));
-                            mTimings.add(new SubEntry(s.getDhuhrEpoch(), s.getDhuhrSilent()));
-                            mTimings.add(new SubEntry(s.getAsrEpoch(), s.getAsrSilent()));
-                            mTimings.add(new SubEntry(s.getMaghribEpoch(), s.getMaghribSilent()));
-                            mTimings.add(new SubEntry(s.getIshaEpoch(), s.getIshaSilent()));
-                        }
-                        processRegularTiming(mTimings);
+                    mTimings.clear();
+                    for (RegularEntry s : x) {
+                        mTimings.add(new SubEntry(s.getFajrEpoch(), s.getFajrSilent()));
+                        mTimings.add(new SubEntry(s.getDhuhrEpoch(), s.getDhuhrSilent()));
+                        mTimings.add(new SubEntry(s.getAsrEpoch(), s.getAsrSilent()));
+                        mTimings.add(new SubEntry(s.getMaghribEpoch(), s.getMaghribSilent()));
+                        mTimings.add(new SubEntry(s.getIshaEpoch(), s.getIshaSilent()));
+                    }
+                    processRegularTiming(mTimings);
+                }, e -> {
+                    Log.d(TAG, "setObserverForRegularDay: " + e.getMessage());
+                    Log.d(TAG, "setObserverForRegularDay: " + Arrays.toString(e.getStackTrace()));
                 });
 
     }
@@ -96,12 +100,12 @@ public class DndHelper {
         SubEntry earliestSubEntry = null;
         if (newList.size() > 0) {
             earliestSubEntry = newList.get(0);
-            Log.d(TAG, "processRegularTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing)
-                    + " " + Converters.getDateFromLong(earliestSubEntry.timing));
+            Log.d(TAG, "processRegularTiming: earliest timing is " + Converters.convertEpochIntoTextTime(earliestSubEntry.timing)
+                    + " " + Converters.convertEpochIntoTextDate(earliestSubEntry.timing));
         }
 
 
-        boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
+        boolean isFridaysOnlyActive = mSharedPreferencesHelper.isDndForFridaysOnly();
 
         if (!isFridaysOnlyActive && earliestSubEntry != null) {
             if (mCurrentAlarmCash.isAlarmActive()) {
@@ -136,11 +140,14 @@ public class DndHelper {
 
         mRepository.selectTwoFridaysForAlarmSetting(startDayEpoch, endDayEpoch)
                 .subscribe(x -> {
-                        mTimings.clear();
-                        for (FridayEntry s : x) {
-                            mTimings.add(new SubEntry(s.getTimeEpoch(), s.getSilent()));
-                        }
-                        processFridayTiming(mTimings);
+                    mTimings.clear();
+                    for (FridayEntry s : x) {
+                        mTimings.add(new SubEntry(s.getTimeEpoch(), s.getSilent()));
+                    }
+                    processFridayTiming(mTimings);
+                }, e -> {
+                    Log.d(TAG, "setObserverForRegularDay: " + e.getMessage());
+                    Log.d(TAG, "setObserverForRegularDay: " + Arrays.toString(e.getStackTrace()));
                 });
     }
 
@@ -153,12 +160,12 @@ public class DndHelper {
         SubEntry earliestSubEntry = null;
         if (newList.size() > 0) {
             earliestSubEntry = newList.get(0);
-            Log.d(TAG, "processFRIDAYTiming: earliest timing is " + Converters.setTimeFromLong(earliestSubEntry.timing)
-                    + " " + Converters.getDateFromLong(earliestSubEntry.timing));
+            Log.d(TAG, "processFRIDAYTiming: earliest timing is " + Converters.convertEpochIntoTextTime(earliestSubEntry.timing)
+                    + " " + Converters.convertEpochIntoTextDate(earliestSubEntry.timing));
         }
 
 
-        boolean isFridaysOnlyActive = mPrefHelper.isDndForFridaysOnly();
+        boolean isFridaysOnlyActive = mSharedPreferencesHelper.isDndForFridaysOnly();
 
         if (isFridaysOnlyActive && earliestSubEntry != null) {
             if (mCurrentAlarmCash.isAlarmActive()) {
@@ -192,11 +199,11 @@ public class DndHelper {
             if (!mActivatedAlarmList.contains(timing * 1000))
                 mActivatedAlarmList.add(timing * 1000);
 
-            Log.d(TAG, "AlarmManager activated on " + timing * 1000 + ": " + Converters.getDateFromLong(timing) + ", " + Converters.setTimeFromLong(timing));
+            Log.d(TAG, "AlarmManager activated on " + timing * 1000 + ": " + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
         } else {
             mAlarmManager.cancel(dndOnIntent);
             mActivatedAlarmList.remove(timing * 1000);
-            Log.d(TAG, "AlarmManager canceled on " + timing * 1000 + ": " + Converters.getDateFromLong(timing) + ", " + Converters.setTimeFromLong(timing));
+            Log.d(TAG, "AlarmManager canceled on " + timing * 1000 + ": " + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
         }
         updateNotificationContext();
     }
@@ -207,7 +214,7 @@ public class DndHelper {
             Date date = new Date(mActivatedAlarmList.get(0));
 
             LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mPrefHelper.getDndPeriod());
+            LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mSharedPreferencesHelper.getDndPeriod());
 
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
             DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
@@ -230,7 +237,7 @@ public class DndHelper {
         intent.setAction(DND_OFF);
         PendingIntent dndOffIntent = PendingIntent.getService(mContext, 999, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long delayTime = (getCurrentTimeInSeconds() * 1000) + (mPrefHelper.getDndPeriod() * 60 * 1000);
+        long delayTime = (getCurrentTimeInSeconds() * 1000) + (mSharedPreferencesHelper.getDndPeriod() * 60 * 1000);
         mAlarmManager.setExact(AlarmManager.RTC, delayTime, dndOffIntent);
     }
 

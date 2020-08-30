@@ -21,12 +21,12 @@ public class Day {
 
     public RegularEntry toEntry() {
         return new RegularEntry(
-                Converters.getLocalDateIntoLong(date.gregorian.date),
-                Converters.getLocalTimeIntoLong(date.gregorian.date, timings.fajr),
-                Converters.getLocalTimeIntoLong(date.gregorian.date, timings.dhuhr),
-                Converters.getLocalTimeIntoLong(date.gregorian.date, timings.asr),
-                Converters.getLocalTimeIntoLong(date.gregorian.date, timings.maghrib),
-                Converters.getLocalTimeIntoLong(date.gregorian.date, timings.isha)
+                Converters.convertTextDateIntoEpoch(date.gregorian.date),
+                Converters.convertTextDateAndTextTimeIntoEpoch(date.gregorian.date, timings.fajr),
+                Converters.convertTextDateAndTextTimeIntoEpoch(date.gregorian.date, timings.dhuhr),
+                Converters.convertTextDateAndTextTimeIntoEpoch(date.gregorian.date, timings.asr),
+                Converters.convertTextDateAndTextTimeIntoEpoch(date.gregorian.date, timings.maghrib),
+                Converters.convertTextDateAndTextTimeIntoEpoch(date.gregorian.date, timings.isha)
         );
     }
 }

@@ -16,25 +16,16 @@ import androidx.lifecycle.SavedStateHandle;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Calendar;
-
-import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.Repository;
-import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
 public class LocationViewModel extends AndroidViewModel {
 
     private static final String TAG = "App LocationViewModel";
     private final SavedStateHandle savedStateHandle;
     private LocationHelper mLocationHelper;
-    private PrefHelper mPrefHelper;
+    private SharedPreferencesHelper mSharedPreferencesHelper;
     private Repository mRepository;
 
     private Location mLocation;
@@ -48,11 +39,11 @@ public class LocationViewModel extends AndroidViewModel {
     @ViewModelInject
     public LocationViewModel(@NonNull Application application, LocationHelper locationHelper,
                              Repository repository,
-                             @Assisted SavedStateHandle savedStateHandle, PrefHelper prefHelper) {
+                             @Assisted SavedStateHandle savedStateHandle, SharedPreferencesHelper sharedPreferencesHelper) {
         super(application);
         this.savedStateHandle = savedStateHandle;
         mLocationHelper = locationHelper;
-        mPrefHelper = prefHelper;
+        mSharedPreferencesHelper = sharedPreferencesHelper;
         mRepository = repository;
 
 
@@ -86,10 +77,10 @@ public class LocationViewModel extends AndroidViewModel {
 
 
     public void saveLocationInPrefs() {
-        mPrefHelper.setLocationStatus(true);
-        mPrefHelper.setLocationText(position.getValue());
-        mPrefHelper.setLatitude((float) mLocation.getLatitude());
-        mPrefHelper.setLongitude((float) mLocation.getLongitude());
+        mSharedPreferencesHelper.setLocationStatus(true);
+        mSharedPreferencesHelper.setLocationText(position.getValue());
+        mSharedPreferencesHelper.setLatitude((float) mLocation.getLatitude());
+        mSharedPreferencesHelper.setLongitude((float) mLocation.getLongitude());
     }
 
 

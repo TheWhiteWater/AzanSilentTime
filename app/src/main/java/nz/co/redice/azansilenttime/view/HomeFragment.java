@@ -34,7 +34,7 @@ import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.FragmentHomeBinding;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.view.presentation.DatePickerFragment;
 import nz.co.redice.azansilenttime.view.presentation.TimePickerFragment;
 import nz.co.redice.azansilenttime.viewmodel.HomeViewModel;
@@ -44,7 +44,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private static final String TAG = "App HomeFragment";
 
-    @Inject PrefHelper mPrefHelper;
+    @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     private HomeViewModel mViewModel;
     private FragmentHomeBinding mViewBinding;
     private RegularEntry mRegularEntry;
@@ -94,12 +94,12 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         setLayoutWidgets();
 
-        if (mPrefHelper.isRegularTableShouldBePopulated())
+        if (mSharedPreferencesHelper.isRegularTableShouldBePopulated())
             mViewModel.populateRegularTable();
         else
             mViewModel.selectNewRegularEntry(LocalDate.now());
 
-        if (mPrefHelper.isFridayTableShouldBePopulated())
+        if (mSharedPreferencesHelper.isFridayTableShouldBePopulated())
             mViewModel.populateFridayTable();
         else
             mViewModel.selectNewFridayEntry(LocalDate.now());
@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private void setLayoutWidgets() {
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-        mViewBinding.setPrefs(mPrefHelper);
+        mViewBinding.setPrefs(mSharedPreferencesHelper);
         mViewBinding.checkbox.setOnCheckedChangeListener(this);
 
         //setting date picker
@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
-        if (!mPrefHelper.isDndForFridaysOnly())
+        if (!mSharedPreferencesHelper.isDndForFridaysOnly())
             mViewModel.selectNewRegularEntry(selectedDate);
         else
             mViewModel.selectNewFridayEntry(selectedDate);
@@ -243,7 +243,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 mViewBinding.invalidateAll();
                 break;
             case R.id.checkbox:
-                mPrefHelper.setDndForFridaysOnly(isChecked);
+                mSharedPreferencesHelper.setDndForFridaysOnly(isChecked);
                 mViewBinding.invalidateAll();
                 break;
         }

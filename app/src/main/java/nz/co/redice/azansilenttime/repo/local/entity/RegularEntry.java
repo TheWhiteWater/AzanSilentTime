@@ -128,31 +128,27 @@ public class RegularEntry {
     }
 
     public String getFajrTimeText() {
-        return Converters.setTimeFromLong(fajrEpoch);
+        return Converters.convertEpochIntoTextTime(fajrEpoch);
     }
 
     public String getDhuhrTimeText() {
-        return Converters.setTimeFromLong(dhuhrEpoch);
+        return Converters.convertEpochIntoTextTime(dhuhrEpoch);
     }
 
     public String getAsrTimeText() {
-        return Converters.setTimeFromLong(asrEpoch);
+        return Converters.convertEpochIntoTextTime(asrEpoch);
     }
 
     public String getMaghribTimeText() {
-        return Converters.setTimeFromLong(maghribEpoch);
+        return Converters.convertEpochIntoTextTime(maghribEpoch);
     }
 
     public String getIshaTimeText() {
-        return Converters.setTimeFromLong(ishaEpoch);
+        return Converters.convertEpochIntoTextTime(ishaEpoch);
     }
 
     public String getDateText() {
-        return Converters.getDateFromLong(date);
-    }
-
-    public String getDayOfTheWeekString() {
-        return Converters.setDayOfTheWeekFromLong(date);
+        return Converters.convertEpochIntoTextDate(date);
     }
 
 }

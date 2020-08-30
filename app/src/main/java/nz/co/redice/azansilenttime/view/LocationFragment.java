@@ -29,7 +29,7 @@ import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.FragmentLocationBinding;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
 import nz.co.redice.azansilenttime.utils.PermissionHelper;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.viewmodel.LocationViewModel;
 
 @AndroidEntryPoint
@@ -37,7 +37,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 34;
     @Inject PermissionHelper mPermissionHelper;
-    @Inject PrefHelper mPrefHelper;
+    @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     @Inject LocationHelper mLocationHelper;
     private FragmentLocationBinding mViewBinding;
     private LocationViewModel mViewModel;
@@ -60,7 +60,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         // Check that the user hasn't revoked permissions by going to Settings.
-        if (!mPrefHelper.getLocationStatus()) {
+        if (!mSharedPreferencesHelper.getLocationStatus()) {
             if (!mPermissionHelper.isLocationPermissionGranted()) {
                 requestLocationPermissions();
             }
@@ -98,7 +98,7 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                     .setAction(R.string.ok, view -> {
                         // Request permission
                         ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-                        mPrefHelper.setLocationStatus(true);
+                        mSharedPreferencesHelper.setLocationStatus(true);
                     }).show();
         } else {
             Log.i("App", "Requesting permission");
@@ -124,8 +124,8 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
             default:
                 mViewModel.saveLocationInPrefs();
                 mViewModel.removeLocationRequest();
-                mPrefHelper.setRegularTableShouldBePopulated(true);
-                mPrefHelper.setFridayTableShouldBePopulated(true);
+                mSharedPreferencesHelper.setRegularTableShouldBePopulated(true);
+                mSharedPreferencesHelper.setFridayTableShouldBePopulated(true);
                 NavHostFragment.findNavController(this).navigate(R.id.fromLocationToHome);
                 break;
         }

@@ -58,19 +58,13 @@ public class FridayEntry {
     }
 
     public String getTimeText() {
-        return Converters.setTimeFromLong(timeEpoch);
+        return Converters.convertEpochIntoTextTime(timeEpoch);
     }
 
 
     public String getDateString() {
-        return Converters.getDateFromLong(date);
+        return Converters.convertEpochIntoTextDate(date);
     }
-
-    public String getDayOfTheWeekString() {
-        return Converters.setDayOfTheWeekFromLong(date);
-    }
-
-
 
     public String getBlank() {
         return blank;

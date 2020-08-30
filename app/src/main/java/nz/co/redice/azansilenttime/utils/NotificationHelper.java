@@ -69,7 +69,7 @@ public class NotificationHelper {
                 .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
                 .setContentTitle("Next Mute period:")
                 .setContentText("Not set yet")
-                .setSmallIcon(R.drawable.ic_black_24);
+                .setSmallIcon(R.drawable.ic_blc_small);
     }
 
 

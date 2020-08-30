@@ -7,11 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -21,11 +19,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.R;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
 @AndroidEntryPoint
 public class SplashFragment extends Fragment {
-    @Inject PrefHelper mPrefHelper;
+    @Inject SharedPreferencesHelper mSharedPreferencesHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +47,7 @@ public class SplashFragment extends Fragment {
     }
 
     private void shiftToNextScreen() {
-        if (!mPrefHelper.getLocationStatus()) {
+        if (!mSharedPreferencesHelper.getLocationStatus()) {
             NavHostFragment.findNavController(this).navigate(R.id.fromSplashToLocation);
         } else {
             NavHostFragment.findNavController(this).navigate(R.id.fromSplashScreenToHome);

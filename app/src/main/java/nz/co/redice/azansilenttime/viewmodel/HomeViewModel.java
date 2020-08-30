@@ -25,7 +25,7 @@ import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
 import nz.co.redice.azansilenttime.repo.remote.models.Day;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
 public class HomeViewModel extends AndroidViewModel {
 
@@ -35,18 +35,18 @@ public class HomeViewModel extends AndroidViewModel {
     private MutableLiveData<FridayEntry> mFridayEntry = new MutableLiveData<>();
 
     private Repository mRepository;
-    private PrefHelper mPrefHelper;
+    private SharedPreferencesHelper mSharedPreferencesHelper;
 
 
     @SuppressLint("CheckResult")
     @ViewModelInject
     public HomeViewModel(@NonNull Application application,
-                         Repository repository, PrefHelper prefHelper,
+                         Repository repository, SharedPreferencesHelper sharedPreferencesHelper,
                          @Assisted SavedStateHandle savedStateHandle) {
         super(application);
         mRepository = repository;
         this.savedStateHandle = savedStateHandle;
-        mPrefHelper = prefHelper;
+        mSharedPreferencesHelper = sharedPreferencesHelper;
 
     }
 
@@ -106,11 +106,11 @@ public class HomeViewModel extends AndroidViewModel {
     @SuppressLint("CheckResult")
     public void populateRegularTable() {
         mRepository.getAzanService().requestRegularCalendar(
-                mPrefHelper.getLatitude(),
-                mPrefHelper.getLongitude(),
-                mPrefHelper.getCalculationMethod(),
-                mPrefHelper.getCalculationSchool(),
-                mPrefHelper.getMidnightMode(),
+                mSharedPreferencesHelper.getLatitude(),
+                mSharedPreferencesHelper.getLongitude(),
+                mSharedPreferencesHelper.getCalculationMethod(),
+                mSharedPreferencesHelper.getCalculationSchool(),
+                mSharedPreferencesHelper.getMidnightMode(),
                 Calendar.getInstance().get(Calendar.YEAR),
                 true)
                 .subscribeOn(Schedulers.io())
@@ -119,7 +119,7 @@ public class HomeViewModel extends AndroidViewModel {
                 .map(Day::toEntry)
                 .doOnComplete(() -> {
                     selectNewRegularEntry(LocalDate.now());
-                    mPrefHelper.setRegularTableShouldBePopulated(false);
+                    mSharedPreferencesHelper.setRegularTableShouldBePopulated(false);
                 })
                 .subscribe(s ->mRepository.insertRegularEntry(s));
 
@@ -133,14 +133,13 @@ public class HomeViewModel extends AndroidViewModel {
 
         while (targetDay.isBefore(endOfTheYear)) {
             targetDay = calcNextFriday(targetDay);
-
             Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             Long time = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             FridayEntry fridayEntry = new FridayEntry(date, true, time);
             Log.d(TAG, "populateFridayTable: " + fridayEntry.getDateString());
             mRepository.insertFridayEntry(fridayEntry);
         }
-        mPrefHelper.setFridayTableShouldBePopulated(false);
+        mSharedPreferencesHelper.setFridayTableShouldBePopulated(false);
         selectNewFridayEntry(LocalDate.now());
     }
 

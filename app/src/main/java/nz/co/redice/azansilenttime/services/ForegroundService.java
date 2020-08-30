@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.utils.DndHelper;
 import nz.co.redice.azansilenttime.utils.NotificationHelper;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
 import static nz.co.redice.azansilenttime.utils.DndHelper.DND_OFF;
 import static nz.co.redice.azansilenttime.utils.DndHelper.DND_ON;
@@ -36,7 +36,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     private final IBinder mBinder = new LocalBinder();
     @Inject Repository mRepository;
-    @Inject PrefHelper mPrefHelper;
+    @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     @Inject DndHelper mDndHelper;
     @Inject NotificationHelper mNotificationHelper;
     private NotificationManager mNotificationManager;
@@ -52,7 +52,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
         startForeground(NotificationHelper.NOTIFICATION_ID, mNotificationHelper.mNotificationBuilder.build());
 
-        mPrefHelper.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        mSharedPreferencesHelper.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         if (intent.getAction() != null)
             switch (intent.getAction()) {
@@ -83,7 +83,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-        if (!mPrefHelper.isDndForFridaysOnly())
+        if (!mSharedPreferencesHelper.isDndForFridaysOnly())
             mDndHelper.setObserverForRegularDay(LocalDate.now());
         else
             mDndHelper.setObserverForNextFriday(LocalDate.now());
@@ -130,7 +130,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals(PrefHelper.DND_FRIDAYS_ONLY)) {
+        if (s.equals(SharedPreferencesHelper.DND_FRIDAYS_ONLY)) {
             Log.d(TAG, "onSharedPreferenceChanged: ");
             startObservingAlarmTimings();
         }

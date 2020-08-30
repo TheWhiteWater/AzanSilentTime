@@ -25,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
-import nz.co.redice.azansilenttime.utils.PrefHelper;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.utils.ServiceHelper;
 
 @AndroidEntryPoint
@@ -38,7 +38,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     private static final String CALCULATION_METHOD = "calculation_method";
     private static final String SCHOOL = "school";
     private static final String MIDNIGHT_MODE = "midnight_mode";
-    @Inject PrefHelper mPrefHelper;
+    @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     @Inject LocationHelper mLocationHelper;
     @Inject Repository mRepository;
     @Inject ServiceHelper mServiceHelper;
@@ -54,7 +54,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             public void handleOnBackPressed() {
                 if (isDatabaseUpdateRequired) {
                     mRepository.deletePrayerCalendar();
-                    mPrefHelper.setRegularTableShouldBePopulated(true);
+                    mSharedPreferencesHelper.setRegularTableShouldBePopulated(true);
                 }
                 getBackToHomeScreen();
             }
@@ -81,14 +81,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
         Preference locationPreference = findPreference(LOCATION);
         if (locationPreference != null) {
-            locationPreference.setSummary(mPrefHelper.getLocationText());
+            locationPreference.setSummary(mSharedPreferencesHelper.getLocationText());
             locationPreference.setOnPreferenceClickListener(this);
         }
 
         Preference mutePeriodPreference = findPreference(MUTE_PERIOD);
         if (mutePeriodPreference != null) {
             mutePeriodPreference.setSummaryProvider(preference -> {
-                int prefValue = mPrefHelper.getDndPeriod();
+                int prefValue = mSharedPreferencesHelper.getDndPeriod();
                 return prefValue == 60 ? "1 hour" : prefValue + " min";
             });
             mutePeriodPreference.setOnPreferenceChangeListener(this);
@@ -98,7 +98,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if (calculationMethodPreference != null) {
             calculationMethodPreference.setSummaryProvider(preference -> {
                 String[] values = getResources().getStringArray(R.array.calculation_methods_entries);
-                return values[getCorrectedCalculationMethod(mPrefHelper.getCalculationMethod())];
+                return values[getCorrectedCalculationMethod(mSharedPreferencesHelper.getCalculationMethod())];
             });
             calculationMethodPreference.setOnPreferenceChangeListener(this);
         }
@@ -108,7 +108,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if (calculationSchoolPreference != null) {
             calculationSchoolPreference.setSummaryProvider(preference -> {
                 String[] values = getResources().getStringArray(R.array.school_entries);
-                return values[mPrefHelper.getCalculationSchool()];
+                return values[mSharedPreferencesHelper.getCalculationSchool()];
             });
             calculationSchoolPreference.setOnPreferenceChangeListener(this);
         }
@@ -117,7 +117,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if (midnightModePreference != null) {
             midnightModePreference.setSummaryProvider(preference -> {
                 String[] values = getResources().getStringArray(R.array.midnight_mode_entries);
-                return values[mPrefHelper.getMidnightMode()];
+                return values[mSharedPreferencesHelper.getMidnightMode()];
             });
             midnightModePreference.setOnPreferenceChangeListener(this);
         }
@@ -134,21 +134,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case MUTE_PERIOD:
-                mPrefHelper.setDndPeriod((String) newValue);
+                mSharedPreferencesHelper.setDndPeriod((String) newValue);
                 isDatabaseUpdateRequired = false;
                 break;
             case CALCULATION_METHOD:
                 Log.d(TAG, "onPreferenceChange: value from xml " + newValue);
-                mPrefHelper.setCalculationMethod((String) newValue);
+                mSharedPreferencesHelper.setCalculationMethod((String) newValue);
                 isDatabaseUpdateRequired = true;
                 break;
             case SCHOOL:
-                mPrefHelper.setCalculationSchool((String) newValue);
+                mSharedPreferencesHelper.setCalculationSchool((String) newValue);
                 isDatabaseUpdateRequired = true;
 
                 break;
             case MIDNIGHT_MODE:
-                mPrefHelper.setMidnightMode((String) newValue);
+                mSharedPreferencesHelper.setMidnightMode((String) newValue);
                 isDatabaseUpdateRequired = true;
                 break;
         }
@@ -171,9 +171,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                             String locationText = mLocationHelper.locationToArea(locationResult.getLastLocation());
                             if (!locationText.isEmpty()) {
                                 preference.setSummary(locationText);
-                                mPrefHelper.setLocationText(locationText);
-                                mPrefHelper.setLongitude((float) locationResult.getLastLocation().getLongitude());
-                                mPrefHelper.setLatitude((float) locationResult.getLastLocation().getLatitude());
+                                mSharedPreferencesHelper.setLocationText(locationText);
+                                mSharedPreferencesHelper.setLongitude((float) locationResult.getLastLocation().getLongitude());
+                                mSharedPreferencesHelper.setLatitude((float) locationResult.getLastLocation().getLatitude());
                                 mLocationHelper.removeLocationUpdates(this);
                                 isDatabaseUpdateRequired = true;
                                 Log.d(TAG, "onLocationResult: address: " + locationText);
