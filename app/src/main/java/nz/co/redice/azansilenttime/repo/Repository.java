@@ -13,7 +13,7 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.local.EventDao;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
-import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.repo.remote.AzanService;
 
 public class Repository {
@@ -33,7 +33,7 @@ public class Repository {
         return mAzanService;
     }
 
-    public void insertRegularEntry(RegularEntry entry) {
+    public void insertRegularEntry(RegularSchedule entry) {
         mDao.insertEntry(entry);
     }
 
@@ -43,11 +43,11 @@ public class Repository {
                 .subscribe();
     }
 
-    public RegularEntry getRegularEntry(Long value) {
+    public RegularSchedule getRegularEntry(Long value) {
         return mDao.getSelectedRegularEntry(value);
     }
 
-    public void updateRegularEntry(RegularEntry model) {
+    public void updateRegularEntry(RegularSchedule model) {
         mDao.updateEntry(model)
                 .subscribeOn(Schedulers.computation())
                 .subscribe();
@@ -73,7 +73,7 @@ public class Repository {
                 .subscribe(mDao::insertFridayEntry);
     }
 
-    public LiveData<RegularEntry> getSelectedRegularLiveData(Long value) {
+    public LiveData<RegularSchedule> getSelectedRegularLiveData(Long value) {
         return mDao.getSelectedRegularLiveData(value);
     }
 
@@ -81,7 +81,7 @@ public class Repository {
         return mDao.getSelectedFridayLiveData(value);
     }
 
-    public Observable<List<RegularEntry>> selectTwoDaysForAlarmSetting(Long startDate, Long endDate) {
+    public Observable<List<RegularSchedule>> selectTwoDaysForAlarmSetting(Long startDate, Long endDate) {
         return mDao.getTwoDaysForAlarmSetting(startDate, endDate);
     }
 

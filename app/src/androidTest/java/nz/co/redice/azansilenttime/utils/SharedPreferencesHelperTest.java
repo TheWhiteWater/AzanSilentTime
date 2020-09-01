@@ -64,15 +64,15 @@ public class SharedPreferencesHelperTest {
     //DndForFridaysOnly
     @Test
     public void sharedPreferencesHelper_isDndForFridaysOnly_returnsValidDefaultValue() {
-        boolean actual = SUT.isDndForFridaysOnly();
+        boolean actual = SUT.isFridaysOnlyModeActive();
         assertEquals(DEFAULT_DND_FRIDAYS_ONLY, actual);
     }
 
     @Test
     public void sharedPreferencesHelper_isDndForFridaysOnly_returnsValidSavedValue() {
         boolean expected = true;
-        SUT.setDndForFridaysOnly(expected);
-        boolean actual = SUT.isDndForFridaysOnly();
+        SUT.setFridaysOnlyModeActive(expected);
+        boolean actual = SUT.isFridaysOnlyModeActive();
         assertEquals(expected, actual);
     }
 

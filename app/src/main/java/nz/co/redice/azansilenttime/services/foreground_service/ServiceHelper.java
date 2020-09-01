@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.utils;
+package nz.co.redice.azansilenttime.services.foreground_service;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
-import nz.co.redice.azansilenttime.services.ForegroundService;
 
 @Singleton
 public class ServiceHelper {

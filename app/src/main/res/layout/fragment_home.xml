@@ -9,7 +9,7 @@
 
         <variable
             name="entry"
-            type="nz.co.redice.azansilenttime.repo.local.entity.RegularEntry" />
+            type="nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule" />
 
         <variable
             name="friday"
@@ -45,7 +45,7 @@
             <TextView
                 android:id="@+id/date_view"
                 style="@style/AzanAppTheme.RoundedCard.Date"
-                android:text="@{prefs.dndForFridaysOnly ? friday.dateString  : entry.dateText}"
+                android:text="@{prefs.fridaysOnlyModeActive ? friday.dateString  : entry.dateText}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -71,8 +71,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fajr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.fajrSilent ? @color/cardview : @color/faded_cardview}"
+            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{entry.fajrMute ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/dhuhr_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -99,7 +99,7 @@
                     android:id="@+id/fajr_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{entry.fajrSilent}"
+                    android:checked="@{entry.fajrMute}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -115,8 +115,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/dhuhr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.dhuhrSilent ? @color/cardview : @color/faded_cardview}"
+            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{entry.dhuhrMute ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/asr_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -143,7 +143,7 @@
                     android:id="@+id/dhuhr_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{entry.dhuhrSilent}"
+                    android:checked="@{entry.dhuhrMute}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -159,8 +159,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/asr_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.asrSilent ? @color/cardview : @color/faded_cardview}"
+            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{entry.asrMute ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/maghrib_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -187,7 +187,7 @@
                     android:id="@+id/asr_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{entry.asrSilent}"
+                    android:checked="@{entry.asrMute}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -203,8 +203,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/maghrib_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.maghribSilent ? @color/cardview : @color/faded_cardview}"
+            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{entry.maghribMute ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/isha_card"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -231,7 +231,7 @@
                     android:id="@+id/maghrib_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{entry.maghribSilent}"
+                    android:checked="@{entry.maghribMute}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -247,8 +247,8 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/isha_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.ishaSilent ? @color/cardview : @color/faded_cardview}"
+            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@{entry.ishaMute ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -275,7 +275,7 @@
                     android:id="@+id/isha_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{entry.ishaSilent}"
+                    android:checked="@{entry.ishaMute}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -292,7 +292,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/friday_card"
             style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{prefs.dndForFridaysOnly ? View.VISIBLE : View.GONE}"
+            android:visibility="@{prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
             app:cardBackgroundColor="@{friday.Silent ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
@@ -337,7 +337,7 @@
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="@{prefs.dndForFridaysOnly}"
+            android:checked="@{prefs.fridaysOnlyModeActive}"
             android:text="The Friday Prayer only"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

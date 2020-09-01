@@ -1,15 +1,14 @@
-package nz.co.redice.azansilenttime.utils;
+package nz.co.redice.azansilenttime.services.alarm_service;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
 public class AlarmStatus {
 
     private AtomicBoolean alarmActive;
     private Long alarmTiming;
+
 
     @Inject
     public AlarmStatus() {
@@ -21,7 +20,7 @@ public class AlarmStatus {
         return alarmActive.get();
     }
 
-    public synchronized void setAlarmActive(boolean alarmActive) {
+    public synchronized void setAlarmStatus(boolean alarmActive) {
         this.alarmActive.set(alarmActive);
     }
 

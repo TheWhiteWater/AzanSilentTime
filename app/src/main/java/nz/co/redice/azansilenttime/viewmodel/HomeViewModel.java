@@ -23,7 +23,7 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
-import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.repo.remote.models.Day;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
@@ -31,7 +31,7 @@ public class HomeViewModel extends AndroidViewModel {
 
     private static final String TAG = "App HomeViewModel";
     private final SavedStateHandle savedStateHandle;
-    private MutableLiveData<RegularEntry> mRegularEntry = new MutableLiveData<>();
+    private MutableLiveData<RegularSchedule> mRegularEntry = new MutableLiveData<>();
     private MutableLiveData<FridayEntry> mFridayEntry = new MutableLiveData<>();
 
     private Repository mRepository;
@@ -50,11 +50,11 @@ public class HomeViewModel extends AndroidViewModel {
 
     }
 
-    public LiveData<RegularEntry> getRegularObservable() {
+    public LiveData<RegularSchedule> getRegularObservable() {
         return mRegularEntry;
     }
 
-    public void setRegularObservable(RegularEntry observableLiveEntry) {
+    public void setRegularObservable(RegularSchedule observableLiveEntry) {
         mRegularEntry.postValue(observableLiveEntry);
     }
 
@@ -98,7 +98,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    public void updateEntry(RegularEntry entry) {
+    public void updateEntry(RegularSchedule entry) {
         mRepository.updateRegularEntry(entry);
     }
 

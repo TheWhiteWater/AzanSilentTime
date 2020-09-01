@@ -14,7 +14,7 @@ import static android.content.Context.MODE_PRIVATE;
 @Singleton
 public class SharedPreferencesHelper {
 
-    public static final String DND_FRIDAYS_ONLY = "dnd_fridays_only";
+    public static final String FRIDAYS_ONLY_MODE = "fridays_only";
     private static final String MY_PREFS = "my prefs";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
@@ -65,12 +65,12 @@ public class SharedPreferencesHelper {
         mEditor.putBoolean(LOCATION_STATUS, status).apply();
     }
 
-    public boolean isDndForFridaysOnly() {
-        return mSharedPreferences.getBoolean(DND_FRIDAYS_ONLY, false);
+    public boolean isFridaysOnlyModeActive() {
+        return mSharedPreferences.getBoolean(FRIDAYS_ONLY_MODE, false);
     }
 
-    public void setDndForFridaysOnly(boolean b) {
-        mEditor.putBoolean(DND_FRIDAYS_ONLY, b).apply();
+    public void setFridaysOnlyModeActive(boolean b) {
+        mEditor.putBoolean(FRIDAYS_ONLY_MODE, b).apply();
     }
 
     public String getLocationText() {

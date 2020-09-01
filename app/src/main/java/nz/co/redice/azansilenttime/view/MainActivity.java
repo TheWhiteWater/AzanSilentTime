@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.ActivityMainBinding;
-import nz.co.redice.azansilenttime.utils.ServiceHelper;
+import nz.co.redice.azansilenttime.services.foreground_service.ServiceHelper;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {

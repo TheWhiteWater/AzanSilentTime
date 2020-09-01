@@ -33,7 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.FragmentHomeBinding;
 import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
-import nz.co.redice.azansilenttime.repo.local.entity.RegularEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.view.presentation.DatePickerFragment;
 import nz.co.redice.azansilenttime.view.presentation.TimePickerFragment;
@@ -47,7 +47,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     private HomeViewModel mViewModel;
     private FragmentHomeBinding mViewBinding;
-    private RegularEntry mRegularEntry;
+    private RegularSchedule mRegularSchedule;
     private FridayEntry mFridayEntry;
 
     @Override
@@ -115,7 +115,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 Log.d(TAG, "setLiveDataObserver: setting livedata");
                 registerSwitchListeners(false);
                 setRegularSwitches(entry);
-                mRegularEntry = entry;
+                mRegularSchedule = entry;
                 mViewBinding.invalidateAll();
                 mViewBinding.setEntry(entry);
                 registerSwitchListeners(true);
@@ -179,12 +179,12 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
 
 
-    public void setRegularSwitches(RegularEntry regularEntry) {
-        mViewBinding.fajrSwitch.setChecked(regularEntry.getFajrSilent());
-        mViewBinding.dhuhrSwitch.setChecked(regularEntry.getDhuhrSilent());
-        mViewBinding.asrSwitch.setChecked(regularEntry.getAsrSilent());
-        mViewBinding.maghribSwitch.setChecked(regularEntry.getMaghribSilent());
-        mViewBinding.ishaSwitch.setChecked(regularEntry.getIshaSilent());
+    public void setRegularSwitches(RegularSchedule regularSchedule) {
+        mViewBinding.fajrSwitch.setChecked(regularSchedule.isFajrMute());
+        mViewBinding.dhuhrSwitch.setChecked(regularSchedule.isDhuhrMute());
+        mViewBinding.asrSwitch.setChecked(regularSchedule.isAsrMute());
+        mViewBinding.maghribSwitch.setChecked(regularSchedule.isMaghribMute());
+        mViewBinding.ishaSwitch.setChecked(regularSchedule.isIshaMute());
     }
 
     public void setFridaySwitch(FridayEntry regularEntry) {
@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
-        if (!mSharedPreferencesHelper.isDndForFridaysOnly())
+        if (!mSharedPreferencesHelper.isFridaysOnlyModeActive())
             mViewModel.selectNewRegularEntry(selectedDate);
         else
             mViewModel.selectNewFridayEntry(selectedDate);
@@ -213,28 +213,28 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         switch (compoundButton.getId()) {
             case R.id.fajr_switch:
-                mRegularEntry.setFajrSilent(!mRegularEntry.getFajrSilent());
-                mViewModel.updateEntry(mRegularEntry);
+                mRegularSchedule.setFajrMute(!mRegularSchedule.isFajrMute());
+                mViewModel.updateEntry(mRegularSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.dhuhr_switch:
-                mRegularEntry.setDhuhrSilent(!mRegularEntry.getDhuhrSilent());
-                mViewModel.updateEntry(mRegularEntry);
+                mRegularSchedule.setDhuhrMute(!mRegularSchedule.isDhuhrMute());
+                mViewModel.updateEntry(mRegularSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.maghrib_switch:
-                mRegularEntry.setMaghribSilent(!mRegularEntry.getMaghribSilent());
-                mViewModel.updateEntry(mRegularEntry);
+                mRegularSchedule.setMaghribMute(!mRegularSchedule.isMaghribMute());
+                mViewModel.updateEntry(mRegularSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.asr_switch:
-                mRegularEntry.setAsrSilent(!mRegularEntry.getAsrSilent());
-                mViewModel.updateEntry(mRegularEntry);
+                mRegularSchedule.setAsrMute(!mRegularSchedule.isAsrMute());
+                mViewModel.updateEntry(mRegularSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.isha_switch:
-                mRegularEntry.setIshaSilent(!mRegularEntry.getIshaSilent());
-                mViewModel.updateEntry(mRegularEntry);
+                mRegularSchedule.setIshaMute(!mRegularSchedule.isIshaMute());
+                mViewModel.updateEntry(mRegularSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.friday_switch:
@@ -243,7 +243,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 mViewBinding.invalidateAll();
                 break;
             case R.id.checkbox:
-                mSharedPreferencesHelper.setDndForFridaysOnly(isChecked);
+                mSharedPreferencesHelper.setFridaysOnlyModeActive(isChecked);
                 mViewBinding.invalidateAll();
                 break;
         }

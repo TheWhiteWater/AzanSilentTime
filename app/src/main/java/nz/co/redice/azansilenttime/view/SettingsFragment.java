@@ -26,7 +26,7 @@ import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
-import nz.co.redice.azansilenttime.utils.ServiceHelper;
+import nz.co.redice.azansilenttime.services.foreground_service.ServiceHelper;
 
 @AndroidEntryPoint
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener,
