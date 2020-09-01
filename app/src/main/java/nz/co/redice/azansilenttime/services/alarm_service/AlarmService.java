@@ -23,9 +23,9 @@ public interface AlarmService {
 
     void scheduleWakeUpAlarm();
 
-    Long getEarliestAlarmTimestamp();
+    Long getAlarmTimestamp();
 
-    void registerNewAlarmListener(OnNewAlarmListener onNewAlarmListener);
+    void registerAlarmListener(OnNewAlarmListener onNewAlarmListener);
 
     void processRegularSchedule(Schedule earliestSchedule);
 

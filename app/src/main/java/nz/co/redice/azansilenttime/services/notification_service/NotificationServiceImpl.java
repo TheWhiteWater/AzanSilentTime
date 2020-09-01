@@ -1,6 +1,7 @@
 package nz.co.redice.azansilenttime.services.notification_service;
 
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,7 +24,6 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import io.reactivex.subjects.BehaviorSubject;
 import nz.co.redice.azansilenttime.R;
-import nz.co.redice.azansilenttime.services.alarm_service.OnNewAlarmListener;
 import nz.co.redice.azansilenttime.services.foreground_service.ForegroundService;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.view.MainActivity;
@@ -35,18 +35,19 @@ public class NotificationServiceImpl implements NotificationService {
     // The identifier for the notification displayed for the foreground service.
     public static final int NOTIFICATION_ID = 12345678;
     private static final String FOREGROUND_CHANNEL_ID = "channelId";
-    public BehaviorSubject<String> mNextAlarmTime;
+    public BehaviorSubject<String> mAlarmObserver;
     private SharedPreferencesHelper mSharedPreferencesHelper;
 
 
     public NotificationCompat.Builder mNotificationBuilder;
 
 
+    @SuppressLint("CheckResult")
     @Inject
     public NotificationServiceImpl(@ApplicationContext Context context,
                                    SharedPreferencesHelper sharedPreferencesHelper) {
         mSharedPreferencesHelper = sharedPreferencesHelper;
-        mNextAlarmTime = BehaviorSubject.create();
+        mAlarmObserver = BehaviorSubject.create();
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -55,8 +56,14 @@ public class NotificationServiceImpl implements NotificationService {
                     "ForegroundChannelId",
                     NotificationManager.IMPORTANCE_LOW);
 
-            NotificationManager manager = context.getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(foregroundNotificationChannel);
+            NotificationManager mNotificationManager;
+            mNotificationManager = context.getSystemService(NotificationManager.class);
+            mNotificationManager.createNotificationChannel(foregroundNotificationChannel);
+
+            mAlarmObserver.subscribe(s -> {
+                mNotificationBuilder.setContentText(s);
+                mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+            });
 
         }
 
@@ -86,7 +93,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 
 
-    public void generateNotificationText(Long timing) {
+    public void generateNotificationContextText(Long timing) {
             Date date = new Date(timing);
 
             LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -96,10 +103,10 @@ public class NotificationServiceImpl implements NotificationService {
             DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
 
             if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
-                mNextAlarmTime.onNext("today between " + timeFormatter.format(startMuteTime)
+                mAlarmObserver.onNext("today between " + timeFormatter.format(startMuteTime)
                         + " - " + timeFormatter.format(endMuteTime));
             else
-                mNextAlarmTime.onNext(dayFormatter.format(startMuteTime) + " between "
+                mAlarmObserver.onNext(dayFormatter.format(startMuteTime) + " between "
                         + timeFormatter.format(startMuteTime) + " - " + timeFormatter.format(endMuteTime));
         }
 
@@ -108,13 +115,14 @@ public class NotificationServiceImpl implements NotificationService {
         return mNotificationBuilder;
     }
 
-    public BehaviorSubject<String> getNextAlarmTextTimeBehaviorSubject() {
-        return mNextAlarmTime;
+    @Override
+    public int getNotificationChannel() {
+        return NOTIFICATION_ID;
     }
 
     @Override
-    public void onNewAlarmSet(Long timing) {
-        generateNotificationText(timing);
+    public void onAlarmScheduled(Long timing) {
+        generateNotificationContextText(timing);
     }
 }
 

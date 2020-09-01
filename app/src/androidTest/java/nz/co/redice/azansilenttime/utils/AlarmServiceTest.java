@@ -39,7 +39,7 @@ public class AlarmServiceTest {
         Long timing = LocalDateTime.now().minusMinutes(10).toEpochSecond(ZoneOffset.UTC);
         int requestCode = 777;
         SUT.scheduleMuteAlarm(timing, requestCode);
-        Log.d("Test", "alarmManagerHelper: " + SUT.getActivatedAlarmList().get(0));
+        Log.d("Test", "alarmManagerHelper: " + SUT.getScheduledAlarmList().get(0));
         Log.d("Test", "alarmManagerHelper: " + timing);
     }
 

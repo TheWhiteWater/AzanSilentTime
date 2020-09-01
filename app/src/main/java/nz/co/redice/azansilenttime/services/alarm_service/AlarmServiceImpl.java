@@ -14,7 +14,6 @@ import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +35,10 @@ public class AlarmServiceImpl implements AlarmService {
     private static final int REGULAR_ALARM = 123;
     private static final int FRIDAY_ALARM = 321;
     private static final long ONE_DAY = 1;
-    boolean isFridaysOnlyModeActive;
     private SharedPreferencesHelper mSharedPreferencesHelper;
     private Repository mRepository;
     private AlarmStatus mCurrentAlarmCash;
-    private ArrayList<Long> mActivatedAlarmList;
+    private ArrayList<Long> mScheduledAlarmList;
     private Context mContext;
     private AlarmManager mAlarmManager;
     private OnNewAlarmListener mAlarmListener;
@@ -52,19 +50,18 @@ public class AlarmServiceImpl implements AlarmService {
                             Repository repository, AlarmStatus alarmStatus) {
         mContext = context;
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        mActivatedAlarmList = new ArrayList<>();
+        mScheduledAlarmList = new ArrayList<>();
         mSharedPreferencesHelper = sharedPreferencesHelper;
         mCurrentAlarmCash = alarmStatus;
         mRepository = repository;
-        isFridaysOnlyModeActive = mSharedPreferencesHelper.isFridaysOnlyModeActive();
     }
 
     private long getCurrentEpochSeconds() {
         return System.currentTimeMillis() / 1000;
     }
 
-    public ArrayList<Long> getActivatedAlarmList() {
-        return mActivatedAlarmList;
+    public ArrayList<Long> getScheduledAlarmList() {
+        return mScheduledAlarmList;
     }
 
     @Override
@@ -93,7 +90,7 @@ public class AlarmServiceImpl implements AlarmService {
 
 
     public void processRegularSchedule(Schedule earliestSchedule) {
-        if (!isFridaysOnlyModeActive && earliestSchedule != null) {
+        if (!mSharedPreferencesHelper.isFridaysOnlyModeActive() && earliestSchedule != null) {
             if (mCurrentAlarmCash.isAlarmActive()) {
                 if (mCurrentAlarmCash.getAlarmTiming() == earliestSchedule.epochSecond) {
                     return;
@@ -109,7 +106,7 @@ public class AlarmServiceImpl implements AlarmService {
             }
         } else
             return;
-        if (isFridaysOnlyModeActive && mCurrentAlarmCash.isAlarmActive()) {
+        if (mSharedPreferencesHelper.isFridaysOnlyModeActive() && mCurrentAlarmCash.isAlarmActive()) {
             cancelScheduledMuteAlarm(mCurrentAlarmCash.getAlarmTiming(), REGULAR_ALARM);
             mCurrentAlarmCash.setAlarmStatus(false);
         }
@@ -155,7 +152,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     public void processFridaySchedule(Schedule earliestSchedule) {
-        if (isFridaysOnlyModeActive && earliestSchedule != null) {
+        if (mSharedPreferencesHelper.isFridaysOnlyModeActive() && earliestSchedule != null) {
             if (mCurrentAlarmCash.isAlarmActive()) {
                 if (mCurrentAlarmCash.getAlarmTiming() == earliestSchedule.epochSecond) {
                     return;
@@ -170,7 +167,7 @@ public class AlarmServiceImpl implements AlarmService {
                 mCurrentAlarmCash.setAlarmTiming(earliestSchedule.epochSecond);
             }
         }
-        if (!isFridaysOnlyModeActive && mCurrentAlarmCash.isAlarmActive()) {
+        if (!mSharedPreferencesHelper.isFridaysOnlyModeActive() && mCurrentAlarmCash.isAlarmActive()) {
             cancelScheduledMuteAlarm(mCurrentAlarmCash.getAlarmTiming(), FRIDAY_ALARM);
             mCurrentAlarmCash.setAlarmStatus(false);
         }
@@ -179,13 +176,13 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void scheduleMuteAlarm(Long timing, int requestCode) {
-        if (!mActivatedAlarmList.contains(timing * 1000)) {
+        if (!mScheduledAlarmList.contains(timing * 1000)) {
             Intent intent = new Intent(mContext, ForegroundService.class);
             intent.setAction(DND_ON);
             PendingIntent dndOnIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(timing * 1000, null), dndOnIntent);
-            mActivatedAlarmList.add(timing * 1000);
-            mAlarmListener.onNewAlarmSet(getEarliestAlarmTimestamp());
+            mScheduledAlarmList.add(timing * 1000);
+            mAlarmListener.onAlarmScheduled(getAlarmTimestamp());
             Log.d(TAG, "AlarmManager activated on " + timing * 1000 + ": "
                     + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
         }
@@ -193,13 +190,13 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public void cancelScheduledMuteAlarm(Long timing, int requestCode) {
-        if (mActivatedAlarmList.contains(timing * 1000)) {
+        if (mScheduledAlarmList.contains(timing * 1000)) {
             Intent intent = new Intent(mContext, ForegroundService.class);
             intent.setAction(DND_OFF);
             PendingIntent dndOnIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             mAlarmManager.cancel(dndOnIntent);
-            mActivatedAlarmList.remove(timing * 1000);
-            mAlarmListener.onNewAlarmSet(getEarliestAlarmTimestamp());
+            mScheduledAlarmList.remove(timing * 1000);
+            mAlarmListener.onAlarmScheduled(getAlarmTimestamp());
             Log.d(TAG, "AlarmManager canceled on " + timing * 1000 + ": "
                     + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
         }
@@ -216,15 +213,15 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public Long getEarliestAlarmTimestamp() {
-        if (mActivatedAlarmList.size() > 0) {
-            return mActivatedAlarmList.get(0);
+    public Long getAlarmTimestamp() {
+        if (mScheduledAlarmList.size() > 0) {
+            return mScheduledAlarmList.get(0);
         } else
             return null;
     }
 
     @Override
-    public void registerNewAlarmListener(OnNewAlarmListener onNewAlarmListener) {
+    public void registerAlarmListener(OnNewAlarmListener onNewAlarmListener) {
         mAlarmListener = onNewAlarmListener;
     }
 

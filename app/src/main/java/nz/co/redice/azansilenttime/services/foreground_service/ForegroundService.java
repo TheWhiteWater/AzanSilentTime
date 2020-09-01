@@ -1,7 +1,6 @@
 package nz.co.redice.azansilenttime.services.foreground_service;
 
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import nz.co.redice.azansilenttime.services.notification_service.NotificationServiceImpl;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
 import static nz.co.redice.azansilenttime.services.alarm_service.AlarmService.DND_OFF;
@@ -34,8 +32,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     private final IBinder mBinder = new LocalBinder();
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
-    @Inject AlarmFacade mAlarmFacade;
-    private NotificationManager mNotificationManager;
+    @Inject ForegroundFacade mForegroundFacade;
 
     private boolean mChangingConfiguration = false;
 
@@ -44,8 +41,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        startForeground(NotificationServiceImpl.NOTIFICATION_ID, mAlarmFacade.getNotificationBuilder().build());
+        startForeground(mForegroundFacade.getNotificationChannel(), mForegroundFacade.getNotificationBuilder().build());
         mSharedPreferencesHelper.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         if (intent.getAction() != null)
@@ -54,48 +50,32 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
                     stopSelf();
                     break;
                 case DND_ON:
-                    turnAudioServicesOn();
+                    mForegroundFacade.turnAudioServicesOn();
+                    Log.d(TAG, "RingerMode: SILENT");
+                    mForegroundFacade.scheduleWakeUpAlarm();
                     break;
                 case DND_OFF:
-                    turnAudioServicesOff();
+                    mForegroundFacade.turnAudioServicesOff();
+                    Log.d(TAG, "RingerMode: UNSILENT");
                     break;
             }
 
         startObservingAlarmTimings();
-
-        mAlarmFacade.getNextAlarmTimeBehaviorSubject().subscribe(s -> {
-            mAlarmFacade.getNotificationBuilder().setContentText(s);
-            mNotificationManager.notify(NotificationServiceImpl.NOTIFICATION_ID, mAlarmFacade.getNotificationBuilder().build());
-        });
-
-        Log.d(TAG, "onStartCommand: service started");
-
         return START_REDELIVER_INTENT;
     }
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
         if (!mSharedPreferencesHelper.isFridaysOnlyModeActive())
-            mAlarmFacade.getSchedulesFromNextTwoDaysStartingFrom(LocalDate.now());
+            mForegroundFacade.getSchedulesFromNextTwoDaysStartingFrom(LocalDate.now());
         else
-            mAlarmFacade.getSchedulesFromNextTwoFridaysStartingFrom(LocalDate.now());
+            mForegroundFacade.getSchedulesFromNextTwoFridaysStartingFrom(LocalDate.now());
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mChangingConfiguration = true;
-    }
-
-    public void turnAudioServicesOn() {
-        mAlarmFacade.turnAudioServicesOn();
-        Log.d(TAG, "RingerMode: SILENT");
-        mAlarmFacade.scheduleWakeUpAlarm();
-    }
-
-    public void turnAudioServicesOff() {
-        mAlarmFacade.turnAudioServicesOff();
-        Log.d(TAG, "RingerMode: UNSILENT");
     }
 
 
@@ -122,7 +102,7 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind: ");
         if (!mChangingConfiguration)
-            startForeground(NotificationServiceImpl.NOTIFICATION_ID, mAlarmFacade.getNotificationBuilder().build());
+            startForeground(mForegroundFacade.getNotificationChannel(), mForegroundFacade.getNotificationBuilder().build());
         return true;
     }
 
@@ -135,7 +115,6 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(SharedPreferencesHelper.FRIDAYS_ONLY_MODE)) {
-            Log.d(TAG, "onSharedPreferenceChanged: ");
             startObservingAlarmTimings();
         }
     }

@@ -13,12 +13,14 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
-public class ServiceHelper {
+public class BindService {
 
     private ForegroundService mService = null;
-    private boolean isBound = false;
     private boolean mShouldUnbind;
 
+    @Inject
+    public BindService() {
+    }
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -34,21 +36,12 @@ public class ServiceHelper {
         }
     };
 
-    @Inject
-    public ServiceHelper(@ApplicationContext Context context) {
-    }
-
     public void startService(Context context) {
         Intent intent = new Intent(context, ForegroundService.class);
         context.startService(intent);
     }
 
     public void doBindService(Context context) {
-        // Attempts to establish a connection with the service.  We use an
-        // explicit class name because we want a specific service
-        // implementation that we know will be running in our own process
-        // (and thus won't be supporting component replacement by other
-        // applications).
         if (context.bindService(new Intent(context, ForegroundService.class),
                 mServiceConnection, Context.BIND_AUTO_CREATE)) {
             mShouldUnbind = true;

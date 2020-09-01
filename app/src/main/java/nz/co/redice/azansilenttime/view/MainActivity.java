@@ -13,27 +13,27 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.ActivityMainBinding;
-import nz.co.redice.azansilenttime.services.foreground_service.ServiceHelper;
+import nz.co.redice.azansilenttime.services.foreground_service.BindService;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
-    @Inject ServiceHelper mServiceHelper;
-    private ActivityMainBinding mBinding;
+    @Inject BindService mBindService;
+    private ActivityMainBinding mViewBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(mBinding.getRoot());
-        setSupportActionBar(mBinding.toolbar);
-        mServiceHelper.startService(this);
+        mViewBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mViewBinding.getRoot());
+        setSupportActionBar(mViewBinding.toolbar);
+        mBindService.startService(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mServiceHelper.doBindService(this);
+        mBindService.doBindService(this);
     }
 
     @Override
@@ -45,13 +45,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        mServiceHelper.doUnbindService(this);
+        mBindService.doUnbindService(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBinding = null;
+        mViewBinding = null;
     }
 
     @Override

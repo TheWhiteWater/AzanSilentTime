@@ -26,7 +26,7 @@ import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
-import nz.co.redice.azansilenttime.services.foreground_service.ServiceHelper;
+import nz.co.redice.azansilenttime.services.foreground_service.BindService;
 
 @AndroidEntryPoint
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener,
@@ -41,7 +41,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     @Inject LocationHelper mLocationHelper;
     @Inject Repository mRepository;
-    @Inject ServiceHelper mServiceHelper;
+    @Inject BindService mBindService;
     private boolean isDatabaseUpdateRequired;
 
 
