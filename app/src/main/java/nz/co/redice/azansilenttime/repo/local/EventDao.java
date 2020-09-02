@@ -11,7 +11,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 
 import static androidx.room.OnConflictStrategy.REPLACE;
@@ -27,13 +27,13 @@ public interface EventDao {
     Completable updateEntry(RegularSchedule regularSchedule);
 
     @Insert(onConflict = REPLACE)
-    void insertFridayEntry(FridayEntry fridayEntry);
+    void insertFridayEntry(FridaySchedule fridaySchedule);
 
     @Update(onConflict = REPLACE)
-    void updateFridayEntry(FridayEntry fridayEntry);
+    void updateFridayEntry(FridaySchedule fridaySchedule);
 
     @Query("SELECT * FROM friday_table WHERE date = :selectedDate ")
-    FridayEntry getSelectedFridayEntry(Long selectedDate);
+    FridaySchedule getSelectedFridayEntry(Long selectedDate);
 
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
     RegularSchedule getSelectedRegularEntry(Long selectedDate);
@@ -42,17 +42,17 @@ public interface EventDao {
     LiveData<RegularSchedule> getSelectedRegularLiveData(Long selectedDate);
 
     @Query("SELECT * FROM friday_table WHERE date = :selectedDate ")
-    LiveData<FridayEntry> getSelectedFridayLiveData(Long selectedDate);
+    LiveData<FridaySchedule> getSelectedFridayLiveData(Long selectedDate);
 
     @Query("DELETE FROM regular_table")
     void deleteCalendar();
 
     @Query("SELECT * FROM regular_table WHERE date BETWEEN :startDate AND :endDate" )
-    Observable<List<RegularSchedule>> getTwoDaysForAlarmSetting(Long startDate, Long endDate);
+    io.reactivex.Observable<List<RegularSchedule>> getTwoDaysForAlarmSetting(Long startDate, Long endDate);
 
 
     @Query("SELECT * FROM friday_table WHERE date BETWEEN :startDate AND :endDate" )
-    Observable<List<FridayEntry>> getTwoFridaysForAlarmSetting(Long startDate, Long endDate);
+    Observable<List<FridaySchedule>> getTwoFridaysForAlarmSetting(Long startDate, Long endDate);
 
 
 

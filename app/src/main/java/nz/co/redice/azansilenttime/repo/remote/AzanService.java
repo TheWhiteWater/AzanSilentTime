@@ -2,7 +2,6 @@ package nz.co.redice.azansilenttime.repo.remote;
 
 import io.reactivex.Single;
 import nz.co.redice.azansilenttime.repo.remote.models.ApiResponse;
-import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 

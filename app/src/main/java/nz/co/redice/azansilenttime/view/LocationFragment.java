@@ -73,12 +73,9 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
 
         getAdminArea();
 
-        mViewModel.lastKnownPosition.observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                mViewBinding.progressBar.hide();
-                mViewBinding.locationTv.setText(s);
-            }
+        mViewModel.lastKnownPosition.observe(getViewLifecycleOwner(), s -> {
+            mViewBinding.progressBar.hide();
+            mViewBinding.locationTv.setText(s);
         });
     }
 

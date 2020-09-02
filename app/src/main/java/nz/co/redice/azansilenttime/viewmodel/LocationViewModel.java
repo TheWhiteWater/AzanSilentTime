@@ -23,10 +23,8 @@ import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 public class LocationViewModel extends AndroidViewModel {
 
     private static final String TAG = "App LocationViewModel";
-    private final SavedStateHandle savedStateHandle;
     private LocationHelper mLocationHelper;
     private SharedPreferencesHelper mSharedPreferencesHelper;
-    private Repository mRepository;
 
     private Location mLocation;
     private LocationCallback mLocationCallback;
@@ -41,12 +39,8 @@ public class LocationViewModel extends AndroidViewModel {
                              Repository repository,
                              @Assisted SavedStateHandle savedStateHandle, SharedPreferencesHelper sharedPreferencesHelper) {
         super(application);
-        this.savedStateHandle = savedStateHandle;
         mLocationHelper = locationHelper;
         mSharedPreferencesHelper = sharedPreferencesHelper;
-        mRepository = repository;
-
-
 
         mLocationCallback = new LocationCallback() {
             @Override

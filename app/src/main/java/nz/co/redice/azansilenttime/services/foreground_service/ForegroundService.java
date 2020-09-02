@@ -50,12 +50,12 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
                     stopSelf();
                     break;
                 case DND_ON:
-                    mForegroundFacade.turnAudioServicesOn();
+                    mForegroundFacade.turnDndOn();
                     Log.d(TAG, "RingerMode: SILENT");
                     mForegroundFacade.scheduleWakeUpAlarm();
                     break;
                 case DND_OFF:
-                    mForegroundFacade.turnAudioServicesOff();
+                    mForegroundFacade.turnDndOff();
                     Log.d(TAG, "RingerMode: UNSILENT");
                     break;
             }

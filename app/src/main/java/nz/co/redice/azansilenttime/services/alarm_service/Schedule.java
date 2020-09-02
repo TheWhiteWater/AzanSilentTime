@@ -1,8 +1,8 @@
 package nz.co.redice.azansilenttime.services.alarm_service;
 
 public class Schedule implements Comparable<Schedule> {
-    final long epochSecond;
-    final boolean isActive;
+    public final long epochSecond;
+    public final boolean isActive;
 
     public Schedule(Long epochSecond, Boolean isActive) {
         this.epochSecond = epochSecond;
@@ -29,12 +29,6 @@ public class Schedule implements Comparable<Schedule> {
 
     @Override
     public int compareTo(Schedule schedule) {
-        if (this.epochSecond > schedule.epochSecond) {
-            return 1;
-        } else if (this.epochSecond < schedule.epochSecond) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return Long.compare(this.epochSecond, schedule.epochSecond);
     }
 }

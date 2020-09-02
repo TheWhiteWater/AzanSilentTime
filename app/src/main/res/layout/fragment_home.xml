@@ -13,7 +13,7 @@
 
         <variable
             name="friday"
-            type="nz.co.redice.azansilenttime.repo.local.entity.FridayEntry" />
+            type="nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule" />
 
         <variable
             name="prefs"
@@ -320,7 +320,7 @@
                     android:id="@+id/friday_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{friday.silent}"
+                    android:checked="@{friday.isSilent}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -12,7 +12,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.local.EventDao;
-import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.repo.remote.AzanService;
 
@@ -54,21 +54,21 @@ public class Repository {
     }
 
 
-    public FridayEntry getFridayEntry(Long value) {
+    public FridaySchedule getFridayEntry(Long value) {
         return mDao.getSelectedFridayEntry(value);
     }
 
 
     @SuppressLint("CheckResult")
-    public void updateFridayEntry(FridayEntry fridayEntry) {
-        Observable.just(fridayEntry)
+    public void updateFridayEntry(FridaySchedule fridaySchedule) {
+        Observable.just(fridaySchedule)
                 .subscribeOn(Schedulers.io())
-                .subscribe(s -> mDao.updateFridayEntry(fridayEntry));
+                .subscribe(s -> mDao.updateFridayEntry(fridaySchedule));
     }
 
     @SuppressLint("CheckResult")
-    public void insertFridayEntry(FridayEntry fridayEntry) {
-        Observable.just(fridayEntry)
+    public void insertFridayEntry(FridaySchedule fridaySchedule) {
+        Observable.just(fridaySchedule)
                 .subscribeOn(Schedulers.io())
                 .subscribe(mDao::insertFridayEntry);
     }
@@ -77,7 +77,7 @@ public class Repository {
         return mDao.getSelectedRegularLiveData(value);
     }
 
-    public LiveData<FridayEntry> getSelectedFridayLiveData(Long value) {
+    public LiveData<FridaySchedule> getSelectedFridayLiveData(Long value) {
         return mDao.getSelectedFridayLiveData(value);
     }
 
@@ -85,7 +85,7 @@ public class Repository {
         return mDao.getTwoDaysForAlarmSetting(startDate, endDate);
     }
 
-    public Observable<List<FridayEntry>> selectTwoFridaysForAlarmSetting(Long startDate, Long endDate) {
+    public Observable<List<FridaySchedule>> selectTwoFridaysForAlarmSetting(Long startDate, Long endDate) {
         return mDao.getTwoFridaysForAlarmSetting(startDate, endDate);
     }
 

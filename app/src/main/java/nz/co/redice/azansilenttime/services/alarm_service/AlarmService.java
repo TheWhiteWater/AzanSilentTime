@@ -17,9 +17,9 @@ public interface AlarmService {
     @SuppressLint("CheckResult")
     void getSchedulesFromNextTwoFridaysStartingFrom(LocalDate day);
 
-    void scheduleMuteAlarm(Long timing, int requestCode);
+//    void scheduleMuteAlarm(Long timing, int requestCode);
 
-    void cancelScheduledMuteAlarm(Long timing, int requestCode);
+//    void cancelScheduledMuteAlarm(Long timing, int requestCode);
 
     void scheduleWakeUpAlarm();
 
@@ -27,7 +27,4 @@ public interface AlarmService {
 
     void registerAlarmListener(OnNewAlarmListener onNewAlarmListener);
 
-    void processRegularSchedule(Schedule earliestSchedule);
-
-    void processFridaySchedule(Schedule earliestSchedule);
 }

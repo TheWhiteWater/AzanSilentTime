@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +14,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 
 import nz.co.redice.azansilenttime.services.alarm_service.AlarmServiceImpl;
 import nz.co.redice.azansilenttime.services.alarm_service.AlarmStatus;
 import nz.co.redice.azansilenttime.repo.Repository;
+import nz.co.redice.azansilenttime.services.alarm_service.Schedule;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,9 +41,25 @@ public class AlarmServiceTest {
     public void alarmManagerHelper_setAlarmManager_setsValidAlarm() {
         Long timing = LocalDateTime.now().minusMinutes(10).toEpochSecond(ZoneOffset.UTC);
         int requestCode = 777;
-        SUT.scheduleMuteAlarm(timing, requestCode);
-        Log.d("Test", "alarmManagerHelper: " + SUT.getScheduledAlarmList().get(0));
+//        SUT.scheduleMuteAlarm(timing, requestCode);
+        Log.d("Test", "alarmManagerHelper: " + SUT.getScheduledAlarmTimings().get(0));
         Log.d("Test", "alarmManagerHelper: " + timing);
+    }
+
+    @Test
+    public void getEarliestSchedule_returnsValidSchedule() {
+
+        ArrayList <Schedule> schedules = new ArrayList<>();
+        schedules.add(new Schedule(1601574720L, false));
+        schedules.add(new Schedule(1601574721L, false));
+        schedules.add(new Schedule(1601574722L, true));
+        schedules.add(new Schedule(1601574723L, false));
+        schedules.add(new Schedule(1601574724L, true));
+        schedules.add(new Schedule(1601574725L, false));
+
+        long expected = SUT.getEarliestSchedule(schedules).epochSecond;
+
+        Assert.assertEquals(1601574722L, expected);
     }
 
 

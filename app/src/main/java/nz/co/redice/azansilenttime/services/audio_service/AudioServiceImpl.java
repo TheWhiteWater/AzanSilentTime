@@ -20,12 +20,12 @@ public class AudioServiceImpl implements AudioService {
     }
 
     @Override
-    public void turnAudioServicesOn() {
+    public void turnDndOn() {
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
     }
 
     @Override
-    public void turnAudioServicesOff() {
+    public void turnDndOff() {
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     }
 }

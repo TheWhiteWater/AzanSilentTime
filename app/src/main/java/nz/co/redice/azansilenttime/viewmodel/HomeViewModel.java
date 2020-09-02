@@ -22,7 +22,7 @@ import java.util.Calendar;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.Repository;
-import nz.co.redice.azansilenttime.repo.local.entity.FridayEntry;
+import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.repo.remote.models.Day;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
@@ -30,9 +30,8 @@ import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 public class HomeViewModel extends AndroidViewModel {
 
     private static final String TAG = "App HomeViewModel";
-    private final SavedStateHandle savedStateHandle;
     private MutableLiveData<RegularSchedule> mRegularEntry = new MutableLiveData<>();
-    private MutableLiveData<FridayEntry> mFridayEntry = new MutableLiveData<>();
+    private MutableLiveData<FridaySchedule> mFridayEntry = new MutableLiveData<>();
 
     private Repository mRepository;
     private SharedPreferencesHelper mSharedPreferencesHelper;
@@ -45,7 +44,6 @@ public class HomeViewModel extends AndroidViewModel {
                          @Assisted SavedStateHandle savedStateHandle) {
         super(application);
         mRepository = repository;
-        this.savedStateHandle = savedStateHandle;
         mSharedPreferencesHelper = sharedPreferencesHelper;
 
     }
@@ -59,14 +57,14 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
 
-    public LiveData<FridayEntry> getFridayEntry() {
+    public LiveData<FridaySchedule> getFridayEntry() {
         if (mFridayEntry == null)
             selectNewFridayEntry(LocalDate.now());
         return mFridayEntry;
     }
 
-    public void setFridayObservable(FridayEntry fridayEntry) {
-        mFridayEntry.postValue(fridayEntry);
+    public void setFridayObservable(FridaySchedule fridaySchedule) {
+        mFridayEntry.postValue(fridaySchedule);
     }
 
     @SuppressLint("CheckResult")
@@ -83,18 +81,14 @@ public class HomeViewModel extends AndroidViewModel {
         Long nextFriday = calcNextFriday(date.minusDays(1)).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         Observable.fromCallable(() -> mRepository.getFridayEntry(nextFriday))
                 .subscribeOn(Schedulers.io())
-                .subscribe(this::setFridayObservable, throwable -> {
-                    Log.d(TAG, throwable.getMessage(), throwable);
-                });
+                .subscribe(this::setFridayObservable, throwable -> Log.d(TAG, throwable.getMessage(), throwable));
     }
 
     @SuppressLint("CheckResult")
     public void selectNewFridayEntry(Long value) {
         Observable.fromCallable(() -> mRepository.getFridayEntry(value))
                 .subscribeOn(Schedulers.io())
-                .subscribe(this::setFridayObservable, throwable -> {
-                    Log.d(TAG, throwable.getMessage(), throwable);
-                });
+                .subscribe(this::setFridayObservable, throwable -> Log.d(TAG, throwable.getMessage(), throwable));
     }
 
 
@@ -135,9 +129,9 @@ public class HomeViewModel extends AndroidViewModel {
             targetDay = calcNextFriday(targetDay);
             Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             Long time = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
-            FridayEntry fridayEntry = new FridayEntry(date, true, time);
-            Log.d(TAG, "populateFridayTable: " + fridayEntry.getDateString());
-            mRepository.insertFridayEntry(fridayEntry);
+            FridaySchedule fridaySchedule = new FridaySchedule(date, true, time);
+            Log.d(TAG, "populateFridayTable: " + fridaySchedule.getDateString());
+            mRepository.insertFridayEntry(fridaySchedule);
         }
         mSharedPreferencesHelper.setFridayTableToBePopulated(false);
         selectNewFridayEntry(LocalDate.now());
@@ -156,13 +150,13 @@ public class HomeViewModel extends AndroidViewModel {
             targetDay = calcNextFriday(targetDay);
             Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             Long time = targetDay.atTime(LocalTime.of(hourOfDay, minute)).atZone(ZoneId.systemDefault()).toEpochSecond();
-            mRepository.updateFridayEntry(new FridayEntry(date, true, time));
+            mRepository.updateFridayEntry(new FridaySchedule(date, true, time));
         }
     }
 
     @SuppressLint("CheckResult")
-    public void updateFridayEntry(FridayEntry fridayEntry) {
-        mRepository.updateFridayEntry(fridayEntry);
+    public void updateFridayEntry(FridaySchedule fridaySchedule) {
+        mRepository.updateFridayEntry(fridaySchedule);
     }
 
 }

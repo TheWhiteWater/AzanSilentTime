@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
-import io.reactivex.subjects.BehaviorSubject;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.services.foreground_service.ForegroundService;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
@@ -35,11 +34,10 @@ public class NotificationServiceImpl implements NotificationService {
     // The identifier for the notification displayed for the foreground service.
     public static final int NOTIFICATION_ID = 12345678;
     private static final String FOREGROUND_CHANNEL_ID = "channelId";
-    public BehaviorSubject<String> mAlarmObserver;
-    private SharedPreferencesHelper mSharedPreferencesHelper;
-
-
     public NotificationCompat.Builder mNotificationBuilder;
+    private int mNotificationChannel;
+    private SharedPreferencesHelper mSharedPreferencesHelper;
+    private NotificationManager mNotificationManager;
 
 
     @SuppressLint("CheckResult")
@@ -47,24 +45,15 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationServiceImpl(@ApplicationContext Context context,
                                    SharedPreferencesHelper sharedPreferencesHelper) {
         mSharedPreferencesHelper = sharedPreferencesHelper;
-        mAlarmObserver = BehaviorSubject.create();
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel foregroundNotificationChannel = new NotificationChannel(
                     FOREGROUND_CHANNEL_ID,
                     "ForegroundChannelId",
                     NotificationManager.IMPORTANCE_LOW);
-
-            NotificationManager mNotificationManager;
             mNotificationManager = context.getSystemService(NotificationManager.class);
             mNotificationManager.createNotificationChannel(foregroundNotificationChannel);
-
-            mAlarmObserver.subscribe(s -> {
-                mNotificationBuilder.setContentText(s);
-                mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
-            });
-
+            mNotificationChannel = NOTIFICATION_ID;
         }
 
 
@@ -91,24 +80,26 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
 
-
-
-    public void generateNotificationContextText(Long timing) {
-            Date date = new Date(timing);
-
-            LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mSharedPreferencesHelper.getDndPeriod());
-
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
-            DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
-
-            if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
-                mAlarmObserver.onNext("today between " + timeFormatter.format(startMuteTime)
-                        + " - " + timeFormatter.format(endMuteTime));
-            else
-                mAlarmObserver.onNext(dayFormatter.format(startMuteTime) + " between "
-                        + timeFormatter.format(startMuteTime) + " - " + timeFormatter.format(endMuteTime));
+    private void convertTimestampIntoNotificationContextText(Long timing) {
+        if (timing == null) {
+            publishNotificationContextText("No active alarm detected");
+            return;
         }
+        Date date = new Date(timing);
+
+        LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mSharedPreferencesHelper.getDndPeriod());
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
+        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
+
+        if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
+            publishNotificationContextText("today between " + timeFormatter.format(startMuteTime)
+                    + " - " + timeFormatter.format(endMuteTime));
+        else
+            publishNotificationContextText(dayFormatter.format(startMuteTime) + " between "
+                    + timeFormatter.format(startMuteTime) + " - " + timeFormatter.format(endMuteTime));
+    }
 
     @Override
     public NotificationCompat.Builder getNotificationBuilder() {
@@ -117,12 +108,17 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public int getNotificationChannel() {
-        return NOTIFICATION_ID;
+        return mNotificationChannel;
     }
 
     @Override
     public void onAlarmScheduled(Long timing) {
-        generateNotificationContextText(timing);
+        convertTimestampIntoNotificationContextText(timing);
+    }
+
+    private void publishNotificationContextText(String text) {
+        mNotificationBuilder.setContentText(text);
+        mNotificationManager.notify(NOTIFICATION_ID, mNotificationBuilder.build());
     }
 }
 

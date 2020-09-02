@@ -16,7 +16,7 @@ public class AlarmStatus {
         this.alarmActive.set(false);
     }
 
-    public synchronized boolean isAlarmActive() {
+    public synchronized boolean isActive() {
         return alarmActive.get();
     }
 
@@ -24,7 +24,7 @@ public class AlarmStatus {
         this.alarmActive.set(alarmActive);
     }
 
-    public synchronized long getAlarmTiming() {
+    public synchronized long getTiming() {
 
         return alarmTiming;
     }

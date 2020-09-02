@@ -7,29 +7,29 @@ import androidx.room.PrimaryKey;
 import nz.co.redice.azansilenttime.view.presentation.Converters;
 
 @Entity(tableName = "friday_table")
-public class FridayEntry {
+public class FridaySchedule {
 
     @PrimaryKey
     private Long date;
-    private Boolean isSilent = true;
-    private Long timeEpoch;
+    private Boolean silent = true;
+    private Long epochSecond;
     private String blank;
 
-    public FridayEntry() {
+    public FridaySchedule() {
     }
 
     @Ignore
-    public FridayEntry(Long date) {
+    public FridaySchedule(Long date) {
         this.date = date;
-        this.isSilent = true;
+        this.silent = true;
         this.blank = "Select";
     }
 
     @Ignore
-    public FridayEntry(Long date, Boolean isFridaySilent, Long timeEpoch) {
+    public FridaySchedule(Long date, Boolean isFridaySilent, Long epochSecond) {
         this.date = date;
-        this.isSilent = isFridaySilent;
-        this.timeEpoch = timeEpoch;
+        this.silent = isFridaySilent;
+        this.epochSecond = epochSecond;
     }
 
 
@@ -41,24 +41,24 @@ public class FridayEntry {
         this.date = date;
     }
 
-    public Boolean getSilent() {
-        return isSilent;
+    public Boolean isSilent() {
+        return silent;
     }
 
     public void setSilent(Boolean fridaySilent) {
-        isSilent = fridaySilent;
+        silent = fridaySilent;
     }
 
-    public Long getTimeEpoch() {
-        return timeEpoch;
+    public Long getEpochSecond() {
+        return epochSecond;
     }
 
-    public void setTimeEpoch(Long timeEpoch) {
-        this.timeEpoch = timeEpoch;
+    public void setEpochSecond(Long epochSecond) {
+        this.epochSecond = epochSecond;
     }
 
     public String getTimeText() {
-        return Converters.convertEpochIntoTextTime(timeEpoch);
+        return Converters.convertEpochIntoTextTime(epochSecond);
     }
 
 

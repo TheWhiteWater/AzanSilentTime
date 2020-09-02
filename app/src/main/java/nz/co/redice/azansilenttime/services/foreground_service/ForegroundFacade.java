@@ -31,6 +31,7 @@ public class ForegroundFacade {
         mAlarmService.registerAlarmListener(mNotificationService);
     }
 
+    //AlarmManager
 
     public void getSchedulesFromNextTwoDaysStartingFrom(LocalDate now) {
         mAlarmService.getSchedulesFromNextTwoDaysStartingFrom(now);
@@ -44,12 +45,15 @@ public class ForegroundFacade {
         mAlarmService.scheduleWakeUpAlarm();
     }
 
-    public void turnAudioServicesOn() {
-        mAudioService.turnAudioServicesOn();
+
+    //Audio
+
+    public void turnDndOn() {
+        mAudioService.turnDndOn();
     }
 
-    public void turnAudioServicesOff() {
-        mAudioService.turnAudioServicesOff();
+    public void turnDndOff() {
+        mAudioService.turnDndOff();
     }
 
 

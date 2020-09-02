@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        if (!Objects.requireNonNull(navController.getCurrentDestination()).getLabel().equals("HomeFragment") &&
-                !navController.getCurrentDestination().getLabel().equals("LocationFragment")) {
+        if (!Objects.equals(Objects.requireNonNull(navController.getCurrentDestination()).getLabel(), "HomeFragment") &&
+                !Objects.equals(navController.getCurrentDestination().getLabel(), "LocationFragment")) {
             super.onBackPressed();
         }
 
