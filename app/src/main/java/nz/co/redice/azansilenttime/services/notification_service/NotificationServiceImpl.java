@@ -77,7 +77,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
                 .setContentTitle("Next Mute period:")
                 .setContentText("Not set yet")
-                .setSmallIcon(R.drawable.ic_blc_small);
+                .setSmallIcon(R.drawable.ic_bell_small);
     }
 
 
