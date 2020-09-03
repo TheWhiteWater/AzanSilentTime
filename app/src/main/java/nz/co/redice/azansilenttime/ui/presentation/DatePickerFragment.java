@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.view.presentation;
+package nz.co.redice.azansilenttime.ui.presentation;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

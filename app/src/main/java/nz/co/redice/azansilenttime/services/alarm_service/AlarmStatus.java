@@ -7,7 +7,7 @@ import javax.inject.Inject;
 public class AlarmStatus {
 
     private AtomicBoolean alarmActive;
-    private Long alarmTiming;
+    private Long epochSeconds;
 
 
     @Inject
@@ -24,12 +24,12 @@ public class AlarmStatus {
         this.alarmActive.set(alarmActive);
     }
 
-    public synchronized long getTiming() {
+    public synchronized long getEpochSeconds() {
 
-        return alarmTiming;
+        return epochSeconds;
     }
 
-    public synchronized void setAlarmTiming(long alarmTiming) {
-        this.alarmTiming = alarmTiming;
+    public synchronized void setEpochSeconds(long alarmTiming) {
+        this.epochSeconds = alarmTiming;
     }
 }

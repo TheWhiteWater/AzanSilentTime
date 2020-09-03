@@ -5,13 +5,8 @@
 
     <color name="primary">#1b262c</color>
     <color name="primary_dark">#0f4c75</color>
-    <color name="primary_light">#3282b8</color>
     <color name="accent">#CF170A</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#757575</color>
-    <color name="icons">#FFFFFF</color>
-    <color name="divider">#BDBDBD</color>
     <color name="faded_cardview">#E0E0E3</color>
-
     <color name="white_text">#FFFFFF</color>
+    <color name="splash_background">#356992</color>
 </resources>

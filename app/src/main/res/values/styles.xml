@@ -27,11 +27,6 @@
         <item name="preferenceCategoryTitleTextAppearance">@style/PrefTitle</item>
     </style>
 
-    <style name="listItemSize">
-        <item name="android:textSize">12sp</item>
-        <item name="android:layout_marginStart">4dp</item>
-    </style>
-
 
     <style name="PrefTitle">
         <item name="android:textStyle">bold</item>

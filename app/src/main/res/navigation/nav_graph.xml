@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/splashScreenFragment"
-        android:name="nz.co.redice.azansilenttime.view.SplashFragment"
+        android:name="nz.co.redice.azansilenttime.ui.SplashFragment"
         android:label="SplashFragment"
         tools:layout="@layout/fragment_splash">
         <action
@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/locationFragment"
-        android:name="nz.co.redice.azansilenttime.view.LocationFragment"
+        android:name="nz.co.redice.azansilenttime.ui.LocationFragment"
         android:label="LocationFragment"
         tools:layout="@layout/fragment_location">
         <action
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="nz.co.redice.azansilenttime.view.HomeFragment"
+        android:name="nz.co.redice.azansilenttime.ui.HomeFragment"
         android:label="HomeFragment"
         tools:layout="@layout/fragment_home">
         <action
@@ -36,7 +36,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="nz.co.redice.azansilenttime.view.SettingsFragment"
+        android:name="nz.co.redice.azansilenttime.ui.SettingsFragment"
         android:label="SettingsFragment"
         >
         <action

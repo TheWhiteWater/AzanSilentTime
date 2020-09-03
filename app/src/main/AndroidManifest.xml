@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AzanAppTheme">
         <activity
-            android:name="nz.co.redice.azansilenttime.view.MainActivity"
+            android:name="nz.co.redice.azansilenttime.ui.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

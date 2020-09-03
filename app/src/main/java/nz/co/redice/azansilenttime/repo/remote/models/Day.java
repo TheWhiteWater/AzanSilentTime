@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
-import nz.co.redice.azansilenttime.view.presentation.Converters;
+import nz.co.redice.azansilenttime.ui.presentation.Converters;
 
 public class Day {
 

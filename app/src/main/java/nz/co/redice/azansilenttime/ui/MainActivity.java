@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.view;
+package nz.co.redice.azansilenttime.ui;
 
 import android.os.Bundle;
 

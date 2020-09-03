@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.view;
+package nz.co.redice.azansilenttime.ui;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -28,8 +30,6 @@ public class SplashFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: 24.08.2020  
-//        (((AppCompatActivity) requireActivity().getSupportActionBar())).hide();
     }
 
     @SuppressLint("CheckResult")

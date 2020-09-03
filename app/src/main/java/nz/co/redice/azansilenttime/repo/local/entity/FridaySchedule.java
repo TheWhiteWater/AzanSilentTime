@@ -4,7 +4,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import nz.co.redice.azansilenttime.view.presentation.Converters;
+import nz.co.redice.azansilenttime.ui.presentation.Converters;
 
 @Entity(tableName = "friday_table")
 public class FridaySchedule {

@@ -24,8 +24,9 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.services.foreground_service.ForegroundService;
+import nz.co.redice.azansilenttime.ui.presentation.Converters;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
-import nz.co.redice.azansilenttime.view.MainActivity;
+import nz.co.redice.azansilenttime.ui.MainActivity;
 
 @Singleton
 public class NotificationServiceImpl implements NotificationService {
@@ -94,11 +95,10 @@ public class NotificationServiceImpl implements NotificationService {
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
 
         if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
-            publishNotificationContextText("today between " + timeFormatter.format(startMuteTime)
-                    + " - " + timeFormatter.format(endMuteTime));
+            publishNotificationContextText(String.format("today between %s - %s", timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
         else
-            publishNotificationContextText(dayFormatter.format(startMuteTime) + " between "
-                    + timeFormatter.format(startMuteTime) + " - " + timeFormatter.format(endMuteTime));
+            publishNotificationContextText(String.format( "%s between %s - %s", dayFormatter.format(startMuteTime),
+                    timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
     }
 
     @Override
@@ -112,7 +112,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void onAlarmScheduled(Long timing) {
+    public void notifyNewAlarmScheduled(Long timing) {
         convertTimestampIntoNotificationContextText(timing);
     }
 

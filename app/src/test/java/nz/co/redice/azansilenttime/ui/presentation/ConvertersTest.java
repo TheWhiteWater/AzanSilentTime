@@ -1,11 +1,11 @@
-package nz.co.redice.azansilenttime.view.presentation;
+package nz.co.redice.azansilenttime.ui.presentation;
 
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import static nz.co.redice.azansilenttime.view.presentation.Converters.convertTextDateAndTextTimeIntoEpoch;
-import static nz.co.redice.azansilenttime.view.presentation.Converters.convertTextDateIntoEpoch;
+import static nz.co.redice.azansilenttime.ui.presentation.Converters.convertTextDateAndTextTimeIntoEpoch;
+import static nz.co.redice.azansilenttime.ui.presentation.Converters.convertTextDateIntoEpoch;
 
 public class ConvertersTest {
 

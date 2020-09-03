@@ -26,8 +26,8 @@ import nz.co.redice.azansilenttime.repo.Repository;
 import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.services.foreground_service.ForegroundService;
+import nz.co.redice.azansilenttime.ui.presentation.Converters;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
-import nz.co.redice.azansilenttime.view.presentation.Converters;
 
 @Singleton
 public class AlarmServiceImpl implements AlarmService {
@@ -87,12 +87,12 @@ public class AlarmServiceImpl implements AlarmService {
 
         if (earliestSchedule == null) {
             if (mScheduledAlarm.isActive())
-                cancelScheduledAlarm(mScheduledAlarm.getTiming(), REGULAR_ALARM);
-            mAlarmListener.onAlarmScheduled(null);
+                cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), REGULAR_ALARM);
+            mAlarmListener.notifyNewAlarmScheduled(null);
         } else {
             boolean isFridayModeActive = mSharedPreferencesHelper.isFridaysOnlyModeActive();
-            boolean isEarlierTimingDetected = mScheduledAlarm.isActive() && mScheduledAlarm.getTiming() != earliestSchedule.epochSecond;
-            boolean isNewTimingSameAsOld = mScheduledAlarm.isActive() && mScheduledAlarm.getTiming() == earliestSchedule.epochSecond;
+            boolean isEarlierTimingDetected = mScheduledAlarm.isActive() && mScheduledAlarm.getEpochSeconds() != earliestSchedule.epochSecond;
+            boolean isNewTimingSameAsOld = mScheduledAlarm.isActive() && mScheduledAlarm.getEpochSeconds() == earliestSchedule.epochSecond;
 
             if (!isFridayModeActive) {
                 if (!mScheduledAlarm.isActive())
@@ -102,12 +102,13 @@ public class AlarmServiceImpl implements AlarmService {
                     return;
                 }
                 if (isEarlierTimingDetected) {
-                    cancelScheduledAlarm(mScheduledAlarm.getTiming(), REGULAR_ALARM);
+                    if (mScheduledAlarm.getEpochSeconds() != getCurrentEpochSeconds())
+                        cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), REGULAR_ALARM);
                     scheduleAlarm(earliestSchedule.epochSecond, REGULAR_ALARM);
                 }
             } else {
                 if (mScheduledAlarm.isActive())
-                    cancelScheduledAlarm(mScheduledAlarm.getTiming(), REGULAR_ALARM);
+                    cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), REGULAR_ALARM);
             }
         }
 
@@ -119,13 +120,13 @@ public class AlarmServiceImpl implements AlarmService {
         intent.setAction(DND_ON);
         PendingIntent dndOnIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(timing * 1000, null), dndOnIntent);
-        Log.d(TAG, "AlarmManager activated on " + timing * 1000 + ": "
+        mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(Converters.convertEpochSecondsIntoTimeMillis(timing), null), dndOnIntent);
+        Log.d(TAG, "AlarmManager activated on " + Converters.convertEpochSecondsIntoTimeMillis(timing) + ": "
                 + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
 
         mScheduledAlarm.setAlarmStatus(true);
-        mScheduledAlarm.setAlarmTiming(timing);
-        mAlarmListener.onAlarmScheduled(timing);
+        mScheduledAlarm.setEpochSeconds(timing);
+        mAlarmListener.notifyNewAlarmScheduled(Converters.convertEpochSecondsIntoTimeMillis(timing));
     }
 
 
@@ -136,9 +137,8 @@ public class AlarmServiceImpl implements AlarmService {
 
         mAlarmManager.cancel(dndIntent);
         mScheduledAlarm.setAlarmStatus(false);
-        Log.d(TAG, "AlarmManager canceled on " + timing * 1000 + ": "
+        Log.d(TAG, "AlarmManager canceled on " + Converters.convertEpochSecondsIntoTimeMillis(timing) + ": "
                 + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
-
     }
 
 
@@ -186,12 +186,12 @@ public class AlarmServiceImpl implements AlarmService {
     private void setFridaySchedule(Schedule earliestSchedule) {
         if (earliestSchedule == null) {
             if (mScheduledAlarm.isActive())
-                cancelScheduledAlarm(mScheduledAlarm.getTiming(), FRIDAY_ALARM);
-            mAlarmListener.onAlarmScheduled(null);
+                cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), FRIDAY_ALARM);
+            mAlarmListener.notifyNewAlarmScheduled(null);
         } else {
             boolean isFridayModeActive = mSharedPreferencesHelper.isFridaysOnlyModeActive();
-            boolean isEarlierTimingDetected = mScheduledAlarm.isActive() && mScheduledAlarm.getTiming() != earliestSchedule.epochSecond;
-            boolean isNewTimingSameAsOld = mScheduledAlarm.isActive() && mScheduledAlarm.getTiming() == earliestSchedule.epochSecond;
+            boolean isEarlierTimingDetected = mScheduledAlarm.isActive() && mScheduledAlarm.getEpochSeconds() != earliestSchedule.epochSecond;
+            boolean isNewTimingSameAsOld = mScheduledAlarm.isActive() && mScheduledAlarm.getEpochSeconds() == earliestSchedule.epochSecond;
 
             if (isFridayModeActive) {
                 if (!mScheduledAlarm.isActive())
@@ -201,12 +201,13 @@ public class AlarmServiceImpl implements AlarmService {
                     return;
                 }
                 if (isEarlierTimingDetected) {
-                    cancelScheduledAlarm(mScheduledAlarm.getTiming(), FRIDAY_ALARM);
+                    if (mScheduledAlarm.getEpochSeconds() != getCurrentEpochSeconds())
+                        cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), FRIDAY_ALARM);
                     scheduleAlarm(earliestSchedule.epochSecond, FRIDAY_ALARM);
                 }
             } else {
                 if (mScheduledAlarm.isActive())
-                    cancelScheduledAlarm(mScheduledAlarm.getTiming(), FRIDAY_ALARM);
+                    cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), FRIDAY_ALARM);
             }
         }
 
@@ -219,14 +220,16 @@ public class AlarmServiceImpl implements AlarmService {
         intent.setAction(DND_OFF);
         PendingIntent dndOffIntent = PendingIntent.getService(mContext, 999, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long delayTime = (getCurrentEpochSeconds() * 1000) + (mSharedPreferencesHelper.getDndPeriod() * 60 * 1000);
+        long delayTime = (System.currentTimeMillis() + (mSharedPreferencesHelper.getDndPeriod() * 60 * 1000));
+        Log.d(TAG, String.format("scheduleWakeUpAlarm: wakeUp Alarm scheduled on %s", Converters.convertEpochIntoTextTime(delayTime/1000)));
+
         mAlarmManager.setExact(AlarmManager.RTC, delayTime, dndOffIntent);
     }
 
     @Override
     public Long getAlarmTimestamp() {
         if (mScheduledAlarm != null) {
-            return mScheduledAlarm.getTiming();
+            return mScheduledAlarm.getEpochSeconds();
         } else
             return null;
     }

@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.view;
+package nz.co.redice.azansilenttime.ui;
 
 import android.Manifest;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -87,10 +86,9 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
         // Provide an additional rationale to the user. This would happen if the user denied the
         // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
-            Log.i("App", "Displaying permission rationale to provide additional context.");
             Snackbar.make(
                     mViewBinding.locationLayout,
-                    "Location permission is needed for core functionality",
+                    R.string.location_permission_rationale_text,
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.ok, view -> {
                         // Request permission
@@ -98,7 +96,6 @@ public class LocationFragment extends Fragment implements View.OnClickListener {
                         mSharedPreferencesHelper.setLocationStatus(true);
                     }).show();
         } else {
-            Log.i("App", "Requesting permission");
             // Request permission. It's possible this can be auto answered if device policy
             // sets the permission in a given state or the user denied the permission
             // previously and checked "Never ask again".

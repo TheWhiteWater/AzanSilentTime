@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.view;
+package nz.co.redice.azansilenttime.ui;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -89,7 +89,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if (mutePeriodPreference != null) {
             mutePeriodPreference.setSummaryProvider(preference -> {
                 int prefValue = mSharedPreferencesHelper.getDndPeriod();
-                return prefValue == 60 ? "1 hour" : prefValue + " min";
+                return prefValue == 60 ? getString(R.string.one_hour) : String.format("%d %s", prefValue, getString(R.string.min));
             });
             mutePeriodPreference.setOnPreferenceChangeListener(this);
         }
@@ -138,7 +138,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 isDatabaseUpdateRequired = false;
                 break;
             case CALCULATION_METHOD:
-                Log.d(TAG, "onPreferenceChange: value from xml " + newValue);
                 mSharedPreferencesHelper.setCalculationMethod((String) newValue);
                 isDatabaseUpdateRequired = true;
                 break;
@@ -165,9 +164,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 LocationCallback locationCallback = new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
-                        Log.d(TAG, "onLocationResult: receiving location result from LocationHelper");
                         if (locationResult != null) {
-                            Log.d(TAG, "onLocationResult: locationResult is not null");
                             String locationText = mLocationHelper.locationToArea(locationResult.getLastLocation());
                             if (!locationText.isEmpty()) {
                                 preference.setSummary(locationText);
@@ -176,7 +173,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                                 mSharedPreferencesHelper.setLatitude((float) locationResult.getLastLocation().getLatitude());
                                 mLocationHelper.removeLocationUpdates(this);
                                 isDatabaseUpdateRequired = true;
-                                Log.d(TAG, "onLocationResult: address: " + locationText);
                             }
                         } else {
                             Log.d(TAG, "onLocationResult: result is null");

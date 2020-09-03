@@ -1,4 +1,4 @@
-package nz.co.redice.azansilenttime.view;
+package nz.co.redice.azansilenttime.ui;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -35,8 +35,8 @@ import nz.co.redice.azansilenttime.databinding.FragmentHomeBinding;
 import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
-import nz.co.redice.azansilenttime.view.presentation.DatePickerFragment;
-import nz.co.redice.azansilenttime.view.presentation.TimePickerFragment;
+import nz.co.redice.azansilenttime.ui.presentation.DatePickerFragment;
+import nz.co.redice.azansilenttime.ui.presentation.TimePickerFragment;
 import nz.co.redice.azansilenttime.viewmodel.HomeViewModel;
 
 @AndroidEntryPoint
