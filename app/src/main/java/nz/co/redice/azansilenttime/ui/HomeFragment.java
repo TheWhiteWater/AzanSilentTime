@@ -3,7 +3,6 @@ package nz.co.redice.azansilenttime.ui;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,15 +33,13 @@ import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.FragmentHomeBinding;
 import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
 import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
-import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.ui.presentation.DatePickerFragment;
 import nz.co.redice.azansilenttime.ui.presentation.TimePickerFragment;
+import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.viewmodel.HomeViewModel;
 
 @AndroidEntryPoint
 public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, CompoundButton.OnCheckedChangeListener {
-
-    private static final String TAG = "App HomeFragment";
 
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     private HomeViewModel mViewModel;
@@ -70,10 +67,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int menuItemId = item.getItemId();
-        switch (menuItemId) {
-            case R.id.settings_id:
-                NavHostFragment.findNavController(this).navigate(R.id.fromHomeToSettings);
-                return true;
+        if (menuItemId == R.id.settings_id) {
+            NavHostFragment.findNavController(this).navigate(R.id.fromHomeToSettings);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -112,7 +108,6 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     private void bindRegularEntry() {
         mViewModel.getRegularObservable().observe(getViewLifecycleOwner(), entry -> {
             if (entry != null) {
-                Log.d(TAG, "setLiveDataObserver: setting livedata");
                 registerSwitchListeners(false);
                 setRegularSwitches(entry);
                 mRegularSchedule = entry;
@@ -161,12 +156,12 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private void showTimePickerDialog(View view) {
         DialogFragment newFragment = new TimePickerFragment(getContext(), this);
-        newFragment.show(requireActivity().getSupportFragmentManager(), "timePicker");
+        newFragment.show(requireActivity().getSupportFragmentManager(), getString(R.string.fragment_tag_time_picker));
     }
 
     private void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment(getContext(), this);
-        newFragment.show(requireActivity().getSupportFragmentManager(), "datePicker");
+        newFragment.show(requireActivity().getSupportFragmentManager(), getString(R.string.fragment_tag_date_picker));
     }
 
     @Override
@@ -188,7 +183,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
 
     public void setFridaySwitch(FridaySchedule regularEntry) {
-        mViewBinding.fridaySwitch.setChecked(regularEntry.isSilent());
+        mViewBinding.fridaySwitch.setChecked(regularEntry.isMute());
     }
 
     @Override
@@ -238,7 +233,7 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
                 mViewBinding.invalidateAll();
                 break;
             case R.id.friday_switch:
-                mFridaySchedule.setSilent(!mFridaySchedule.isSilent());
+                mFridaySchedule.setMute(!mFridaySchedule.isMute());
                 mViewModel.updateFridayEntry(mFridaySchedule);
                 mViewBinding.invalidateAll();
                 break;

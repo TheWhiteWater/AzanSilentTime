@@ -6,7 +6,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -32,7 +31,6 @@ import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 @Singleton
 public class AlarmServiceImpl implements AlarmService {
 
-    private static final String TAG = "App AlarmService";
     private static final int REGULAR_ALARM = 123;
     private static final int FRIDAY_ALARM = 321;
     private static final long ONE_DAY = 1;
@@ -59,6 +57,12 @@ public class AlarmServiceImpl implements AlarmService {
         return System.currentTimeMillis() / 1000;
     }
 
+
+    /**
+     * Observes 2 RegularSchedule for further processing.
+     *
+     * @param day - start date of 2 day range.
+     */
     @Override
     @SuppressLint("CheckResult")
     public void getSchedulesFromNextTwoDaysStartingFrom(LocalDate day) {
@@ -71,6 +75,12 @@ public class AlarmServiceImpl implements AlarmService {
                 .subscribe(this::processRegularSchedules);
     }
 
+    /**
+     * Processes passed in schedule list and schedules alarm to launch PendingIntent,
+     * which is switching the phone into Do Not Disturb mode.
+     *
+     * @param regularSchedules -  RegularSchedule list to be processed.
+     */
     private void processRegularSchedules(List<RegularSchedule> regularSchedules) {
         List<Schedule> schedules = new ArrayList<>();
         for (RegularSchedule s : regularSchedules) {
@@ -80,14 +90,19 @@ public class AlarmServiceImpl implements AlarmService {
             schedules.add(new Schedule(s.getMaghribEpochSecond(), s.isMaghribMute()));
             schedules.add(new Schedule(s.getIshaEpochSecond(), s.isIshaMute()));
         }
-        setRegularSchedule(getEarliestSchedule(schedules));
+        scheduleRegularAlarm(getEarliestSchedule(schedules));
     }
 
-    public void setRegularSchedule(Schedule earliestSchedule) {
 
+    /**
+     * Schedules Regular Alarm
+     *
+     * @param earliestSchedule - alarm to be scheduled
+     */
+    public void scheduleRegularAlarm(Schedule earliestSchedule) {
         if (earliestSchedule == null) {
             if (mScheduledAlarm.isActive())
-                cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), REGULAR_ALARM);
+                cancelScheduledAlarm(REGULAR_ALARM);
             mAlarmListener.notifyNewAlarmScheduled(null);
         } else {
             boolean isFridayModeActive = mSharedPreferencesHelper.isFridaysOnlyModeActive();
@@ -96,54 +111,60 @@ public class AlarmServiceImpl implements AlarmService {
 
             if (!isFridayModeActive) {
                 if (!mScheduledAlarm.isActive())
-                    scheduleAlarm(earliestSchedule.epochSecond, REGULAR_ALARM);
+                    setNewAlarm(earliestSchedule.epochSecond, REGULAR_ALARM);
 
                 if (isNewTimingSameAsOld) {
                     return;
                 }
                 if (isEarlierTimingDetected) {
                     if (mScheduledAlarm.getEpochSeconds() != getCurrentEpochSeconds())
-                        cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), REGULAR_ALARM);
-                    scheduleAlarm(earliestSchedule.epochSecond, REGULAR_ALARM);
+                        cancelScheduledAlarm(REGULAR_ALARM);
+                    setNewAlarm(earliestSchedule.epochSecond, REGULAR_ALARM);
                 }
             } else {
                 if (mScheduledAlarm.isActive())
-                    cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), REGULAR_ALARM);
+                    cancelScheduledAlarm(REGULAR_ALARM);
             }
         }
 
     }
 
-
-    public void scheduleAlarm(Long timing, int requestCode) {
+    /**
+     * Creates new alarm
+     *
+     * @param timing      - time in milliseconds;
+     * @param requestCode - alarm id.
+     */
+    public void setNewAlarm(Long timing, int requestCode) {
         Intent intent = new Intent(mContext, ForegroundService.class);
-        intent.setAction(DND_ON);
+        intent.setAction(DO_NOT_DISTURB_ON);
         PendingIntent dndOnIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         mAlarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(Converters.convertEpochSecondsIntoTimeMillis(timing), null), dndOnIntent);
-        Log.d(TAG, "AlarmManager activated on " + Converters.convertEpochSecondsIntoTimeMillis(timing) + ": "
-                + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
-
         mScheduledAlarm.setAlarmStatus(true);
         mScheduledAlarm.setEpochSeconds(timing);
         mAlarmListener.notifyNewAlarmScheduled(Converters.convertEpochSecondsIntoTimeMillis(timing));
     }
 
-
-    public void cancelScheduledAlarm(Long timing, int requestCode) {
+    /**
+     * Cancels previously scheduled alarm
+     *
+     * @param requestCode - alarm id.
+     */
+    public void cancelScheduledAlarm(int requestCode) {
         Intent intent = new Intent(mContext, ForegroundService.class);
-        intent.setAction(DND_OFF);
+        intent.setAction(DO_NOT_DISTURB_OFF);
         PendingIntent dndIntent = PendingIntent.getService(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         mAlarmManager.cancel(dndIntent);
         mScheduledAlarm.setAlarmStatus(false);
-        Log.d(TAG, "AlarmManager canceled on " + Converters.convertEpochSecondsIntoTimeMillis(timing) + ": "
-                + Converters.convertEpochIntoTextDate(timing) + ", " + Converters.convertEpochIntoTextTime(timing));
     }
 
-
-    @Override
-    public synchronized Schedule getEarliestSchedule(List<Schedule> unsortedList) {
+    /**
+     * Sorts Schedule list.
+     *
+     * @param unsortedList - list to be sorted;
+     * @return - Schedule which is having the earliest time against current time and being active.
+     */
+    public Schedule getEarliestSchedule(List<Schedule> unsortedList) {
         Schedule earliestSchedule;
         ArrayList<Schedule> sortedList = unsortedList
                 .stream()
@@ -153,14 +174,16 @@ public class AlarmServiceImpl implements AlarmService {
                 .collect(Collectors.toCollection(ArrayList::new));
         if (sortedList.size() > 0) {
             earliestSchedule = sortedList.get(0);
-            Log.d(TAG, "The earliest timing is " + Converters.convertEpochIntoTextTime(earliestSchedule.epochSecond)
-                    + " " + Converters.convertEpochIntoTextDate(earliestSchedule.epochSecond));
             return earliestSchedule;
         } else
             return null;
     }
 
-
+    /**
+     * Observes 2 FridaySchedule for further processing.
+     *
+     * @param day - start date of 2 day range.
+     */
     @Override
     @SuppressLint("CheckResult")
     public void getSchedulesFromNextTwoFridaysStartingFrom(LocalDate day) {
@@ -175,18 +198,31 @@ public class AlarmServiceImpl implements AlarmService {
                 .subscribe(this::processFridaySchedules);
     }
 
+
+    /**
+     * Processes passed in schedule list and schedules alarm to launch PendingIntent,
+     * which is switching the phone into Do Not Disturb mode.
+     *
+     * @param fridayEntries - FridaySchedule list to be process.
+     */
     private void processFridaySchedules(List<FridaySchedule> fridayEntries) {
         List<Schedule> schedules = new ArrayList<>();
         for (FridaySchedule s : fridayEntries) {
-            schedules.add(new Schedule(s.getEpochSecond(), s.isSilent()));
+            schedules.add(new Schedule(s.getEpochSecond(), s.isMute()));
         }
-        setFridaySchedule(getEarliestSchedule(schedules));
+        scheduleFridayAlarm(getEarliestSchedule(schedules));
     }
 
-    private void setFridaySchedule(Schedule earliestSchedule) {
+
+    /**
+     * Schedules Friday Alarms
+     *
+     * @param earliestSchedule - alarm to be scheduled
+     */
+    private void scheduleFridayAlarm(Schedule earliestSchedule) {
         if (earliestSchedule == null) {
             if (mScheduledAlarm.isActive())
-                cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), FRIDAY_ALARM);
+                cancelScheduledAlarm(FRIDAY_ALARM);
             mAlarmListener.notifyNewAlarmScheduled(null);
         } else {
             boolean isFridayModeActive = mSharedPreferencesHelper.isFridaysOnlyModeActive();
@@ -195,43 +231,34 @@ public class AlarmServiceImpl implements AlarmService {
 
             if (isFridayModeActive) {
                 if (!mScheduledAlarm.isActive())
-                    scheduleAlarm(earliestSchedule.epochSecond, FRIDAY_ALARM);
+                    setNewAlarm(earliestSchedule.epochSecond, FRIDAY_ALARM);
 
                 if (isNewTimingSameAsOld) {
                     return;
                 }
                 if (isEarlierTimingDetected) {
                     if (mScheduledAlarm.getEpochSeconds() != getCurrentEpochSeconds())
-                        cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), FRIDAY_ALARM);
-                    scheduleAlarm(earliestSchedule.epochSecond, FRIDAY_ALARM);
+                        cancelScheduledAlarm(FRIDAY_ALARM);
+                    setNewAlarm(earliestSchedule.epochSecond, FRIDAY_ALARM);
                 }
             } else {
                 if (mScheduledAlarm.isActive())
-                    cancelScheduledAlarm(mScheduledAlarm.getEpochSeconds(), FRIDAY_ALARM);
+                    cancelScheduledAlarm(FRIDAY_ALARM);
             }
         }
 
     }
 
-
+    /**
+     * Sets post DND alarm to return phone back to normal
+     */
     @Override
-    public void scheduleWakeUpAlarm() {
+    public void setPostAlarmWakeUp() {
         Intent intent = new Intent(mContext, ForegroundService.class);
-        intent.setAction(DND_OFF);
+        intent.setAction(DO_NOT_DISTURB_OFF);
         PendingIntent dndOffIntent = PendingIntent.getService(mContext, 999, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         long delayTime = (System.currentTimeMillis() + (mSharedPreferencesHelper.getDndPeriod() * 60 * 1000));
-        Log.d(TAG, String.format("scheduleWakeUpAlarm: wakeUp Alarm scheduled on %s", Converters.convertEpochIntoTextTime(delayTime/1000)));
-
         mAlarmManager.setExact(AlarmManager.RTC, delayTime, dndOffIntent);
-    }
-
-    @Override
-    public Long getAlarmTimestamp() {
-        if (mScheduledAlarm != null) {
-            return mScheduledAlarm.getEpochSeconds();
-        } else
-            return null;
     }
 
     @Override
@@ -239,6 +266,13 @@ public class AlarmServiceImpl implements AlarmService {
         mAlarmListener = onNewAlarmListener;
     }
 
+
+    /**
+     * Returns next friday
+     *
+     * @param day - date of the week, target Friday belongs to.
+     * @return next friday date
+     */
     private LocalDate getNextFriday(LocalDate day) {
         return day.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
     }

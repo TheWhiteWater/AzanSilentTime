@@ -130,7 +130,6 @@ public class HomeViewModel extends AndroidViewModel {
             Long date = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             Long time = targetDay.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
             FridaySchedule fridaySchedule = new FridaySchedule(date, true, time);
-            Log.d(TAG, "populateFridayTable: " + fridaySchedule.getDateString());
             mRepository.insertFridayEntry(fridaySchedule);
         }
         mSharedPreferencesHelper.setFridayTableToBePopulated(false);

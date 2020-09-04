@@ -2,8 +2,6 @@ package nz.co.redice.azansilenttime.repo;
 
 import android.annotation.SuppressLint;
 
-import androidx.lifecycle.LiveData;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -18,7 +16,6 @@ import nz.co.redice.azansilenttime.repo.remote.AzanService;
 
 public class Repository {
 
-    private static final String TAG = "App Repo";
     private final EventDao mDao;
     private AzanService mAzanService;
 
@@ -26,7 +23,6 @@ public class Repository {
     public Repository(AzanService newsService, EventDao dao) {
         mAzanService = newsService;
         mDao = dao;
-
     }
 
     public AzanService getAzanService() {
@@ -71,14 +67,6 @@ public class Repository {
         Observable.just(fridaySchedule)
                 .subscribeOn(Schedulers.io())
                 .subscribe(mDao::insertFridayEntry);
-    }
-
-    public LiveData<RegularSchedule> getSelectedRegularLiveData(Long value) {
-        return mDao.getSelectedRegularLiveData(value);
-    }
-
-    public LiveData<FridaySchedule> getSelectedFridayLiveData(Long value) {
-        return mDao.getSelectedFridayLiveData(value);
     }
 
     public Observable<List<RegularSchedule>> selectTwoDaysForAlarmSetting(Long startDate, Long endDate) {

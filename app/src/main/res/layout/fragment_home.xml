@@ -83,7 +83,7 @@
                 <TextView
                     android:id="@+id/fajr_name"
                     style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="Fajr"
+                    android:text="@string/fajr"
                     app:layout_constraintStart_toStartOf="@+id/fajr_time"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -127,7 +127,7 @@
                 <TextView
                     android:id="@+id/dhuhr_name"
                     style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="Dhuhr"
+                    android:text="@string/dhuhr"
                     app:layout_constraintStart_toStartOf="@+id/dhuhr_time"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -171,7 +171,7 @@
                 <TextView
                     android:id="@+id/asr_name"
                     style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="Asr"
+                    android:text="@string/asr"
                     app:layout_constraintStart_toStartOf="@+id/asr_time"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -215,7 +215,7 @@
                 <TextView
                     android:id="@+id/maghrib_name"
                     style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="Maghrib"
+                    android:text="@string/maghrib"
                     app:layout_constraintStart_toStartOf="@+id/maghrib_time"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -259,7 +259,7 @@
                 <TextView
                     android:id="@+id/isha_name"
                     style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="Isha"
+                    android:text="@string/isha"
                     app:layout_constraintStart_toStartOf="@+id/isha_time"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -293,7 +293,7 @@
             android:id="@+id/friday_card"
             style="@style/AzanAppTheme.RoundedCard"
             android:visibility="@{prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{friday.Silent ? @color/cardview : @color/faded_cardview}"
+            app:cardBackgroundColor="@{friday.isMute() ? @color/cardview : @color/faded_cardview}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/guideline_right"
             app:layout_constraintStart_toStartOf="@+id/guideline_left"
@@ -304,14 +304,14 @@
                 <TextView
                     android:id="@+id/friday_name"
                     style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="Friday Prayer"
+                    android:text="@string/friday_prayer"
                     app:layout_constraintStart_toStartOf="@+id/friday_time"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/friday_time"
                     style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{friday.timeText}"
+                    android:text="@{friday.timeString}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/friday_name"
                     tools:text="20:20 AM" />
@@ -320,7 +320,7 @@
                     android:id="@+id/friday_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="@{friday.isSilent}"
+                    android:checked="@{friday.isMute}"
                     android:theme="@style/SwitchTheme"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -338,7 +338,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="@{prefs.fridaysOnlyModeActive}"
-            android:text="The Friday Prayer only"
+            android:text="@string/friday_prayer_only"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

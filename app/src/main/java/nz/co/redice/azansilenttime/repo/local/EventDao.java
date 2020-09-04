@@ -38,12 +38,6 @@ public interface EventDao {
     @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
     RegularSchedule getSelectedRegularEntry(Long selectedDate);
 
-    @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
-    LiveData<RegularSchedule> getSelectedRegularLiveData(Long selectedDate);
-
-    @Query("SELECT * FROM friday_table WHERE date = :selectedDate ")
-    LiveData<FridaySchedule> getSelectedFridayLiveData(Long selectedDate);
-
     @Query("DELETE FROM regular_table")
     void deleteCalendar();
 

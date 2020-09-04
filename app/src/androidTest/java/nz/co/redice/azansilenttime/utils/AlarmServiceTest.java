@@ -38,17 +38,7 @@ public class AlarmServiceTest {
     }
 
     @Test
-    public void alarmManagerHelper_setAlarmManager_setsValidAlarm() {
-        Long timing = LocalDateTime.now().minusMinutes(10).toEpochSecond(ZoneOffset.UTC);
-        int requestCode = 777;
-//        SUT.scheduleMuteAlarm(timing, requestCode);
-        Log.d("Test", "alarmManagerHelper: " + SUT.getScheduledAlarmTimings().get(0));
-        Log.d("Test", "alarmManagerHelper: " + timing);
-    }
-
-    @Test
     public void getEarliestSchedule_returnsValidSchedule() {
-
         ArrayList <Schedule> schedules = new ArrayList<>();
         schedules.add(new Schedule(1601574720L, false));
         schedules.add(new Schedule(1601574721L, false));

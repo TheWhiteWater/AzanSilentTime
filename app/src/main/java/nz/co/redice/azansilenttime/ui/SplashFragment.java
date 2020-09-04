@@ -7,11 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -25,6 +23,7 @@ import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
 @AndroidEntryPoint
 public class SplashFragment extends Fragment {
+    private static final String TAG = SplashFragment.class.getSimpleName();
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
 
     @Override
@@ -42,7 +41,7 @@ public class SplashFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(s -> shiftToNextScreen(),
-                        error -> Log.d("App", "onCreateView rxtimer error: " + error.getMessage() ));
+                        error -> Log.e(TAG, getString(R.string.splashfragment_timer_error_message) + error.getMessage()));
         return view;
     }
 

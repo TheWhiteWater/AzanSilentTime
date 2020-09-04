@@ -1,7 +1,6 @@
 package nz.co.redice.azansilenttime.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -24,15 +24,14 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.repo.Repository;
+import nz.co.redice.azansilenttime.services.foreground_service.BindService;
 import nz.co.redice.azansilenttime.utils.LocationHelper;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
-import nz.co.redice.azansilenttime.services.foreground_service.BindService;
 
 @AndroidEntryPoint
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener,
         Preference.OnPreferenceClickListener {
 
-    private static final String TAG = "App Pref";
     private static final String LOCATION = "location";
     private static final String MUTE_PERIOD = "mute_period";
     private static final String CALCULATION_METHOD = "calculation_method";
@@ -89,7 +88,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if (mutePeriodPreference != null) {
             mutePeriodPreference.setSummaryProvider(preference -> {
                 int prefValue = mSharedPreferencesHelper.getDndPeriod();
-                return prefValue == 60 ? getString(R.string.one_hour) : String.format("%d %s", prefValue, getString(R.string.min));
+                return prefValue == 60 ? getString(R.string.one_hour) : String.format(Locale.ENGLISH, getString(R.string.mute_period_summary_format), prefValue, getString(R.string.min));
             });
             mutePeriodPreference.setOnPreferenceChangeListener(this);
         }
@@ -158,33 +157,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        switch (preference.getKey()) {
-            case LOCATION:
-            default:
-                LocationCallback locationCallback = new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        if (locationResult != null) {
-                            String locationText = mLocationHelper.locationToArea(locationResult.getLastLocation());
-                            if (!locationText.isEmpty()) {
-                                preference.setSummary(locationText);
-                                mSharedPreferencesHelper.setLocationText(locationText);
-                                mSharedPreferencesHelper.setLongitude((float) locationResult.getLastLocation().getLongitude());
-                                mSharedPreferencesHelper.setLatitude((float) locationResult.getLastLocation().getLatitude());
-                                mLocationHelper.removeLocationUpdates(this);
-                                isDatabaseUpdateRequired = true;
-                            }
-                        } else {
-                            Log.d(TAG, "onLocationResult: result is null");
-                        }
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    String locationText = mLocationHelper.locationToArea(locationResult.getLastLocation());
+                    if (!locationText.isEmpty()) {
+                        preference.setSummary(locationText);
+                        mSharedPreferencesHelper.setLocationText(locationText);
+                        mSharedPreferencesHelper.setLongitude((float) locationResult.getLastLocation().getLongitude());
+                        mSharedPreferencesHelper.setLatitude((float) locationResult.getLastLocation().getLatitude());
+                        mLocationHelper.removeLocationUpdates(this);
+                        isDatabaseUpdateRequired = true;
                     }
-                };
+                }
+            }
+        };
 
-                mLocationHelper.getAdminArea(locationCallback);
-                break;
-
-
-        }
+        mLocationHelper.getAdminArea(locationCallback);
         return true;
     }
 

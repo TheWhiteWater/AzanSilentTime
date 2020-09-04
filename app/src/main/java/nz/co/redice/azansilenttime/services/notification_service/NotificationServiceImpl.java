@@ -32,11 +32,11 @@ import nz.co.redice.azansilenttime.ui.MainActivity;
 public class NotificationServiceImpl implements NotificationService {
 
     public static final String QUIT_APP = "quit app";
-    // The identifier for the notification displayed for the foreground service.
     public static final int NOTIFICATION_ID = 12345678;
     private static final String FOREGROUND_CHANNEL_ID = "channelId";
     public NotificationCompat.Builder mNotificationBuilder;
     private int mNotificationChannel;
+    private Context mContext;
     private SharedPreferencesHelper mSharedPreferencesHelper;
     private NotificationManager mNotificationManager;
 
@@ -45,6 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Inject
     public NotificationServiceImpl(@ApplicationContext Context context,
                                    SharedPreferencesHelper sharedPreferencesHelper) {
+        mContext = context;
         mSharedPreferencesHelper = sharedPreferencesHelper;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -73,17 +74,17 @@ public class NotificationServiceImpl implements NotificationService {
         PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0, activityLaunchingIntent, 0);
 
         mNotificationBuilder = new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-                .addAction(R.drawable.ic_settings, "Home", activityPendingIntent)
-                .addAction(R.drawable.ic_cancel, "Quit", servicePendingIntent)
-                .setContentTitle("Next Mute period:")
-                .setContentText("Not set yet")
+                .addAction(R.drawable.ic_settings, context.getString(R.string.notificatin_home_button_value), activityPendingIntent)
+                .addAction(R.drawable.ic_cancel, context.getString(R.string.notification_quit_button_value), servicePendingIntent)
+                .setContentTitle(context.getString(R.string.notification_content_title))
+                .setContentText(context.getString(R.string.notification_empty_content_text))
                 .setSmallIcon(R.drawable.ic_bell_small);
     }
 
 
     private void convertTimestampIntoNotificationContextText(Long timing) {
         if (timing == null) {
-            publishNotificationContextText("No active alarm detected");
+            publishNotificationContextText(mContext.getString(R.string.notification_no_active_alarm_detected));
             return;
         }
         Date date = new Date(timing);
@@ -95,9 +96,9 @@ public class NotificationServiceImpl implements NotificationService {
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
 
         if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
-            publishNotificationContextText(String.format("today between %s - %s", timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
+            publishNotificationContextText(String.format(mContext.getString(R.string.notification_content_format_today), timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
         else
-            publishNotificationContextText(String.format( "%s between %s - %s", dayFormatter.format(startMuteTime),
+            publishNotificationContextText(String.format( mContext.getString(R.string.notification_content_format_not_today), dayFormatter.format(startMuteTime),
                     timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
     }
 

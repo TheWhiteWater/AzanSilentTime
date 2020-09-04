@@ -16,7 +16,6 @@ public class AudioServiceImpl implements AudioService {
     @Inject
     public AudioServiceImpl(@ApplicationContext Context context) {
         mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-
     }
 
     @Override

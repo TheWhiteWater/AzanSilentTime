@@ -19,7 +19,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @InstallIn(ApplicationComponent.class)
 public class NetworkModule {
 
-
     private static final String BASE_URL = "https://api.aladhan.com/v1/";
 
     @Provides

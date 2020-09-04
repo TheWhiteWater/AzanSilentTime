@@ -21,14 +21,12 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 
-import static nz.co.redice.azansilenttime.services.alarm_service.AlarmService.DND_OFF;
-import static nz.co.redice.azansilenttime.services.alarm_service.AlarmService.DND_ON;
+import static nz.co.redice.azansilenttime.services.alarm_service.AlarmService.DO_NOT_DISTURB_OFF;
+import static nz.co.redice.azansilenttime.services.alarm_service.AlarmService.DO_NOT_DISTURB_ON;
 import static nz.co.redice.azansilenttime.services.notification_service.NotificationServiceImpl.QUIT_APP;
 
 @AndroidEntryPoint
 public class ForegroundService extends JobIntentService implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-    private static final String TAG = "App Service";
 
     private final IBinder mBinder = new LocalBinder();
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
@@ -49,14 +47,12 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
                 case QUIT_APP:
                     stopSelf();
                     break;
-                case DND_ON:
+                case DO_NOT_DISTURB_ON:
                     mForegroundFacade.turnDndOn();
-                    Log.d(TAG, "RingerMode: SILENT");
                     mForegroundFacade.scheduleWakeUpAlarm();
                     break;
-                case DND_OFF:
+                case DO_NOT_DISTURB_OFF:
                     mForegroundFacade.turnDndOff();
-                    Log.d(TAG, "RingerMode: UNSILENT");
                     break;
             }
 
@@ -83,7 +79,6 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
     @Override
     public IBinder onBind(@NotNull Intent intent) {
         super.onBind(intent);
-        Log.d(TAG, "onBind: Service bound");
         stopForeground(true);
         mChangingConfiguration = false;
         return mBinder;
@@ -91,7 +86,6 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     @Override
     public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind: ");
         stopForeground(true);
         mChangingConfiguration = false;
         super.onRebind(intent);
@@ -100,7 +94,6 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind: ");
         if (!mChangingConfiguration)
             startForeground(mForegroundFacade.getNotificationChannel(), mForegroundFacade.getNotificationBuilder().build());
         return true;

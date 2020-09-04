@@ -26,8 +26,6 @@ public class BindService {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mService = ((ForegroundService.LocalBinder) service).getService();
-            Log.d("App", "onServiceConnected: connected to the ForegroundService");
-
         }
 
         @Override
@@ -45,9 +43,6 @@ public class BindService {
         if (context.bindService(new Intent(context, ForegroundService.class),
                 mServiceConnection, Context.BIND_AUTO_CREATE)) {
             mShouldUnbind = true;
-        } else {
-            Log.e("App", "Error: The requested service doesn't " +
-                    "exist, or this client isn't allowed access to it.");
         }
     }
 

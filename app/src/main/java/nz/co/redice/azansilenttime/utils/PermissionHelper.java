@@ -19,7 +19,6 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 @Singleton
 public class PermissionHelper {
 
-    private static final String TAG = PermissionHelper.class.getSimpleName();
     private Context mContext;
 
     @Inject

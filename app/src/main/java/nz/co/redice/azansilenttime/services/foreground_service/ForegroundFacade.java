@@ -42,7 +42,7 @@ public class ForegroundFacade {
     }
 
     public void scheduleWakeUpAlarm() {
-        mAlarmService.scheduleWakeUpAlarm();
+        mAlarmService.setPostAlarmWakeUp();
     }
 
 

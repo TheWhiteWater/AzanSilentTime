@@ -11,9 +11,8 @@ public class FridaySchedule {
 
     @PrimaryKey
     private Long date;
-    private Boolean silent = true;
+    private Boolean mute = true;
     private Long epochSecond;
-    private String blank;
 
     public FridaySchedule() {
     }
@@ -21,14 +20,13 @@ public class FridaySchedule {
     @Ignore
     public FridaySchedule(Long date) {
         this.date = date;
-        this.silent = true;
-        this.blank = "Select";
+        this.mute = true;
     }
 
     @Ignore
     public FridaySchedule(Long date, Boolean isFridaySilent, Long epochSecond) {
         this.date = date;
-        this.silent = isFridaySilent;
+        this.mute = isFridaySilent;
         this.epochSecond = epochSecond;
     }
 
@@ -41,12 +39,12 @@ public class FridaySchedule {
         this.date = date;
     }
 
-    public Boolean isSilent() {
-        return silent;
+    public Boolean isMute() {
+        return mute;
     }
 
-    public void setSilent(Boolean fridaySilent) {
-        silent = fridaySilent;
+    public void setMute(Boolean fridaySilent) {
+        mute = fridaySilent;
     }
 
     public Long getEpochSecond() {
@@ -57,20 +55,12 @@ public class FridaySchedule {
         this.epochSecond = epochSecond;
     }
 
-    public String getTimeText() {
+    public String getTimeString() {
         return Converters.convertEpochIntoTextTime(epochSecond);
     }
-
 
     public String getDateString() {
         return Converters.convertEpochIntoTextDate(date);
     }
 
-    public String getBlank() {
-        return blank;
-    }
-
-    public void setBlank(String blank) {
-        this.blank = blank;
-    }
 }

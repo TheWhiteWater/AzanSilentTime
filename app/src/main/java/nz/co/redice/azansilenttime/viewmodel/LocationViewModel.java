@@ -36,7 +36,6 @@ public class LocationViewModel extends AndroidViewModel {
     @SuppressLint("MissingPermission")
     @ViewModelInject
     public LocationViewModel(@NonNull Application application, LocationHelper locationHelper,
-                             Repository repository,
                              @Assisted SavedStateHandle savedStateHandle, SharedPreferencesHelper sharedPreferencesHelper) {
         super(application);
         mLocationHelper = locationHelper;
@@ -45,17 +44,12 @@ public class LocationViewModel extends AndroidViewModel {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d(TAG, "onLocationResult: receiving location result from LocationHelper");
                 if (locationResult != null) {
-                    Log.d(TAG, "onLocationResult: locationResult is not null" );
                     mLocation = locationResult.getLastLocation();
                     String locationText = mLocationHelper.locationToArea(locationResult.getLastLocation());
                     if (!locationText.isEmpty()) {
                         position.setValue(locationText);
-                        Log.d(TAG, "onLocationResult: address: " +  locationText);
                     }
-                } else {
-                    Log.d(TAG, "onLocationResult: result is null");
                 }
             }
         };
@@ -66,7 +60,6 @@ public class LocationViewModel extends AndroidViewModel {
     @SuppressLint("MissingPermission")
     public void getAdminArea() {
         mLocationHelper.getAdminArea(mLocationCallback);
-        Log.d(TAG, "getAdminArea: requesting LocationHelper");
     }
 
 
