@@ -20,7 +20,6 @@ public class SharedPreferencesHelper {
     private static final String LATITUDE = "latitude";
     private static final String LOCATION_STATUS = "location_status";
     private static final String LOCATION_TEXT = "location_text";
-    private static final String DND_PERIOD = "dnd_period";
     private static final String CALCULATION_METHOD = "calculation_method";
     private static final String CALCULATION_SCHOOL = "calculation_school";
     private static final String MIDNIGHT_MODE = "midnight_mode";
@@ -65,14 +64,6 @@ public class SharedPreferencesHelper {
         mEditor.putBoolean(LOCATION_STATUS, status).apply();
     }
 
-    public boolean isFridaysOnlyModeActive() {
-        return mSharedPreferences.getBoolean(FRIDAYS_ONLY_MODE, false);
-    }
-
-    public void setFridaysOnlyModeActive(boolean b) {
-        mEditor.putBoolean(FRIDAYS_ONLY_MODE, b).apply();
-    }
-
     public String getLocationText() {
         return mSharedPreferences.getString(LOCATION_TEXT, "XXX");
     }
@@ -81,7 +72,7 @@ public class SharedPreferencesHelper {
         mEditor.putString(LOCATION_TEXT, addressText).apply();
     }
 
-    public Boolean isRegularTableToBePopulated() {
+    public Boolean isAzanTimingsToBePopulated() {
         return mSharedPreferences.getBoolean(REGULAR_TABLE_UPDATE_STATUS, false);
     }
 
@@ -89,22 +80,14 @@ public class SharedPreferencesHelper {
         mEditor.putBoolean(REGULAR_TABLE_UPDATE_STATUS, status).apply();
     }
 
-    public Boolean isFridayTableToBePopulated() {
+    public Boolean isAlarmSchedulesToBeCreated() {
         return mSharedPreferences.getBoolean(FRIDAY_TABLE_UPDATE_STATUS, false);
     }
 
-    public void setFridayTableToBePopulated(Boolean status) {
+    public void setAlarmSchedulesToBeCreated(Boolean status) {
         mEditor.putBoolean(FRIDAY_TABLE_UPDATE_STATUS, status).apply();
     }
 
-
-    public int getDndPeriod() {
-        return mSharedPreferences.getInt(DND_PERIOD, 10);
-    }
-
-    public void setDndPeriod(String value) {
-        mEditor.putInt(DND_PERIOD, Integer.parseInt(value)).apply();
-    }
 
     public int getCalculationSchool() {
         return mSharedPreferences.getInt(CALCULATION_SCHOOL, 0);
@@ -129,4 +112,11 @@ public class SharedPreferencesHelper {
     public void setMidnightMode(String value) {
         mEditor.putInt(MIDNIGHT_MODE, Integer.parseInt(value)).apply();
     }
+
+
+
+
+
+
+
 }

@@ -96,13 +96,13 @@ public class SharedPreferencesHelperTest {
     public void sharedPreferencesHelper_isRegularTableToBePopulated_returnsValidSavedValue() {
         boolean expected = true;
         SUT.setRegularTableToBePopulated(expected);
-        boolean actual = SUT.isRegularTableToBePopulated();
+        boolean actual = SUT.isAzanTimingsToBePopulated();
         assertEquals(expected, actual);
     }
 
     @Test
     public void sharedPreferencesHelper_isRegularTableToBePopulated_returnsValidDefaultValue() {
-        boolean actual = SUT.isRegularTableToBePopulated();
+        boolean actual = SUT.isAzanTimingsToBePopulated();
         assertEquals(DEFAULT_REGULAR_TABLE_UPDATE_STATUS, actual);
     }
 
@@ -110,14 +110,14 @@ public class SharedPreferencesHelperTest {
     @Test
     public void sharedPreferencesHelper_isFridayTableToBePopulated_returnsValidSavedValue() {
         boolean expected = true;
-        SUT.setFridayTableToBePopulated(expected);
-        boolean actual = SUT.isFridayTableToBePopulated();
+        SUT.setAlarmSchedulesToBeCreated(expected);
+        boolean actual = SUT.isAlarmSchedulesToBeCreated();
         assertEquals(expected, actual);
     }
 
     @Test
     public void sharedPreferencesHelper_isFridayTableToBePopulated_returnsValidDefaultValue() {
-        boolean actual = SUT.isFridayTableToBePopulated();
+        boolean actual = SUT.isAlarmSchedulesToBeCreated();
         assertEquals(DEFAULT_FRIDAY_TABLE_UPDATE_STATUS, actual);
     }
 

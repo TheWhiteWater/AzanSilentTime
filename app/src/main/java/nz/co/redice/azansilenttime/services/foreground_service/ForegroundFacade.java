@@ -28,21 +28,21 @@ public class ForegroundFacade {
         mAlarmService = alarmService;
         mNotificationService = notificationService;
         mAudioService = audioService;
-        mAlarmService.registerAlarmListener(mNotificationService);
+//        mAlarmService.registerAlarmListener(mNotificationService);
     }
 
     //AlarmManager
 
     public void getSchedulesFromNextTwoDaysStartingFrom(LocalDate now) {
-        mAlarmService.getSchedulesFromNextTwoDaysStartingFrom(now);
+//        mAlarmService.getSchedulesFromNextTwoDaysStartingFrom(now);
     }
 
     public void getSchedulesFromNextTwoFridaysStartingFrom(LocalDate now) {
-        mAlarmService.getSchedulesFromNextTwoFridaysStartingFrom(now);
+//        mAlarmService.getSchedulesFromNextTwoFridaysStartingFrom(now);
     }
 
     public void scheduleWakeUpAlarm() {
-        mAlarmService.setPostAlarmWakeUp();
+//        mAlarmService.setPostAlarmWakeUp();
     }
 
 

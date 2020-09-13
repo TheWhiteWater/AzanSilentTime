@@ -84,14 +84,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             locationPreference.setOnPreferenceClickListener(this);
         }
 
-        Preference mutePeriodPreference = findPreference(MUTE_PERIOD);
-        if (mutePeriodPreference != null) {
-            mutePeriodPreference.setSummaryProvider(preference -> {
-                int prefValue = mSharedPreferencesHelper.getDndPeriod();
-                return prefValue == 60 ? getString(R.string.one_hour) : String.format(Locale.ENGLISH, getString(R.string.mute_period_summary_format), prefValue, getString(R.string.min));
-            });
-            mutePeriodPreference.setOnPreferenceChangeListener(this);
-        }
 
         Preference calculationMethodPreference = findPreference(CALCULATION_METHOD);
         if (calculationMethodPreference != null) {
@@ -132,10 +124,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
-            case MUTE_PERIOD:
-                mSharedPreferencesHelper.setDndPeriod((String) newValue);
-                isDatabaseUpdateRequired = false;
-                break;
             case CALCULATION_METHOD:
                 mSharedPreferencesHelper.setCalculationMethod((String) newValue);
                 isDatabaseUpdateRequired = true;

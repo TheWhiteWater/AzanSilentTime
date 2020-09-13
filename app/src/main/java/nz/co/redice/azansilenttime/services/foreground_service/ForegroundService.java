@@ -62,10 +62,10 @@ public class ForegroundService extends JobIntentService implements SharedPrefere
 
     @SuppressLint("CheckResult")
     private void startObservingAlarmTimings() {
-        if (!mSharedPreferencesHelper.isFridaysOnlyModeActive())
-            mForegroundFacade.getSchedulesFromNextTwoDaysStartingFrom(LocalDate.now());
-        else
-            mForegroundFacade.getSchedulesFromNextTwoFridaysStartingFrom(LocalDate.now());
+//        if (!mSharedPreferencesHelper.isFridaysOnlyModeActive())
+//            mForegroundFacade.getSchedulesFromNextTwoDaysStartingFrom(LocalDate.now());
+//        else
+//            mForegroundFacade.getSchedulesFromNextTwoFridaysStartingFrom(LocalDate.now());
     }
 
     @Override

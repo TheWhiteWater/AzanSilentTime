@@ -24,7 +24,7 @@
     <string name="maghrib">Maghrib</string>
     <string name="isha">Isha</string>
     <string name="friday_prayer">Friday Prayer</string>
-    <string name="friday_prayer_only">Friday Prayer only</string>
+    <string name="friday_prayer_only">show Friday Prayer only</string>
     <string name="check_your_gps_and_internet_text">Check your GPS and \nInternet connections \n and press Locate</string>
     <string name="locate_btn_text">Locate</string>
     <string name="save_btn_text">Save</string>

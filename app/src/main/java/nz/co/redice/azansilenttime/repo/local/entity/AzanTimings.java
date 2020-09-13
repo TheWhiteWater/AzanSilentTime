@@ -6,30 +6,22 @@ import androidx.room.PrimaryKey;
 
 import nz.co.redice.azansilenttime.ui.presentation.Converters;
 
-
-@Entity(tableName = "regular_table")
-public class RegularSchedule {
+@Entity()
+public class AzanTimings {
 
     @PrimaryKey
     private Long date;
-
-    private boolean isFajrMute = true;
-    private boolean isDhuhrMute = true;
-    private boolean isAsrMute = true;
-    private boolean isMaghribMute = true;
-    private boolean isIshaMute = true;
-
     private Long fajrEpochSecond;
     private Long dhuhrEpochSecond;
     private Long asrEpochSecond;
     private Long maghribEpochSecond;
     private Long ishaEpochSecond;
 
-    public RegularSchedule() {
+    public AzanTimings() {
     }
 
     @Ignore
-    public RegularSchedule(Long date, Long fajrEpochSecond, Long dhuhrEpochSecond, Long asrEpochSecond, Long maghribEpochSecond, Long ishaEpochSecond) {
+    public AzanTimings(Long date, Long fajrEpochSecond, Long dhuhrEpochSecond, Long asrEpochSecond, Long maghribEpochSecond, Long ishaEpochSecond) {
         this.date = date;
         this.fajrEpochSecond = fajrEpochSecond;
         this.dhuhrEpochSecond = dhuhrEpochSecond;
@@ -47,45 +39,6 @@ public class RegularSchedule {
         this.date = date;
     }
 
-    public boolean isFajrMute() {
-        return isFajrMute;
-    }
-
-    public void setFajrMute(boolean fajrMute) {
-        isFajrMute = fajrMute;
-    }
-
-    public boolean isDhuhrMute() {
-        return isDhuhrMute;
-    }
-
-    public void setDhuhrMute(boolean dhuhrMute) {
-        isDhuhrMute = dhuhrMute;
-    }
-
-    public boolean isAsrMute() {
-        return isAsrMute;
-    }
-
-    public void setAsrMute(boolean asrMute) {
-        isAsrMute = asrMute;
-    }
-
-    public boolean isMaghribMute() {
-        return isMaghribMute;
-    }
-
-    public void setMaghribMute(boolean maghribMute) {
-        isMaghribMute = maghribMute;
-    }
-
-    public boolean isIshaMute() {
-        return isIshaMute;
-    }
-
-    public void setIshaMute(boolean ishaMute) {
-        isIshaMute = ishaMute;
-    }
 
     public Long getFajrEpochSecond() {
         return fajrEpochSecond;
@@ -123,31 +76,32 @@ public class RegularSchedule {
         return ishaEpochSecond;
     }
 
+
     public void setIshaEpochSecond(Long ishaEpochSecond) {
         this.ishaEpochSecond = ishaEpochSecond;
     }
 
-    public String getFajrTimeText() {
+    public String getFajrTimeInText() {
         return Converters.convertEpochIntoTextTime(fajrEpochSecond);
     }
 
-    public String getDhuhrTimeText() {
+    public String getDhuhrTimeInText() {
         return Converters.convertEpochIntoTextTime(dhuhrEpochSecond);
     }
 
-    public String getAsrTimeText() {
+    public String getAsrTimeInText() {
         return Converters.convertEpochIntoTextTime(asrEpochSecond);
     }
 
-    public String getMaghribTimeText() {
+    public String getMaghribTimeInText() {
         return Converters.convertEpochIntoTextTime(maghribEpochSecond);
     }
 
-    public String getIshaTimeText() {
+    public String getIshaTimeInText() {
         return Converters.convertEpochIntoTextTime(ishaEpochSecond);
     }
 
-    public String getDateText() {
+    public String getDateInText() {
         return Converters.convertEpochIntoTextDate(date);
     }
 

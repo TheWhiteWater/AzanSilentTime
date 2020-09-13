@@ -31,8 +31,8 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.databinding.FragmentHomeBinding;
-import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
-import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
+import nz.co.redice.azansilenttime.repo.local.entity.AlarmSchedule;
+import nz.co.redice.azansilenttime.repo.local.entity.AzanTimings;
 import nz.co.redice.azansilenttime.ui.presentation.DatePickerFragment;
 import nz.co.redice.azansilenttime.ui.presentation.TimePickerFragment;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
@@ -44,8 +44,9 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     @Inject SharedPreferencesHelper mSharedPreferencesHelper;
     private HomeViewModel mViewModel;
     private FragmentHomeBinding mViewBinding;
-    private RegularSchedule mRegularSchedule;
-    private FridaySchedule mFridaySchedule;
+    private AzanTimings mAzanTimings;
+    private AlarmSchedule mAlarmSchedule;
+    private int mTimePickerCalledView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,44 +91,41 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         setLayoutWidgets();
 
-        if (mSharedPreferencesHelper.isRegularTableToBePopulated())
-            mViewModel.populateRegularTable();
+        if (mSharedPreferencesHelper.isAzanTimingsToBePopulated())
+            mViewModel.populateAzanTimings();
         else
-            mViewModel.selectNewRegularEntry(LocalDate.now());
+            mViewModel.selectAzanTimings(LocalDate.now());
 
-        if (mSharedPreferencesHelper.isFridayTableToBePopulated())
-            mViewModel.populateFridayTable();
+        if (mSharedPreferencesHelper.isAlarmSchedulesToBeCreated())
+            mViewModel.createAlarmSchedules();
         else
-            mViewModel.selectNewFridayEntry(LocalDate.now());
+            mViewModel.getAlarmSchedule();
 
-        bindRegularEntry();
-        bindFridayEntry();
+        bindAzanTimings();
+        bindAlarmSchedule();
 
     }
 
-    private void bindRegularEntry() {
-        mViewModel.getRegularObservable().observe(getViewLifecycleOwner(), entry -> {
-            if (entry != null) {
-                registerSwitchListeners(false);
-                setRegularSwitches(entry);
-                mRegularSchedule = entry;
+    private void bindAzanTimings() {
+        mViewModel.getAzanTimingsLiveData().observe(getViewLifecycleOwner(), timings -> {
+            if (timings != null) {
+                mAzanTimings = timings;
                 mViewBinding.invalidateAll();
-                mViewBinding.setEntry(entry);
-                registerSwitchListeners(true);
+                mViewBinding.setAzanTimings(timings);
             }
         });
     }
 
 
-    private void bindFridayEntry() {
-        mViewModel.getFridayEntry().observe(getViewLifecycleOwner(),
-                fridayEntry -> {
-                    if (fridayEntry != null) {
+    private void bindAlarmSchedule() {
+        mViewModel.getAlarmSchedules().observe(getViewLifecycleOwner(),
+                schedule -> {
+                    if (schedule != null) {
                         registerSwitchListeners(false);
-                        setFridaySwitch(fridayEntry);
-                        mFridaySchedule = fridayEntry;
+                        setAlarmSwitches(schedule);
+                        mAlarmSchedule = schedule;
                         mViewBinding.invalidateAll();
-                        mViewBinding.setFriday(fridayEntry);
+                        mViewBinding.setAlarmSchedule(schedule);
                         registerSwitchListeners(true);
                     }
                 });
@@ -137,24 +135,25 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private void setLayoutWidgets() {
         Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-        mViewBinding.setPrefs(mSharedPreferencesHelper);
-        mViewBinding.checkbox.setOnCheckedChangeListener(this);
 
         //setting date picker
         mViewBinding.dateView.setOnClickListener(this::showDatePickerDialog);
-        mViewBinding.fridayCard.setOnClickListener(this::showTimePickerDialog);
+
+        //time pickers
+        mViewBinding.fridayDisplayTime.setOnClickListener(this::showTimePickerDialog);
     }
 
-    private void registerSwitchListeners(boolean isGood2Go) {
-        mViewBinding.fajrSwitch.setOnCheckedChangeListener(isGood2Go ? this : null);
-        mViewBinding.dhuhrSwitch.setOnCheckedChangeListener(isGood2Go ? this : null);
-        mViewBinding.maghribSwitch.setOnCheckedChangeListener(isGood2Go ? this : null);
-        mViewBinding.asrSwitch.setOnCheckedChangeListener(isGood2Go ? this : null);
-        mViewBinding.ishaSwitch.setOnCheckedChangeListener(isGood2Go ? this : null);
-        mViewBinding.fridaySwitch.setOnCheckedChangeListener(isGood2Go ? this : null);
+    private void registerSwitchListeners(boolean flag) {
+        mViewBinding.fajrSwitch.setOnCheckedChangeListener(flag ? this : null);
+        mViewBinding.dhuhrSwitch.setOnCheckedChangeListener(flag ? this : null);
+        mViewBinding.maghribSwitch.setOnCheckedChangeListener(flag ? this : null);
+        mViewBinding.asrSwitch.setOnCheckedChangeListener(flag ? this : null);
+        mViewBinding.ishaSwitch.setOnCheckedChangeListener(flag ? this : null);
+        mViewBinding.fridaySwitch.setOnCheckedChangeListener(flag ? this : null);
     }
 
     private void showTimePickerDialog(View view) {
+        mTimePickerCalledView = view.getId();
         DialogFragment newFragment = new TimePickerFragment(getContext(), this);
         newFragment.show(requireActivity().getSupportFragmentManager(), getString(R.string.fragment_tag_time_picker));
     }
@@ -168,79 +167,75 @@ public class HomeFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onDestroyView() {
         mViewBinding.unbind();
         mViewBinding = null;
-        mViewModel.getRegularObservable().removeObservers(getViewLifecycleOwner());
-        mViewModel.getFridayEntry().removeObservers(getViewLifecycleOwner());
+        mViewModel.getAzanTimingsLiveData().removeObservers(getViewLifecycleOwner());
+        mViewModel.getAlarmSchedules().removeObservers(getViewLifecycleOwner());
         super.onDestroyView();
     }
 
 
-    public void setRegularSwitches(RegularSchedule regularSchedule) {
-        mViewBinding.fajrSwitch.setChecked(regularSchedule.isFajrMute());
-        mViewBinding.dhuhrSwitch.setChecked(regularSchedule.isDhuhrMute());
-        mViewBinding.asrSwitch.setChecked(regularSchedule.isAsrMute());
-        mViewBinding.maghribSwitch.setChecked(regularSchedule.isMaghribMute());
-        mViewBinding.ishaSwitch.setChecked(regularSchedule.isIshaMute());
-    }
+    public void setAlarmSwitches(AlarmSchedule alarmSchedule) {
+        mViewBinding.fajrSwitch.setChecked(alarmSchedule.isFajrMute());
+        mViewBinding.dhuhrSwitch.setChecked(alarmSchedule.isDhuhrMute());
+        mViewBinding.asrSwitch.setChecked(alarmSchedule.isAsrMute());
+        mViewBinding.maghribSwitch.setChecked(alarmSchedule.isMaghribMute());
+        mViewBinding.ishaSwitch.setChecked(alarmSchedule.isIshaMute());
+        mViewBinding.fridaySwitch.setChecked(alarmSchedule.isFridayMute());
 
-    public void setFridaySwitch(FridaySchedule regularEntry) {
-        mViewBinding.fridaySwitch.setChecked(regularEntry.isMute());
     }
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        mViewModel.updateFridaysTable(hourOfDay, minute);
-        mViewModel.selectNewFridayEntry(mFridaySchedule.getDate());
+
+        switch (mTimePickerCalledView) {
+            case R.id.friday_alarm_period:
+                mViewModel.saveFridayAlarmSchedule(hourOfDay, minute);
+
+        }
+
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         LocalDate selectedDate = LocalDate.of(currentYear, ++month, dayOfMonth);
-        if (!mSharedPreferencesHelper.isFridaysOnlyModeActive())
-            mViewModel.selectNewRegularEntry(selectedDate);
-        else
-            mViewModel.selectNewFridayEntry(selectedDate);
+        mViewModel.selectAzanTimings(selectedDate);
     }
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
 
-
         switch (compoundButton.getId()) {
             case R.id.fajr_switch:
-                mRegularSchedule.setFajrMute(!mRegularSchedule.isFajrMute());
-                mViewModel.updateEntry(mRegularSchedule);
+                mAlarmSchedule.setFajrMute(!mAlarmSchedule.isFajrMute());
+                mViewModel.updateAlarmSchedule(mAlarmSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.dhuhr_switch:
-                mRegularSchedule.setDhuhrMute(!mRegularSchedule.isDhuhrMute());
-                mViewModel.updateEntry(mRegularSchedule);
+                mAlarmSchedule.setDhuhrMute(!mAlarmSchedule.isDhuhrMute());
+                mViewModel.updateAlarmSchedule(mAlarmSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.maghrib_switch:
-                mRegularSchedule.setMaghribMute(!mRegularSchedule.isMaghribMute());
-                mViewModel.updateEntry(mRegularSchedule);
+                mAlarmSchedule.setMaghribMute(!mAlarmSchedule.isMaghribMute());
+                mViewModel.updateAlarmSchedule(mAlarmSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.asr_switch:
-                mRegularSchedule.setAsrMute(!mRegularSchedule.isAsrMute());
-                mViewModel.updateEntry(mRegularSchedule);
+                mAlarmSchedule.setAsrMute(!mAlarmSchedule.isAsrMute());
+                mViewModel.updateAlarmSchedule(mAlarmSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.isha_switch:
-                mRegularSchedule.setIshaMute(!mRegularSchedule.isIshaMute());
-                mViewModel.updateEntry(mRegularSchedule);
+                mAlarmSchedule.setIshaMute(!mAlarmSchedule.isIshaMute());
+                mViewModel.updateAlarmSchedule(mAlarmSchedule);
                 mViewBinding.invalidateAll();
                 break;
             case R.id.friday_switch:
-                mFridaySchedule.setMute(!mFridaySchedule.isMute());
-                mViewModel.updateFridayEntry(mFridaySchedule);
+                mAlarmSchedule.setFridayMute(!mAlarmSchedule.isFridayMute());
+                mViewModel.updateAlarmSchedule(mAlarmSchedule);
                 mViewBinding.invalidateAll();
                 break;
-            case R.id.checkbox:
-                mSharedPreferencesHelper.setFridaysOnlyModeActive(isChecked);
-                mViewBinding.invalidateAll();
-                break;
+
         }
 
     }

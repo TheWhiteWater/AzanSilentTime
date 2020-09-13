@@ -12,19 +12,7 @@
     </PreferenceCategory>
 
 
-    <PreferenceCategory app:title="Mute Timings">
-
-        <ListPreference
-            android:entries="@array/dnd_period_entries"
-            android:entryValues="@array/dnd_period_values"
-            android:key="mute_period"
-            android:title="Mute Period"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
-
-    <PreferenceCategory app:title="Request Settings">
+    <PreferenceCategory app:title="Calculation Settings">
 
         <ListPreference
             android:entries="@array/calculation_methods_entries"

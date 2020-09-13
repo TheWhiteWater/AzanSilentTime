@@ -20,10 +20,11 @@ public class TimePickerFragment extends DialogFragment {
     private final TimePickerDialog.OnTimeSetListener mListener;
     private final Context mContext;
 
-    public TimePickerFragment (Context context, TimePickerDialog.OnTimeSetListener listener) {
+    public TimePickerFragment(Context context, TimePickerDialog.OnTimeSetListener listener) {
         mListener = listener;
         mContext = context;
     }
+
     @NotNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class TimePickerFragment extends DialogFragment {
         int minute = c.get(Calendar.MINUTE);
 
         // Create a new instance of TimePickerDialog and return it
-        return new TimePickerDialog(mContext, R.style.HoloDialogTheme, mListener, hour, minute,DateFormat.is24HourFormat(mContext));
+        return new TimePickerDialog(mContext, R.style.HoloDialogTheme, mListener, hour, minute, DateFormat.is24HourFormat(mContext));
     }
 
 

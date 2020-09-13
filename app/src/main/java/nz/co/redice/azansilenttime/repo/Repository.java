@@ -2,16 +2,14 @@ package nz.co.redice.azansilenttime.repo;
 
 import android.annotation.SuppressLint;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import nz.co.redice.azansilenttime.repo.local.EventDao;
-import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
-import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
+import nz.co.redice.azansilenttime.repo.local.entity.AlarmSchedule;
+import nz.co.redice.azansilenttime.repo.local.entity.AzanTimings;
 import nz.co.redice.azansilenttime.repo.remote.AzanService;
 
 public class Repository {
@@ -29,8 +27,8 @@ public class Repository {
         return mAzanService;
     }
 
-    public void insertRegularEntry(RegularSchedule entry) {
-        mDao.insertEntry(entry);
+    public void insertRegularEntry(AzanTimings entry) {
+        mDao.insertAzanTimings(entry);
     }
 
     public void deletePrayerCalendar() {
@@ -39,42 +37,28 @@ public class Repository {
                 .subscribe();
     }
 
-    public RegularSchedule getRegularEntry(Long value) {
-        return mDao.getSelectedRegularEntry(value);
+    public AzanTimings getRegularEntry(Long value) {
+        return mDao.getAzanTimingOnSelectedDay(value);
     }
 
-    public void updateRegularEntry(RegularSchedule model) {
-        mDao.updateEntry(model)
+    @SuppressLint("CheckResult")
+    public void updateAlarmSchedule(AlarmSchedule schedule) {
+        Observable.just(schedule)
                 .subscribeOn(Schedulers.computation())
-                .subscribe();
+                .subscribe(s -> mDao.updateAlarmSchedule(schedule));
     }
 
 
-    public FridaySchedule getFridayEntry(Long value) {
-        return mDao.getSelectedFridayEntry(value);
+    public AlarmSchedule getAlarmSchedule() {
+        return mDao.getAlarmSchedule();
     }
 
 
     @SuppressLint("CheckResult")
-    public void updateFridayEntry(FridaySchedule fridaySchedule) {
-        Observable.just(fridaySchedule)
+    public void insertAlarmSchedule(AlarmSchedule alarmSchedule) {
+        Observable.just(alarmSchedule)
                 .subscribeOn(Schedulers.io())
-                .subscribe(s -> mDao.updateFridayEntry(fridaySchedule));
-    }
-
-    @SuppressLint("CheckResult")
-    public void insertFridayEntry(FridaySchedule fridaySchedule) {
-        Observable.just(fridaySchedule)
-                .subscribeOn(Schedulers.io())
-                .subscribe(mDao::insertFridayEntry);
-    }
-
-    public Observable<List<RegularSchedule>> selectTwoDaysForAlarmSetting(Long startDate, Long endDate) {
-        return mDao.getTwoDaysForAlarmSetting(startDate, endDate);
-    }
-
-    public Observable<List<FridaySchedule>> selectTwoFridaysForAlarmSetting(Long startDate, Long endDate) {
-        return mDao.getTwoFridaysForAlarmSetting(startDate, endDate);
+                .subscribe(mDao::insertAlarmSchedule);
     }
 
 }

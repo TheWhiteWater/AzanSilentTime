@@ -11,20 +11,12 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Locale;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import nz.co.redice.azansilenttime.R;
 import nz.co.redice.azansilenttime.services.foreground_service.ForegroundService;
-import nz.co.redice.azansilenttime.ui.presentation.Converters;
 import nz.co.redice.azansilenttime.utils.SharedPreferencesHelper;
 import nz.co.redice.azansilenttime.ui.MainActivity;
 
@@ -78,28 +70,28 @@ public class NotificationServiceImpl implements NotificationService {
                 .addAction(R.drawable.ic_cancel, context.getString(R.string.notification_quit_button_value), servicePendingIntent)
                 .setContentTitle(context.getString(R.string.notification_content_title))
                 .setContentText(context.getString(R.string.notification_empty_content_text))
-                .setSmallIcon(R.drawable.ic_bell_small);
+                .setSmallIcon(R.drawable.ic_bell_small_color);
     }
 
 
     private void convertTimestampIntoNotificationContextText(Long timing) {
-        if (timing == null) {
-            publishNotificationContextText(mContext.getString(R.string.notification_no_active_alarm_detected));
-            return;
-        }
-        Date date = new Date(timing);
-
-        LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mSharedPreferencesHelper.getDndPeriod());
-
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
-        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
-
-        if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
-            publishNotificationContextText(String.format(mContext.getString(R.string.notification_content_format_today), timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
-        else
-            publishNotificationContextText(String.format( mContext.getString(R.string.notification_content_format_not_today), dayFormatter.format(startMuteTime),
-                    timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
+//        if (timing == null) {
+//            publishNotificationContextText(mContext.getString(R.string.notification_no_active_alarm_detected));
+//            return;
+//        }
+//        Date date = new Date(timing);
+//
+//        LocalDateTime startMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//        LocalDateTime endMuteTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(mSharedPreferencesHelper.getDndPeriod());
+//
+//        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm a", Locale.getDefault());
+//        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault());
+//
+//        if (startMuteTime.getDayOfMonth() == LocalDate.now().getDayOfMonth())
+//            publishNotificationContextText(String.format(mContext.getString(R.string.notification_content_format_today), timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
+//        else
+//            publishNotificationContextText(String.format( mContext.getString(R.string.notification_content_format_not_today), dayFormatter.format(startMuteTime),
+//                    timeFormatter.format(startMuteTime), timeFormatter.format(endMuteTime)));
     }
 
     @Override

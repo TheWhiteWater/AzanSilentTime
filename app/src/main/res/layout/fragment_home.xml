@@ -8,16 +8,12 @@
         <import type="android.view.View" />
 
         <variable
-            name="entry"
-            type="nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule" />
+            name="azanTimings"
+            type="nz.co.redice.azansilenttime.repo.local.entity.AzanTimings" />
 
         <variable
-            name="friday"
-            type="nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule" />
-
-        <variable
-            name="prefs"
-            type="nz.co.redice.azansilenttime.utils.SharedPreferencesHelper" />
+            name="alarmSchedule"
+            type="nz.co.redice.azansilenttime.repo.local.entity.AlarmSchedule" />
 
     </data>
 
@@ -29,354 +25,475 @@
         tools:context=".ui.HomeFragment">
 
 
-        <LinearLayout
-            android:id="@+id/date_card_view"
+        <TextView
+            android:id="@+id/date_view"
+            style="@style/AzanAppTheme.RoundedCard.Date"
+            android:layout_margin="0dp"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/cardview"
-            app:layout_constraintBottom_toTopOf="@id/guideline_top"
+            android:text="@{azanTimings.dateInText}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
+            tools:text="Thu, 23 July 2020" />
 
 
-            <TextView
-                android:id="@+id/date_view"
-                style="@style/AzanAppTheme.RoundedCard.Date"
-                android:text="@{prefs.fridaysOnlyModeActive ? friday.dateString  : entry.dateText}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Thu, 23 July 2020" />
-
-
-        </LinearLayout>
-
-        <androidx.core.widget.ContentLoadingProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:elevation="10dp"
-            android:indeterminate="true"
-            android:visibility="@{entry==null ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fajr_card"
-            style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.fajrMute ? @color/cardview : @color/faded_cardview}"
-            app:layout_constraintBottom_toTopOf="@+id/dhuhr_card"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@+id/guideline_top">
-
-            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
-
-                <TextView
-                    android:id="@+id/fajr_name"
-                    style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="@string/fajr"
-                    app:layout_constraintStart_toStartOf="@+id/fajr_time"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/fajr_time"
-                    style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{entry.fajrTimeText}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/fajr_name"
-                    tools:text="20:20 AM" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/fajr_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{entry.fajrMute}"
-                    android:theme="@style/SwitchTheme"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:useMaterialThemeColors="false" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/dhuhr_card"
-            style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.dhuhrMute ? @color/cardview : @color/faded_cardview}"
-            app:layout_constraintBottom_toTopOf="@+id/asr_card"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@+id/fajr_card">
-
-            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
-
-                <TextView
-                    android:id="@+id/dhuhr_name"
-                    style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="@string/dhuhr"
-                    app:layout_constraintStart_toStartOf="@+id/dhuhr_time"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/dhuhr_time"
-                    style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{entry.dhuhrTimeText}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/dhuhr_name"
-                    tools:text="20:20 AM" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/dhuhr_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{entry.dhuhrMute}"
-                    android:theme="@style/SwitchTheme"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:useMaterialThemeColors="false" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/asr_card"
-            style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.asrMute ? @color/cardview : @color/faded_cardview}"
-            app:layout_constraintBottom_toTopOf="@+id/maghrib_card"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@+id/dhuhr_card">
-
-            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
-
-                <TextView
-                    android:id="@+id/asr_name"
-                    style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="@string/asr"
-                    app:layout_constraintStart_toStartOf="@+id/asr_time"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/asr_time"
-                    style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{entry.asrTimeText}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/asr_name"
-                    tools:text="20:20 AM" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/asr_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{entry.asrMute}"
-                    android:theme="@style/SwitchTheme"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:useMaterialThemeColors="false" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/maghrib_card"
-            style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.maghribMute ? @color/cardview : @color/faded_cardview}"
-            app:layout_constraintBottom_toTopOf="@+id/isha_card"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@+id/asr_card">
-
-            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
-
-                <TextView
-                    android:id="@+id/maghrib_name"
-                    style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="@string/maghrib"
-                    app:layout_constraintStart_toStartOf="@+id/maghrib_time"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/maghrib_time"
-                    style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{entry.maghribTimeText}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/maghrib_name"
-                    tools:text="20:20 AM" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/maghrib_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{entry.maghribMute}"
-                    android:theme="@style/SwitchTheme"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:useMaterialThemeColors="false" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/isha_card"
-            style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{!prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{entry.ishaMute ? @color/cardview : @color/faded_cardview}"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@+id/maghrib_card">
-
-            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
-
-                <TextView
-                    android:id="@+id/isha_name"
-                    style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="@string/isha"
-                    app:layout_constraintStart_toStartOf="@+id/isha_time"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/isha_time"
-                    style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{entry.ishaTimeText}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/isha_name"
-                    tools:text="20:20 AM" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/isha_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{entry.ishaMute}"
-                    android:theme="@style/SwitchTheme"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:useMaterialThemeColors="false" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </com.google.android.material.card.MaterialCardView>
-
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/friday_card"
-            style="@style/AzanAppTheme.RoundedCard"
-            android:visibility="@{prefs.fridaysOnlyModeActive ? View.VISIBLE : View.GONE}"
-            app:cardBackgroundColor="@{friday.isMute() ? @color/cardview : @color/faded_cardview}"
-            app:layout_constraintBottom_toTopOf="@+id/guideline_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toTopOf="@+id/guideline_top">
-
-            <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
-
-                <TextView
-                    android:id="@+id/friday_name"
-                    style="@style/AzanAppTheme.RoundedCard.TimeTitle"
-                    android:text="@string/friday_prayer"
-                    app:layout_constraintStart_toStartOf="@+id/friday_time"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/friday_time"
-                    style="@style/AzanAppTheme.RoundedCard.TimeValue"
-                    android:text="@{friday.timeString}"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/friday_name"
-                    tools:text="20:20 AM" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/friday_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="@{friday.isMute}"
-                    android:theme="@style/SwitchTheme"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:useMaterialThemeColors="false" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <CheckBox
-            android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@{prefs.fridaysOnlyModeActive}"
-            android:text="@string/friday_prayer_only"
-            android:textSize="14sp"
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline_bottom"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintTop_toBottomOf="@+id/date_view">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent=".1" />
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/fajr_card"
+                    style="@style/AzanAppTheme.RoundedCard"
+                    app:cardBackgroundColor="@{alarmSchedule.fajrMute ? @color/cardview : @color/faded_cardview}">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
+
+                        <TextView
+                            android:id="@+id/fajr_name"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:text="@string/fajr"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/fajr_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:layout_marginStart="10dp"
+                            android:text="@{azanTimings.fajrTimeInText}"
+                            android:visibility="@{azanTimings==null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintStart_toEndOf="@+id/fajr_name"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="00:00" />
+
+                        <TextView
+                            android:id="@+id/fajr_display_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="10dp"
+                            android:text="@{alarmSchedule.fajrAlarmTimeScheduled ? alarmSchedule.fajrAlarmTimeInText : azanTimings.fajrTimeInText }"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/fajr_icon"
+                            app:layout_constraintTop_toBottomOf="@+id/fajr_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <ImageView
+                            android:id="@+id/fajr_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_bell_small_white"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="@+id/fajr_display_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/fajr_display_time" />
+
+                        <!--   android:checked="@{alarmSchedules.fajrMute}"-->
+
+                        <TextView
+                            android:id="@+id/fajr_alarm_period"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="5dp"
+                            android:text="@{alarmSchedule.getFajrMutePeriodInText}"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/fajr_display_time"
+                            app:layout_constraintTop_toBottomOf="@+id/fajr_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/fajr_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SwitchTheme"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:useMaterialThemeColors="false" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dhuhr_card"
+                    style="@style/AzanAppTheme.RoundedCard"
+                    app:cardBackgroundColor="@{alarmSchedule.dhuhrMute ? @color/cardview : @color/faded_cardview}">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
+
+                        <TextView
+                            android:id="@+id/dhuhr_name"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:text="@string/dhuhr"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/dhuhr_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:layout_marginStart="10dp"
+                            android:text="@{azanTimings.dhuhrTimeInText}"
+                            android:visibility="@{azanTimings==null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintStart_toEndOf="@+id/dhuhr_name"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="00:00" />
+
+                        <TextView
+                            android:id="@+id/dhuhr_display_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="10dp"
+                            android:text="@{alarmSchedule.dhuhrAlarmTimeScheduled ? alarmSchedule.dhuhrAlarmTimeInText : azanTimings.dhuhrTimeInText }"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/dhuhr_icon"
+                            app:layout_constraintTop_toBottomOf="@+id/dhuhr_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <ImageView
+                            android:id="@+id/dhuhr_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_bell_small_white"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="@+id/dhuhr_display_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/dhuhr_display_time" />
+
+                        <!--   android:checked="@{alarmSchedules.fajrMute}"-->
+
+                        <TextView
+                            android:id="@+id/dhuhr_alarm_period"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="5dp"
+                            android:text="@{alarmSchedule.getDhuhrMutePeriodInText}"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/dhuhr_display_time"
+                            app:layout_constraintTop_toBottomOf="@+id/dhuhr_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/dhuhr_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SwitchTheme"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:useMaterialThemeColors="false" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/asr_card"
+                    style="@style/AzanAppTheme.RoundedCard"
+                    app:cardBackgroundColor="@{alarmSchedule.asrMute ? @color/cardview : @color/faded_cardview}">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
+
+                        <TextView
+                            android:id="@+id/asr_name"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:text="@string/asr"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/asr_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:layout_marginStart="10dp"
+                            android:text="@{azanTimings.asrTimeInText}"
+                            android:visibility="@{azanTimings==null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintStart_toEndOf="@+id/asr_name"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="00:00" />
+
+                        <TextView
+                            android:id="@+id/asr_display_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="10dp"
+                            android:text="@{alarmSchedule.asrAlarmTimeScheduled ? alarmSchedule.asrAlarmTimeInText : azanTimings.asrTimeInText }"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/asr_icon"
+                            app:layout_constraintTop_toBottomOf="@+id/asr_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <ImageView
+                            android:id="@+id/asr_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_bell_small_white"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="@+id/asr_display_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/asr_display_time" />
+
+                        <!--   android:checked="@{alarmSchedules.fajrMute}"-->
+
+                        <TextView
+                            android:id="@+id/asr_alarm_period"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="5dp"
+                            android:text="@{alarmSchedule.getAsrMutePeriodInText}"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/asr_display_time"
+                            app:layout_constraintTop_toBottomOf="@+id/asr_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/asr_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SwitchTheme"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:useMaterialThemeColors="false" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/maghrib_card"
+                    style="@style/AzanAppTheme.RoundedCard"
+                    app:cardBackgroundColor="@{alarmSchedule.maghribMute ? @color/cardview : @color/faded_cardview}">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
+
+                        <TextView
+                            android:id="@+id/maghrib_name"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:text="@string/maghrib"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/maghrib_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:layout_marginStart="10dp"
+                            android:text="@{azanTimings.maghribTimeInText}"
+                            android:visibility="@{azanTimings==null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintStart_toEndOf="@+id/maghrib_name"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="00:00" />
+
+                        <TextView
+                            android:id="@+id/maghrib_display_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="10dp"
+                            android:text="@{alarmSchedule.maghribAlarmTimeScheduled ? alarmSchedule.maghribAlarmTimeInText : azanTimings.maghribTimeInText }"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/maghrib_icon"
+                            app:layout_constraintTop_toBottomOf="@+id/maghrib_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <ImageView
+                            android:id="@+id/maghrib_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_bell_small_white"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="@+id/maghrib_display_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/maghrib_display_time" />
+
+                        <!--   android:checked="@{alarmSchedules.fajrMute}"-->
+
+                        <TextView
+                            android:id="@+id/maghrib_alarm_period"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="5dp"
+                            android:text="@{alarmSchedule.getMaghribMutePeriodInText}"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/maghrib_display_time"
+                            app:layout_constraintTop_toBottomOf="@+id/maghrib_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/maghrib_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SwitchTheme"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:useMaterialThemeColors="false" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/isha_card"
+                    style="@style/AzanAppTheme.RoundedCard"
+                    app:cardBackgroundColor="@{alarmSchedule.ishaMute ? @color/cardview : @color/faded_cardview}">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
+
+                        <TextView
+                            android:id="@+id/isha_name"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:text="@string/isha"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/isha_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:layout_marginStart="10dp"
+                            android:text="@{azanTimings.ishaTimeInText}"
+                            android:visibility="@{azanTimings==null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintStart_toEndOf="@+id/isha_name"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="00:00" />
+
+                        <TextView
+                            android:id="@+id/isha_display_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="10dp"
+                            android:text="@{alarmSchedule.ishaAlarmTimeScheduled ? alarmSchedule.ishaAlarmTimeInText : azanTimings.ishaTimeInText }"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/isha_icon"
+                            app:layout_constraintTop_toBottomOf="@+id/isha_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <ImageView
+                            android:id="@+id/isha_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_bell_small_white"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="@+id/isha_display_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/isha_display_time" />
+
+                        <!--   android:checked="@{alarmSchedules.fajrMute}"-->
+
+                        <TextView
+                            android:id="@+id/isha_alarm_period"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="5dp"
+                            android:text="@{alarmSchedule.getIshaMutePeriodInText}"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/isha_display_time"
+                            app:layout_constraintTop_toBottomOf="@+id/isha_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/isha_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SwitchTheme"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:useMaterialThemeColors="false" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/friday_card"
+                    style="@style/AzanAppTheme.RoundedCard"
+                    app:cardBackgroundColor="@{alarmSchedule.fridayMute ? @color/cardview : @color/faded_cardview}">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout style="@style/cardview_constraint_style">
+
+                        <TextView
+                            android:id="@+id/friday_name"
+                            style="@style/AzanAppTheme.RoundedCard.TimeTitle"
+                            android:text="@string/friday_prayer"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent=".9" />
+                        <TextView
+                            android:id="@+id/friday_display_time"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="10dp"
+                            android:text="@{alarmSchedule.fridayAlarmTimeInText }"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/friday_icon"
+                            app:layout_constraintTop_toBottomOf="@+id/friday_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
 
+                        <ImageView
+                            android:id="@+id/friday_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_bell_small_white"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="@+id/friday_display_time"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/friday_display_time" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent=".1" />
+                        <!--   android:checked="@{alarmSchedules.fajrMute}"-->
 
+                        <TextView
+                            android:id="@+id/friday_alarm_period"
+                            style="@style/AzanAppTheme.RoundedCard.TimeValue"
+                            android:layout_marginStart="5dp"
+                            android:text="@{alarmSchedule.getFridayMutePeriodInText}"
+                            android:visibility="@{azanTimings == null ? View.GONE : View.VISIBLE }"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/friday_display_time"
+                            app:layout_constraintTop_toBottomOf="@+id/friday_name"
+                            app:layout_constraintVertical_bias="0.0"
+                            tools:text="20:20" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent=".9" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/friday_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SwitchTheme"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:useMaterialThemeColors="false" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

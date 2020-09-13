@@ -1,7 +1,6 @@
 package nz.co.redice.azansilenttime.repo.local;
 
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -11,8 +10,8 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import nz.co.redice.azansilenttime.repo.local.entity.FridaySchedule;
-import nz.co.redice.azansilenttime.repo.local.entity.RegularSchedule;
+import nz.co.redice.azansilenttime.repo.local.entity.AlarmSchedule;
+import nz.co.redice.azansilenttime.repo.local.entity.AzanTimings;
 
 import static androidx.room.OnConflictStrategy.REPLACE;
 
@@ -20,36 +19,26 @@ import static androidx.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface EventDao {
 
-    @Insert(onConflict = REPLACE)
-    void insertEntry(RegularSchedule regularSchedule);
-
-    @Update(onConflict = REPLACE)
-    Completable updateEntry(RegularSchedule regularSchedule);
+    //Timings
 
     @Insert(onConflict = REPLACE)
-    void insertFridayEntry(FridaySchedule fridaySchedule);
+    void insertAzanTimings(AzanTimings azanTimings);
 
-    @Update(onConflict = REPLACE)
-    void updateFridayEntry(FridaySchedule fridaySchedule);
+    @Query("SELECT * FROM AzanTimings WHERE date = :selectedDate ")
+    AzanTimings getAzanTimingOnSelectedDay(Long selectedDate);
 
-    @Query("SELECT * FROM friday_table WHERE date = :selectedDate ")
-    FridaySchedule getSelectedFridayEntry(Long selectedDate);
-
-    @Query("SELECT * FROM regular_table WHERE date = :selectedDate ")
-    RegularSchedule getSelectedRegularEntry(Long selectedDate);
-
-    @Query("DELETE FROM regular_table")
+    @Query("DELETE FROM AzanTimings")
     void deleteCalendar();
 
-    @Query("SELECT * FROM regular_table WHERE date BETWEEN :startDate AND :endDate" )
-    io.reactivex.Observable<List<RegularSchedule>> getTwoDaysForAlarmSetting(Long startDate, Long endDate);
+    //Alarms
 
+    @Insert(onConflict = REPLACE)
+    void insertAlarmSchedule(AlarmSchedule alarmSchedule);
 
-    @Query("SELECT * FROM friday_table WHERE date BETWEEN :startDate AND :endDate" )
-    Observable<List<FridaySchedule>> getTwoFridaysForAlarmSetting(Long startDate, Long endDate);
+    @Update(onConflict = REPLACE)
+    Completable updateAlarmSchedule(AlarmSchedule alarmSchedule);
 
-
-
-
+    @Query("SELECT * FROM AlarmSchedule")
+    AlarmSchedule getAlarmSchedule();
 
 }

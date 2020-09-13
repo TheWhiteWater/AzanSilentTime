@@ -1,5 +1,6 @@
 package nz.co.redice.azansilenttime.ui;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mViewBinding.getRoot());
         setSupportActionBar(mViewBinding.toolbar);
         mBindService.startService(this);
+
     }
 
     @Override
